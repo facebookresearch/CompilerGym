@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym/service &mdash; CompilerGym 0.2.2 documentation</title>
+  <title>compiler_gym/service &mdash; CompilerGym 0.2.4 documentation</title>
   
 
   
@@ -73,7 +73,7 @@
             
             
               <div class="version">
-                0.2.2
+                0.2.4
               </div>
             
           
@@ -113,6 +113,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../envs/gcc.html">GCC Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../envs/loop_tool.html">loop_tool Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../envs/mlir.html">MLIR Environment Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul>
@@ -236,7 +237,7 @@
 </pre></div>
 </div>
  </p>
-<p>Subclassed by <a class="reference internal" href="envs/llvm/service.html#classcompiler__gym_1_1llvm__service_1_1_llvm_session"><span class="std std-ref">compiler_gym::llvm_service::LlvmSession</span></a></p>
+<p>Subclassed by <a class="reference internal" href="envs/llvm/service.html#classcompiler__gym_1_1llvm__service_1_1_llvm_session"><span class="std std-ref">compiler_gym::llvm_service::LlvmSession</span></a>, compiler_gym::mlir_service::MlirSession</p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
@@ -252,7 +253,7 @@
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym18CompilationSession15getActionSpacesEv">
-<span id="_CPPv3NK12compiler_gym18CompilationSession15getActionSpacesEv"></span><span id="_CPPv2NK12compiler_gym18CompilationSession15getActionSpacesEv"></span><span id="compiler_gym::CompilationSession::getActionSpacesC"></span><span class="target" id="classcompiler__gym_1_1_compilation_session_1a7d0868a826b654755fb29ef5afba023b"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../rpc.html#_CPPv411ActionSpace" title="ActionSpace"><span class="n"><span class="pre">ActionSpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getActionSpaces</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym18CompilationSession15getActionSpacesEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3NK12compiler_gym18CompilationSession15getActionSpacesEv"></span><span id="_CPPv2NK12compiler_gym18CompilationSession15getActionSpacesEv"></span><span id="compiler_gym::CompilationSession::getActionSpacesC"></span><span class="target" id="classcompiler__gym_1_1_compilation_session_1a8a75cd9e5e78f08b777d0a9b0c6f372b"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../rpc.html#_CPPv411ActionSpace" title="ActionSpace"><span class="n"><span class="pre">ActionSpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getActionSpaces</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym18CompilationSession15getActionSpacesEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>A list of action spaces describing the capabilities of the compiler. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -263,7 +264,7 @@
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym18CompilationSession20getObservationSpacesEv">
-<span id="_CPPv3NK12compiler_gym18CompilationSession20getObservationSpacesEv"></span><span id="_CPPv2NK12compiler_gym18CompilationSession20getObservationSpacesEv"></span><span id="compiler_gym::CompilationSession::getObservationSpacesC"></span><span class="target" id="classcompiler__gym_1_1_compilation_session_1adaa5e622b1d256e2e75574a1967694f1"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../rpc.html#_CPPv416ObservationSpace" title="ObservationSpace"><span class="n"><span class="pre">ObservationSpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getObservationSpaces</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym18CompilationSession20getObservationSpacesEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3NK12compiler_gym18CompilationSession20getObservationSpacesEv"></span><span id="_CPPv2NK12compiler_gym18CompilationSession20getObservationSpacesEv"></span><span id="compiler_gym::CompilationSession::getObservationSpacesC"></span><span class="target" id="classcompiler__gym_1_1_compilation_session_1a165762ced29c1dc6d9b2c381fb2268c6"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../rpc.html#_CPPv416ObservationSpace" title="ObservationSpace"><span class="n"><span class="pre">ObservationSpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getObservationSpaces</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym18CompilationSession20getObservationSpacesEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>A list of feature vectors that this compiler provides. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -382,7 +383,7 @@
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-functions">Protected Functions</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym18CompilationSession16workingDirectoryEv">
-<span id="_CPPv3N12compiler_gym18CompilationSession16workingDirectoryEv"></span><span id="_CPPv2N12compiler_gym18CompilationSession16workingDirectoryEv"></span><span id="compiler_gym::CompilationSession::workingDirectory"></span><span class="target" id="classcompiler__gym_1_1_compilation_session_1a4d3a39ad35f1326338970cc014f5dbfd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">boost</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">filesystem</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">path</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">workingDirectory</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12compiler_gym18CompilationSession16workingDirectoryEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N12compiler_gym18CompilationSession16workingDirectoryEv"></span><span id="_CPPv2N12compiler_gym18CompilationSession16workingDirectoryEv"></span><span id="compiler_gym::CompilationSession::workingDirectory"></span><span class="target" id="classcompiler__gym_1_1_compilation_session_1ac758355c22837a6586f34fba77d72c70"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">boost</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">filesystem</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">path</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">workingDirectory</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12compiler_gym18CompilationSession16workingDirectoryEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Get the working directory. </p>
 <p>The working directory is a local filesystem directory that this <a class="reference internal" href="#classcompiler__gym_1_1_compilation_session"><span class="std std-ref">CompilationSession</span></a> can use to store temporary files such as build artifacts. The directory exists.</p>
 <div class="admonition note">

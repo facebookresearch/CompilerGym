@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.envs.llvm.llvm_env &mdash; CompilerGym 0.2.2 documentation</title>
+  <title>compiler_gym.envs.llvm.llvm_env &mdash; CompilerGym 0.2.4 documentation</title>
   
 
   
@@ -71,7 +71,7 @@
             
             
               <div class="version">
-                0.2.2
+                0.2.4
               </div>
             
           
@@ -111,6 +111,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../envs/gcc.html">GCC Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../envs/loop_tool.html">loop_tool Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../envs/mlir.html">MLIR Environment Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul>
@@ -202,35 +203,55 @@
 <span class="c1">#</span>
 <span class="c1"># This source code is licensed under the MIT license found in the</span>
 <span class="c1"># LICENSE file in the root directory of this source tree.</span>
-<span class="sd">&quot;&quot;&quot;Extensions to the CompilerEnv environment for LLVM.&quot;&quot;&quot;</span>
+<span class="sd">&quot;&quot;&quot;Extensions to the ClientServiceCompilerEnv environment for LLVM.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shlex</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <span class="n">TemporaryDirectory</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">compiler_gym.datasets</span> <span class="kn">import</span> <span class="n">Benchmark</span><span class="p">,</span> <span class="n">BenchmarkInitError</span><span class="p">,</span> <span class="n">Dataset</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.envs.compiler_env</span> <span class="kn">import</span> <span class="n">CompilerEnv</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.datasets</span> <span class="kn">import</span> <span class="n">Benchmark</span><span class="p">,</span> <span class="n">Dataset</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.envs.llvm.benchmark_from_command_line</span> <span class="kn">import</span> <span class="n">BenchmarkFromCommandLine</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.envs.llvm.datasets</span> <span class="kn">import</span> <span class="n">get_llvm_datasets</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.envs.llvm.llvm_benchmark</span> <span class="kn">import</span> <span class="n">ClangInvocation</span><span class="p">,</span> <span class="n">make_benchmark</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.envs.llvm.llvm_benchmark</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ClangInvocation</span><span class="p">,</span>
+    <span class="n">get_system_library_flags</span><span class="p">,</span>
+    <span class="n">make_benchmark</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.envs.llvm.llvm_rewards</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">BaselineImprovementNormalizedReward</span><span class="p">,</span>
     <span class="n">CostFunctionReward</span><span class="p">,</span>
     <span class="n">NormalizedReward</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.errors</span> <span class="kn">import</span> <span class="n">BenchmarkInitError</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.service.client_service_compiler_env</span> <span class="kn">import</span> <span class="n">ClientServiceCompilerEnv</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.spaces</span> <span class="kn">import</span> <span class="n">Box</span><span class="p">,</span> <span class="n">Commandline</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.spaces</span> <span class="kn">import</span> <span class="n">Dict</span> <span class="k">as</span> <span class="n">DictSpace</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.spaces</span> <span class="kn">import</span> <span class="n">Scalar</span><span class="p">,</span> <span class="n">Sequence</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.third_party.autophase</span> <span class="kn">import</span> <span class="n">AUTOPHASE_FEATURE_NAMES</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.third_party.gccinvocation.gccinvocation</span> <span class="kn">import</span> <span class="n">GccInvocation</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.third_party.inst2vec</span> <span class="kn">import</span> <span class="n">Inst2vecEncoder</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.third_party.llvm</span> <span class="kn">import</span> <span class="n">download_llvm_files</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.third_party.llvm</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">clang_path</span><span class="p">,</span>
+    <span class="n">download_llvm_files</span><span class="p">,</span>
+    <span class="n">llvm_link_path</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.third_party.llvm.instcount</span> <span class="kn">import</span> <span class="n">INST_COUNT_FEATURE_NAMES</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.commands</span> <span class="kn">import</span> <span class="n">Popen</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.runfiles_path</span> <span class="kn">import</span> <span class="n">transient_cache_path</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.shell_format</span> <span class="kn">import</span> <span class="n">join_cmd</span>
 
 <span class="n">_INST2VEC_ENCODER</span> <span class="o">=</span> <span class="n">Inst2vecEncoder</span><span class="p">()</span>
 
 
 <span class="n">_LLVM_DATASETS</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dataset</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_get_llvm_datasets</span><span class="p">(</span><span class="n">site_data_base</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Dataset</span><span class="p">]:</span>
@@ -245,11 +266,11 @@
     <span class="k">return</span> <span class="n">get_llvm_datasets</span><span class="p">(</span><span class="n">site_data_base</span><span class="o">=</span><span class="n">site_data_base</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="LlvmEnv"><a class="viewcode-back" href="../../../../compiler_gym/envs.html#compiler_gym.envs.LlvmEnv">[docs]</a><span class="k">class</span> <span class="nc">LlvmEnv</span><span class="p">(</span><span class="n">CompilerEnv</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;A specialized CompilerEnv for LLVM.</span>
+<div class="viewcode-block" id="LlvmEnv"><a class="viewcode-back" href="../../../../compiler_gym/envs.html#compiler_gym.envs.LlvmEnv">[docs]</a><span class="k">class</span> <span class="nc">LlvmEnv</span><span class="p">(</span><span class="n">ClientServiceCompilerEnv</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A specialized ClientServiceCompilerEnv for LLVM.</span>
 
-<span class="sd">    This extends the default :class:`CompilerEnv</span>
-<span class="sd">    &lt;compiler_gym.envs.CompilerEnv&gt;` environment, adding extra LLVM</span>
+<span class="sd">    This extends the default :class:`ClientServiceCompilerEnv</span>
+<span class="sd">    &lt;compiler_gym.envs.ClientServiceCompilerEnv&gt;` environment, adding extra LLVM</span>
 <span class="sd">    functionality. Specifically, the actions use the :class:`CommandlineFlag</span>
 <span class="sd">    &lt;compiler_gym.spaces.CommandlineFlag&gt;` space, which is a type of</span>
 <span class="sd">    :code:`Discrete` space that provides additional documentation about each</span>
@@ -578,7 +599,7 @@
 <span class="sd">            You must ensure that any :code:`.bc` and :code:`.ll` files are</span>
 <span class="sd">            compatible with the LLVM version used by CompilerGym, which can be</span>
 <span class="sd">            reported using :func:`env.compiler_version</span>
-<span class="sd">            &lt;compiler_gym.envs.CompilerEnv.compiler_version&gt;`.</span>
+<span class="sd">            &lt;compiler_gym.envs.ClientServiceCompilerEnv.compiler_version&gt;`.</span>
 
 <span class="sd">        E.g. for single-source C/C++ programs, you can pass the path of the source</span>
 <span class="sd">        file:</span>
@@ -817,7 +838,196 @@
             <span class="n">fkd</span><span class="o">.</span><span class="n">runtime_observation_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runtime_observation_count</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">runtime_warmup_runs_count</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">fkd</span><span class="o">.</span><span class="n">runtime_warmup_runs_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runtime_warmup_runs_count</span>
-        <span class="k">return</span> <span class="n">fkd</span></div></div>
+        <span class="k">return</span> <span class="n">fkd</span></div>
+
+<div class="viewcode-block" id="LlvmEnv.make_benchmark_from_command_line"><a class="viewcode-back" href="../../../../compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.make_benchmark_from_command_line">[docs]</a>    <span class="k">def</span> <span class="nf">make_benchmark_from_command_line</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">cmd</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+        <span class="n">replace_driver</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">system_includes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">600</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Benchmark</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Create a benchmark for use with this environment.</span>
+
+<span class="sd">        This function takes a command line compiler invocation as input,</span>
+<span class="sd">        modifies it to produce an unoptimized LLVM-IR bitcode, and then runs the</span>
+<span class="sd">        modified command line to produce a bitcode benchmark.</span>
+
+<span class="sd">        For example, the command line:</span>
+
+<span class="sd">            &gt;&gt;&gt; benchmark = env.make_benchmark_from_command_line(</span>
+<span class="sd">            ...     [&quot;gcc&quot;, &quot;-DNDEBUG&quot;, &quot;a.c&quot;, &quot;b.c&quot;, &quot;-o&quot;, &quot;foo&quot;, &quot;-lm&quot;]</span>
+<span class="sd">            ... )</span>
+
+<span class="sd">        Will compile a.c and b.c to an unoptimized benchmark that can be then</span>
+<span class="sd">        passed to :meth:`reset() &lt;compiler_env.envs.CompilerEnv.reset&gt;`.</span>
+
+<span class="sd">        The way this works is to change the first argument of the command line</span>
+<span class="sd">        invocation to the version of clang shipped with CompilerGym, and to then</span>
+<span class="sd">        append command line flags that causes the compiler to produce LLVM-IR</span>
+<span class="sd">        with optimizations disabled. For example the input command line:</span>
+
+<span class="sd">        .. code-block::</span>
+
+<span class="sd">            gcc -DNDEBUG a.c b.c -o foo -lm</span>
+
+<span class="sd">        Will be rewritten to be roughly equivalent to:</span>
+
+<span class="sd">        .. code-block::</span>
+
+<span class="sd">            /path/to/compiler_gym/clang -DNDEG a.c b.c \\</span>
+<span class="sd">                -Xclang -disable-llvm-passes -Xclang -disable-llvm-optzns \\ -c</span>
+<span class="sd">                -emit-llvm  -o -</span>
+
+<span class="sd">        The generated benchmark then has a method :meth:`compile()</span>
+<span class="sd">        &lt;compiler_env.envs.llvm.BenchmarkFromCommandLine.compile&gt;` which</span>
+<span class="sd">        completes the linking and compilatilion to executable. For the above</span>
+<span class="sd">        example, this would be roughly equivalent to:</span>
+
+<span class="sd">        .. code-block::</span>
+
+<span class="sd">            /path/to/compiler_gym/clang environment-bitcode.bc -o foo -lm</span>
+
+<span class="sd">        :param cmd: A command line compiler invocation, either as a list of</span>
+<span class="sd">            arguments (e.g. :code:`[&quot;clang&quot;, &quot;in.c&quot;]`) or as a single shell</span>
+<span class="sd">            string (e.g. :code:`&quot;clang in.c&quot;`).</span>
+
+<span class="sd">        :param replace_driver: Whether to replace the first argument of the</span>
+<span class="sd">            command with the clang driver used by this environment.</span>
+
+<span class="sd">        :param system_includes: Whether to include the system standard libraries</span>
+<span class="sd">            during compilation jobs. This requires a system toolchain. See</span>
+<span class="sd">            :func:`get_system_library_flags`.</span>
+
+<span class="sd">        :param timeout: The maximum number of seconds to allow the compilation</span>
+<span class="sd">            job to run before terminating.</span>
+
+<span class="sd">        :return: A :class:`BenchmarkFromCommandLine</span>
+<span class="sd">            &lt;compiler_gym.envs.llvm.BenchmarkFromCommandLine&gt;` instance.</span>
+
+<span class="sd">        :raises ValueError: If no command line is provided.</span>
+
+<span class="sd">        :raises BenchmarkInitError: If executing the command line fails.</span>
+
+<span class="sd">        :raises TimeoutExpired: If a compilation job exceeds :code:`timeout`</span>
+<span class="sd">            seconds.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cmd</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Input command line is empty&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Split the command line if passed a single string.</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">cmd</span> <span class="o">=</span> <span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+
+        <span class="n">rewritten_cmd</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">cmd</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Input command line &#39;</span><span class="si">{</span><span class="n">join_cmd</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span><span class="si">}</span><span class="s2">&#39; is too short&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Append include flags for the system headers if requested.</span>
+        <span class="k">if</span> <span class="n">system_includes</span><span class="p">:</span>
+            <span class="n">rewritten_cmd</span> <span class="o">+=</span> <span class="n">get_system_library_flags</span><span class="p">()</span>
+
+        <span class="c1"># Use the CompilerGym clang binary in place of the original driver.</span>
+        <span class="k">if</span> <span class="n">replace_driver</span><span class="p">:</span>
+            <span class="n">rewritten_cmd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">clang_path</span><span class="p">())</span>
+
+        <span class="c1"># Strip the -S flag, if present, as that changes the output format.</span>
+        <span class="n">rewritten_cmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">rewritten_cmd</span> <span class="k">if</span> <span class="n">c</span> <span class="o">!=</span> <span class="s2">&quot;-S&quot;</span><span class="p">]</span>
+
+        <span class="n">invocation</span> <span class="o">=</span> <span class="n">GccInvocation</span><span class="p">(</span><span class="n">rewritten_cmd</span><span class="p">)</span>
+
+        <span class="c1"># Strip the output specifier(s). This is not strictly required since we</span>
+        <span class="c1"># override it later, but makes the generated command easier to</span>
+        <span class="c1"># understand.</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rewritten_cmd</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">rewritten_cmd</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;-o&quot;</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">rewritten_cmd</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="k">del</span> <span class="n">rewritten_cmd</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+        <span class="c1"># Fail early.</span>
+        <span class="k">if</span> <span class="s2">&quot;-&quot;</span> <span class="ow">in</span> <span class="n">invocation</span><span class="o">.</span><span class="n">sources</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Input command line reads from stdin, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;which is not supported: &#39;</span><span class="si">{</span><span class="n">join_cmd</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Convert all of the C/C++ sources to bitcodes which can then be linked</span>
+        <span class="c1"># into a single bitcode. We must process them individually because the</span>
+        <span class="c1"># &#39;-c&#39; flag does not support multiple sources when we are specifying the</span>
+        <span class="c1"># output path using &#39;-o&#39;.</span>
+        <span class="n">sources</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">invocation</span><span class="o">.</span><span class="n">sources</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">s</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.o&quot;</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">sources</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Input command line has no source file inputs: &#39;</span><span class="si">{</span><span class="n">join_cmd</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">bitcodes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">source</span> <span class="ow">in</span> <span class="n">sources</span><span class="p">:</span>
+            <span class="c1"># Adapt and execute the command line so that it will generate an</span>
+            <span class="c1"># unoptimized bitecode file.</span>
+            <span class="n">emit_bitcode_command</span> <span class="o">=</span> <span class="n">rewritten_cmd</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+            <span class="c1"># Strip the name of other sources:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sources</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">emit_bitcode_command</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">emit_bitcode_command</span> <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="n">source</span> <span class="ow">or</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sources</span>
+                <span class="p">]</span>
+
+            <span class="c1"># Append the flags to emit the bitcode and disable the optimization</span>
+            <span class="c1"># passes.</span>
+            <span class="n">emit_bitcode_command</span> <span class="o">+=</span> <span class="p">[</span>
+                <span class="s2">&quot;-c&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;-emit-llvm&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;-o&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;-&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;-Xclang&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;-disable-llvm-passes&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;-Xclang&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;-disable-llvm-optzns&quot;</span><span class="p">,</span>
+            <span class="p">]</span>
+
+            <span class="k">with</span> <span class="n">Popen</span><span class="p">(</span>
+                <span class="n">emit_bitcode_command</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span>
+            <span class="p">)</span> <span class="k">as</span> <span class="n">clang</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Generating LLVM bitcode benchmark: </span><span class="si">{</span><span class="n">join_cmd</span><span class="p">(</span><span class="n">emit_bitcode_command</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+                <span class="n">bitcode</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">clang</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">clang</span><span class="o">.</span><span class="n">returncode</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">BenchmarkInitError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Failed to generate LLVM bitcode with error:</span><span class="se">\n</span><span class="s2">&quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stderr</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;Running command: </span><span class="si">{</span><span class="n">join_cmd</span><span class="p">(</span><span class="n">emit_bitcode_command</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;From original commandline: </span><span class="si">{</span><span class="n">join_cmd</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+                <span class="n">bitcodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bitcode</span><span class="p">)</span>
+
+        <span class="c1"># If there were multiple sources then link the bitcodes together.</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bitcodes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">TemporaryDirectory</span><span class="p">(</span>
+                <span class="nb">dir</span><span class="o">=</span><span class="n">transient_cache_path</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">),</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;llvm-benchmark-&quot;</span>
+            <span class="p">)</span> <span class="k">as</span> <span class="nb">dir</span><span class="p">:</span>
+                <span class="c1"># Write the bitcodes to files.</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">bitcode</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bitcodes</span><span class="p">):</span>
+                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.bc&quot;</span><span class="p">),</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">bitcode</span><span class="p">)</span>
+
+                <span class="c1"># Link the bitcode files.</span>
+                <span class="n">llvm_link_cmd</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">llvm_link_path</span><span class="p">()),</span> <span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.bc&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bitcodes</span><span class="p">))</span>
+                <span class="p">]</span>
+                <span class="k">with</span> <span class="n">Popen</span><span class="p">(</span>
+                    <span class="n">llvm_link_cmd</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span>
+                <span class="p">)</span> <span class="k">as</span> <span class="n">llvm_link</span><span class="p">:</span>
+                    <span class="n">bitcode</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">llvm_link</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">llvm_link</span><span class="o">.</span><span class="n">returncode</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">BenchmarkInitError</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Failed to link LLVM bitcodes with error: </span><span class="si">{</span><span class="n">stderr</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">BenchmarkFromCommandLine</span><span class="p">(</span><span class="n">invocation</span><span class="p">,</span> <span class="n">bitcode</span><span class="p">,</span> <span class="n">timeout</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

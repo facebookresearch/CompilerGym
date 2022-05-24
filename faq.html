@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Frequently Asked Questions &mdash; CompilerGym 0.2.2 documentation</title>
+  <title>Frequently Asked Questions &mdash; CompilerGym 0.2.4 documentation</title>
   
 
   
@@ -73,7 +73,7 @@
             
             
               <div class="version">
-                0.2.2
+                0.2.4
               </div>
             
           
@@ -111,14 +111,16 @@
 <li class="toctree-l3"><a class="reference internal" href="#what-can-i-do-with-this">What can I do with this?</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#do-i-have-to-use-reinforcement-learning">Do I have to use reinforcement learning?</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#why-does-my-environment-s-step-function-return-done">Why does my environment’s step() function return “done”?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#where-does-compilergym-store-files">Where does CompilerGym store files?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#do-i-need-to-call-env-close">Do I need to call env.close()?</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#how-do-i-debug-crashes-or-errors">How do I debug crashes or errors?</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#i-found-a-bug-how-do-i-report-it">I found a bug. How do I report it?</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#development">Development</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#what-features-are-going-to-be-added-in-the-future">What features are going to be added in the future?</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#i-want-to-modify-a-compilergym-environment-where-do-i-start">I want to modify a CompilerGym environment, where do I start?</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#i-want-to-add-a-new-compilergym-environment-where-do-i-start">I want to add a new CompilerGym environment, where do I start?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#i-want-to-modify-one-of-the-environments-where-do-i-start">I want to modify one of the environments, where do I start?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#i-want-to-add-a-new-compiler-environment-where-do-i-start">I want to add a new compiler environment, where do I start?</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#i-updated-with-git-pull-and-now-it-doesn-t-work">I updated with “git pull” and now it doesn’t work</a></li>
 </ul>
 </li>
@@ -130,6 +132,7 @@
 <li class="toctree-l1"><a class="reference internal" href="llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="envs/gcc.html">GCC Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="envs/loop_tool.html">loop_tool Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="envs/mlir.html">MLIR Environment Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul>
@@ -230,16 +233,18 @@ question not answered here? File an issue on the <a class="reference external" h
 <li><p><a class="reference internal" href="#what-can-i-do-with-this" id="id4">What can I do with this?</a></p></li>
 <li><p><a class="reference internal" href="#do-i-have-to-use-reinforcement-learning" id="id5">Do I have to use reinforcement learning?</a></p></li>
 <li><p><a class="reference internal" href="#why-does-my-environment-s-step-function-return-done" id="id6">Why does my environment’s step() function return “done”?</a></p></li>
-<li><p><a class="reference internal" href="#how-do-i-debug-crashes-or-errors" id="id7">How do I debug crashes or errors?</a></p></li>
-<li><p><a class="reference internal" href="#i-found-a-bug-how-do-i-report-it" id="id8">I found a bug. How do I report it?</a></p></li>
+<li><p><a class="reference internal" href="#where-does-compilergym-store-files" id="id7">Where does CompilerGym store files?</a></p></li>
+<li><p><a class="reference internal" href="#do-i-need-to-call-env-close" id="id8">Do I need to call env.close()?</a></p></li>
+<li><p><a class="reference internal" href="#how-do-i-debug-crashes-or-errors" id="id9">How do I debug crashes or errors?</a></p></li>
+<li><p><a class="reference internal" href="#i-found-a-bug-how-do-i-report-it" id="id10">I found a bug. How do I report it?</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#development" id="id9">Development</a></p>
+<li><p><a class="reference internal" href="#development" id="id11">Development</a></p>
 <ul>
-<li><p><a class="reference internal" href="#what-features-are-going-to-be-added-in-the-future" id="id10">What features are going to be added in the future?</a></p></li>
-<li><p><a class="reference internal" href="#i-want-to-modify-a-compilergym-environment-where-do-i-start" id="id11">I want to modify a CompilerGym environment, where do I start?</a></p></li>
-<li><p><a class="reference internal" href="#i-want-to-add-a-new-compilergym-environment-where-do-i-start" id="id12">I want to add a new CompilerGym environment, where do I start?</a></p></li>
-<li><p><a class="reference internal" href="#i-updated-with-git-pull-and-now-it-doesn-t-work" id="id13">I updated with “git pull” and now it doesn’t work</a></p></li>
+<li><p><a class="reference internal" href="#what-features-are-going-to-be-added-in-the-future" id="id12">What features are going to be added in the future?</a></p></li>
+<li><p><a class="reference internal" href="#i-want-to-modify-one-of-the-environments-where-do-i-start" id="id13">I want to modify one of the environments, where do I start?</a></p></li>
+<li><p><a class="reference internal" href="#i-want-to-add-a-new-compiler-environment-where-do-i-start" id="id14">I want to add a new compiler environment, where do I start?</a></p></li>
+<li><p><a class="reference internal" href="#i-updated-with-git-pull-and-now-it-doesn-t-work" id="id15">I updated with “git pull” and now it doesn’t work</a></p></li>
 </ul>
 </li>
 </ul>
@@ -294,8 +299,56 @@ error through a string <code class="code docutils literal notranslate"><span cla
 <p>In either case, calling <a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.reset" title="compiler_gym.envs.CompilerEnv.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.reset()</span></code></a> will reset the environment and start a
 new episode.</p>
 </div>
+<div class="section" id="where-does-compilergym-store-files">
+<h3><a class="toc-backref" href="#id7">Where does CompilerGym store files?</a><a class="headerlink" href="#where-does-compilergym-store-files" title="Permalink to this headline">¶</a></h3>
+<p>CompilerGym is a python library, and is located in the <a class="reference external" href="https://docs.python.org/3/library/site.html#site.getsitepackages">site packages</a> directory.
+Remove it using <code class="code docutils literal notranslate"><span class="pre">pip</span> <span class="pre">uninstall</span> <span class="pre">compiler_gym</span></code>. In addition, CompilerGym
+uses the following file system locations to store files:</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">~/.local/cache/compiler_gym</span></code> is used to cache files such as downloaded
+datasets. Set environment variable <code class="code docutils literal notranslate"><span class="pre">$COMPILER_GYM_CACHE</span></code> to override
+this default location.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">~/.local/share/compiler_gym</span></code> is used to store additional datasets and
+files that are not included in the core CompilerGym library. Set environment
+variable <code class="code docutils literal notranslate"><span class="pre">$COMPILER_GYM_SITE_DATA</span></code> to override this default location.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">/dev/shm/compiler_gym_${USER}</span></code> is used as an in-memory cache on Linux
+systems which support it. Files in this cache are should not outlive the
+lifespan of the CompilerGym environments that created them. Set environment
+variable <code class="code docutils literal notranslate"><span class="pre">$COMPILER_GYM_TRANSIENT_CACHE</span></code> to override this default
+location.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">~/logs/compiler_gym</span></code> is used by some of the example scripts to store
+logs and experiment artifacts. Set environment variable
+<code class="code docutils literal notranslate"><span class="pre">$COMPILER_GYM_LOGS</span></code> to override this default location.</p></li>
+</ul>
+<p>It is perfectly safe to delete all of the above directories, so long as there
+are no active Python processes using CompilerGym. After deleting the above
+directories, you may notice a delay the next time you launch a CompilerGym
+environment as files and datasets are re-downloaded and unpacked.</p>
+</div>
+<div class="section" id="do-i-need-to-call-env-close">
+<h3><a class="toc-backref" href="#id8">Do I need to call env.close()?</a><a class="headerlink" href="#do-i-need-to-call-env-close" title="Permalink to this headline">¶</a></h3>
+<p>Yes! You must ensure that <a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.close" title="compiler_gym.envs.CompilerEnv.close"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.close()</span></code></a> is called once you are done with an
+environment. This is because CompilerGym environments may launch subprocesses
+and create temporary files that must be tidied up when the environment is
+discarded. We recommend using the <code class="code docutils literal notranslate"><span class="pre">with</span></code>-statement pattern for creating
+environments:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;llvm-v0&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">env</span><span class="p">:</span>
+<span class="gp">... </span>   <span class="k">pass</span>  <span class="c1"># use env how you like</span>
+</pre></div>
+</div>
+<p>This removes the need to call <code class="xref py py-meth docutils literal notranslate"><span class="pre">env.close()</span></code> yourself since it is closed
+automatically when leaving the scope of the <code class="code docutils literal notranslate"><span class="pre">with</span></code>-statement. If this is
+not possible, use <code class="code docutils literal notranslate"><span class="pre">try</span></code>/<code class="code docutils literal notranslate"><span class="pre">finally</span></code> blocks:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span> <span class="o">=</span> <span class="n">compiler_gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;llvm-v0&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">pass</span>  <span class="c1"># use env how you like</span>
+<span class="gp">... </span><span class="k">finally</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">env</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
 <div class="section" id="how-do-i-debug-crashes-or-errors">
-<h3><a class="toc-backref" href="#id7">How do I debug crashes or errors?</a><a class="headerlink" href="#how-do-i-debug-crashes-or-errors" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id9">How do I debug crashes or errors?</a><a class="headerlink" href="#how-do-i-debug-crashes-or-errors" title="Permalink to this headline">¶</a></h3>
 <p>The first step is to produce a minimal, reproducible example. The easiest way to
 do this is usually to copy your code into a new file and to iteratively remove
 as many dependencies and chunks of code as possible while still preserving the
@@ -331,19 +384,19 @@ variable <code class="code docutils literal notranslate"><span class="pre">COMPI
 incredibly helpful when reporting bugs. See <a class="reference internal" href="#report-bug"><span class="std std-ref">I found a bug. How do I report it?</span></a>.</p>
 </div>
 <div class="section" id="i-found-a-bug-how-do-i-report-it">
-<span id="report-bug"></span><h3><a class="toc-backref" href="#id8">I found a bug. How do I report it?</a><a class="headerlink" href="#i-found-a-bug-how-do-i-report-it" title="Permalink to this headline">¶</a></h3>
+<span id="report-bug"></span><h3><a class="toc-backref" href="#id10">I found a bug. How do I report it?</a><a class="headerlink" href="#i-found-a-bug-how-do-i-report-it" title="Permalink to this headline">¶</a></h3>
 <p>Great! Please file an issue using the <a class="reference external" href="https://github.com/facebookresearch/CompilerGym/issues">GitHub issue tracker</a>.  See
 <a class="reference internal" href="contributing.html"><span class="doc">Contributing</span></a> for more details.</p>
 </div>
 </div>
 <div class="section" id="development">
-<h2><a class="toc-backref" href="#id9">Development</a><a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id11">Development</a><a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="what-features-are-going-to-be-added-in-the-future">
-<h3><a class="toc-backref" href="#id10">What features are going to be added in the future?</a><a class="headerlink" href="#what-features-are-going-to-be-added-in-the-future" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id12">What features are going to be added in the future?</a><a class="headerlink" href="#what-features-are-going-to-be-added-in-the-future" title="Permalink to this headline">¶</a></h3>
 <p>See <a class="reference internal" href="about.html#roadmap"><span class="std std-ref">roadmap</span></a>.</p>
 </div>
-<div class="section" id="i-want-to-modify-a-compilergym-environment-where-do-i-start">
-<h3><a class="toc-backref" href="#id11">I want to modify a CompilerGym environment, where do I start?</a><a class="headerlink" href="#i-want-to-modify-a-compilergym-environment-where-do-i-start" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="i-want-to-modify-one-of-the-environments-where-do-i-start">
+<h3><a class="toc-backref" href="#id13">I want to modify one of the environments, where do I start?</a><a class="headerlink" href="#i-want-to-modify-one-of-the-environments-where-do-i-start" title="Permalink to this headline">¶</a></h3>
 <p>Many modifications to CompilerGym environments can be achieved through
 <a class="reference internal" href="compiler_gym/wrappers.html#module-compiler_gym.wrappers" title="compiler_gym.wrappers"><code class="xref py py-mod docutils literal notranslate"><span class="pre">wrappers</span></code></a>. For example, you can use the existing
 wrappers to artificially limit the length of episodes using <a class="reference internal" href="compiler_gym/wrappers.html#compiler_gym.wrappers.TimeLimit" title="compiler_gym.wrappers.TimeLimit"><code class="xref py py-class docutils literal notranslate"><span class="pre">TimeLimit</span></code></a>, constrain the actions available to the agent
@@ -361,15 +414,15 @@ interested in. The service codebase is located at
 of the compiler service you would wish to modify, e.g.
 <code class="code docutils literal notranslate"><span class="pre">compiler_gym/envs/llvm/service</span></code> for the <a class="reference internal" href="llvm/index.html"><span class="doc">LLVM environment</span></a>. Once done, send us a pull request!</p>
 </div>
-<div class="section" id="i-want-to-add-a-new-compilergym-environment-where-do-i-start">
-<h3><a class="toc-backref" href="#id12">I want to add a new CompilerGym environment, where do I start?</a><a class="headerlink" href="#i-want-to-add-a-new-compilergym-environment-where-do-i-start" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="i-want-to-add-a-new-compiler-environment-where-do-i-start">
+<h3><a class="toc-backref" href="#id14">I want to add a new compiler environment, where do I start?</a><a class="headerlink" href="#i-want-to-add-a-new-compiler-environment-where-do-i-start" title="Permalink to this headline">¶</a></h3>
 <p>To add a new environment, you must implement the <a class="reference internal" href="compiler_gym/service.html#compiler_gym.service.CompilationSession" title="compiler_gym.service.CompilationSession"><code class="xref py py-class docutils literal notranslate"><span class="pre">CompilationSession</span></code></a> interface to provide a new
 compilation service, and then register this service with the CompilerGym
 frontend. The whole process takes less than 200 lines of code. Full end-to-end
 examples are provided for both Python and C++ in the <a class="reference external" href="https://github.com/facebookresearch/CompilerGym/tree/development/examples/example_compiler_gym_service">examples directory</a>. Once done, send us a pull request!</p>
 </div>
 <div class="section" id="i-updated-with-git-pull-and-now-it-doesn-t-work">
-<h3><a class="toc-backref" href="#id13">I updated with “git pull” and now it doesn’t work</a><a class="headerlink" href="#i-updated-with-git-pull-and-now-it-doesn-t-work" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id15">I updated with “git pull” and now it doesn’t work</a><a class="headerlink" href="#i-updated-with-git-pull-and-now-it-doesn-t-work" title="Permalink to this headline">¶</a></h3>
 <p>The first thing to is to re-run <code class="code docutils literal notranslate"><span class="pre">make</span> <span class="pre">init</span></code> to ensure that you have the
 correct development dependencies installed, as those can change between
 releases. Then run <code class="code docutils literal notranslate"><span class="pre">make</span> <span class="pre">distclean</span></code> to tidy up any build artifacts from

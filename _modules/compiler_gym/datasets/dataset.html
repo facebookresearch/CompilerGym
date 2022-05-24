@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.datasets.dataset &mdash; CompilerGym 0.2.3 documentation</title>
+  <title>compiler_gym.datasets.dataset &mdash; CompilerGym 0.2.4 documentation</title>
   
 
   
@@ -71,7 +71,7 @@
             
             
               <div class="version">
-                0.2.3
+                0.2.4
               </div>
             
           
@@ -111,6 +111,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../envs/gcc.html">GCC Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../envs/loop_tool.html">loop_tool Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../envs/mlir.html">MLIR Environment Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul>
@@ -216,6 +217,7 @@
 <span class="c1"># this import to prevent shadowing.</span>
 <span class="kn">from</span> <span class="nn">deprecated.sphinx</span> <span class="kn">import</span> <span class="n">deprecated</span> <span class="k">as</span> <span class="n">mark_deprecated</span>
 
+<span class="kn">import</span> <span class="nn">compiler_gym.errors</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets.benchmark</span> <span class="kn">import</span> <span class="n">Benchmark</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets.uri</span> <span class="kn">import</span> <span class="n">BenchmarkUri</span>
 
@@ -680,8 +682,10 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">benchmark</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="DatasetInitError"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.DatasetInitError">[docs]</a><span class="k">class</span> <span class="nc">DatasetInitError</span><span class="p">(</span><span class="ne">OSError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Base class for errors raised if a dataset fails to initialize.&quot;&quot;&quot;</span></div>
+<span class="c1"># Deprecated since v0.2.4.</span>
+<span class="c1"># This type is for backwards compatibility that will be removed in a future release.</span>
+<span class="c1"># Please, use errors from `compiler_gym.errors`.</span>
+<span class="n">DatasetInitError</span> <span class="o">=</span> <span class="n">compiler_gym</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">DatasetInitError</span>
 
 
 <span class="nd">@mark_deprecated</span><span class="p">(</span>

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.views.observation_space_spec &mdash; CompilerGym 0.2.2 documentation</title>
+  <title>compiler_gym.views.observation_space_spec &mdash; CompilerGym 0.2.4 documentation</title>
   
 
   
@@ -71,7 +71,7 @@
             
             
               <div class="version">
-                0.2.2
+                0.2.4
               </div>
             
           
@@ -111,6 +111,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../envs/gcc.html">GCC Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../envs/loop_tool.html">loop_tool Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../envs/mlir.html">MLIR Environment Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul>
@@ -282,15 +283,17 @@
 
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Equality check.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="n">ObservationSpaceSpec</span><span class="p">):</span>
-            <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">return</span> <span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">id</span>
-            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">index</span>
-            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">space</span>
-            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">platform_dependent</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">platform_dependent</span>
-            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">deterministic</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">deterministic</span>
-        <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">rhs</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="n">ObservationSpaceSpec</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">id</span>
+                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">index</span>
+                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">space</span>
+                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">platform_dependent</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">platform_dependent</span>
+                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">deterministic</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">deterministic</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_proto</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">proto</span><span class="p">:</span> <span class="n">ObservationSpace</span><span class="p">):</span>
@@ -304,7 +307,7 @@
 <span class="sd">        :raises ValueError: If protocol buffer is invalid.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">spec</span> <span class="o">=</span> <span class="n">ObservationSpaceSpec</span><span class="o">.</span><span class="n">message_converter</span><span class="p">(</span><span class="n">proto</span><span class="o">.</span><span class="n">space</span><span class="p">)</span>
+            <span class="n">spec</span> <span class="o">=</span> <span class="n">ObservationSpaceSpec</span><span class="o">.</span><span class="n">message_converter</span><span class="p">(</span><span class="n">proto</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Error interpreting description of observation space &#39;</span><span class="si">{</span><span class="n">proto</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;.</span><span class="se">\n</span><span class="s2">&quot;</span>

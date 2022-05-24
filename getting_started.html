@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Getting Started &mdash; CompilerGym 0.2.2 documentation</title>
+  <title>Getting Started &mdash; CompilerGym 0.2.4 documentation</title>
   
 
   
@@ -73,7 +73,7 @@
             
             
               <div class="version">
-                0.2.2
+                0.2.4
               </div>
             
           
@@ -124,6 +124,7 @@
 <li class="toctree-l1"><a class="reference internal" href="llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="envs/gcc.html">GCC Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="envs/loop_tool.html">loop_tool Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="envs/mlir.html">MLIR Environment Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul>
@@ -355,7 +356,7 @@ vector of integers:</p>
 </pre></div>
 </div>
 <p>The upper and lower bounds of the reward signal are described by
-<code class="xref py py-meth docutils literal notranslate"><span class="pre">env.reward_range</span></code>:</p>
+<a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.reward_range" title="compiler_gym.envs.CompilerEnv.reward_range"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.reward_range</span></code></a>:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">reward_range</span>
 <span class="go">(0.0, inf)</span>
 </pre></div>

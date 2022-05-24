@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Index &mdash; CompilerGym 0.2.2 documentation</title>
+  <title>Index &mdash; CompilerGym 0.2.4 documentation</title>
   
 
   
@@ -71,7 +71,7 @@
             
             
               <div class="version">
-                0.2.2
+                0.2.4
               </div>
             
           
@@ -111,6 +111,7 @@
 <li class="toctree-l1"><a class="reference internal" href="llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="envs/gcc.html">GCC Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="envs/loop_tool.html">loop_tool Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="envs/mlir.html">MLIR Environment Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul>
@@ -267,6 +268,10 @@
 </li>
         <li><a href="llvm/api.html#compiler_gym.envs.llvm.ClangInvocation.__init__">(compiler_gym.envs.llvm.ClangInvocation method)</a>
 </li>
+        <li><a href="compiler_gym/service.html#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.__init__">(compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv method)</a>
+</li>
+        <li><a href="compiler_gym/service.html#compiler_gym.service.client_service_compiler_env.ServiceMessageConverters.__init__">(compiler_gym.service.client_service_compiler_env.ServiceMessageConverters method)</a>
+</li>
         <li><a href="compiler_gym/service.html#compiler_gym.service.CompilationSession.__init__">(compiler_gym.service.CompilationSession method)</a>
 </li>
         <li><a href="compiler_gym/service.html#compiler_gym.service.CompilerGymServiceConnection.__init__">(compiler_gym.service.CompilerGymServiceConnection method)</a>
@@ -283,11 +288,15 @@
 </li>
         <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.NamedDiscrete.__init__">(compiler_gym.spaces.NamedDiscrete method)</a>
 </li>
+        <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.Permutation.__init__">(compiler_gym.spaces.Permutation method)</a>
+</li>
         <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.Reward.__init__">(compiler_gym.spaces.Reward method)</a>
 </li>
         <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.Scalar.__init__">(compiler_gym.spaces.Scalar method)</a>
 </li>
         <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.Sequence.__init__">(compiler_gym.spaces.Sequence method)</a>
+</li>
+        <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.SpaceSequence.__init__">(compiler_gym.spaces.SpaceSequence method)</a>
 </li>
         <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.Tuple.__init__">(compiler_gym.spaces.Tuple method)</a>
 </li>
@@ -301,11 +310,17 @@
 </li>
         <li><a href="compiler_gym/wrappers.html#compiler_gym.wrappers.CycleOverBenchmarksIterator.__init__">(compiler_gym.wrappers.CycleOverBenchmarksIterator method)</a>
 </li>
+        <li><a href="compiler_gym/wrappers.html#compiler_gym.wrappers.ForkOnStep.__init__">(compiler_gym.wrappers.ForkOnStep method)</a>
+</li>
         <li><a href="compiler_gym/wrappers.html#compiler_gym.wrappers.IterateOverBenchmarks.__init__">(compiler_gym.wrappers.IterateOverBenchmarks method)</a>
 </li>
         <li><a href="compiler_gym/wrappers.html#compiler_gym.wrappers.RandomOrderBenchmarks.__init__">(compiler_gym.wrappers.RandomOrderBenchmarks method)</a>
 </li>
         <li><a href="compiler_gym/wrappers.html#compiler_gym.wrappers.RuntimePointEstimateReward.__init__">(compiler_gym.wrappers.RuntimePointEstimateReward method)</a>
+</li>
+        <li><a href="compiler_gym/wrappers.html#compiler_gym.wrappers.SynchronousSqliteLogger.__init__">(compiler_gym.wrappers.SynchronousSqliteLogger method)</a>
+</li>
+        <li><a href="compiler_gym/wrappers.html#compiler_gym.wrappers.TimeLimit.__init__">(compiler_gym.wrappers.TimeLimit method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -335,9 +350,19 @@
       <li><a href="compiler_gym/wrappers.html#compiler_gym.wrappers.ActionWrapper.action">action() (compiler_gym.wrappers.ActionWrapper method)</a>
 </li>
       <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.action_space">action_space (compiler_gym.envs.CompilerEnv property)</a>
+
+      <ul>
+        <li><a href="compiler_gym/service.html#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.action_space">(compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv property)</a>
 </li>
-      <li><a href="compiler_gym/service.html#compiler_gym.service.CompilationSession.action_spaces">action_spaces (compiler_gym.service.CompilationSession attribute)</a>
+      </ul></li>
+      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.action_spaces">action_spaces (compiler_gym.envs.CompilerEnv property)</a>
+
+      <ul>
+        <li><a href="compiler_gym/service.html#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.action_spaces">(compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv property)</a>
 </li>
+        <li><a href="compiler_gym/service.html#compiler_gym.service.CompilationSession.action_spaces">(compiler_gym.service.CompilationSession attribute)</a>
+</li>
+      </ul></li>
       <li><a href="compiler_gym/compiler_gym.html#compiler_gym.ValidationResult.actions_replay_failed">actions_replay_failed (compiler_gym.ValidationResult attribute)</a>
 </li>
       <li><a href="rpc.html#_CPPv411ActionSpace">ActionSpace (C++ struct)</a>
@@ -352,10 +377,10 @@
 </li>
       <li><a href="compiler_gym/views.html#compiler_gym.views.RewardView.add_space">add_space() (compiler_gym.views.RewardView method)</a>
 </li>
-      <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Benchmark.add_validation_callback">add_validation_callback() (compiler_gym.datasets.Benchmark method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Benchmark.add_validation_callback">add_validation_callback() (compiler_gym.datasets.Benchmark method)</a>
+</li>
       <li><a href="compiler_gym/service/runtime.html#compiler_gym.service.runtime.compiler_gym_service.CompilerGymService.AddBenchmark">AddBenchmark() (compiler_gym.service.runtime.compiler_gym_service.CompilerGymService method)</a>
 </li>
       <li><a href="rpc.html#_CPPv417AddBenchmarkReply">AddBenchmarkReply (C++ struct)</a>
@@ -371,7 +396,11 @@
 </li>
       </ul></li>
       <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.apply">apply() (compiler_gym.envs.CompilerEnv method)</a>
+
+      <ul>
+        <li><a href="compiler_gym/service.html#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.apply">(compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv method)</a>
 </li>
+      </ul></li>
       <li><a href="compiler_gym/service.html#compiler_gym.service.CompilationSession.apply_action">apply_action() (compiler_gym.service.CompilationSession method)</a>
 </li>
       <li><a href="compiler_gym/envs.html#compiler_gym.envs.GccEnv.asm">asm (compiler_gym.envs.GccEnv property)</a>
@@ -398,6 +427,8 @@
 
       <ul>
         <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.benchmark">(compiler_gym.envs.CompilerEnv property)</a>
+</li>
+        <li><a href="compiler_gym/service.html#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.benchmark">(compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv property)</a>
 </li>
       </ul></li>
       <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Dataset.benchmark">benchmark() (compiler_gym.datasets.Dataset method)</a>
@@ -443,6 +474,8 @@
       <li><a href="rpc.html#_CPPv4N22BenchmarkDynamicConfig9build_cmdE">BenchmarkDynamicConfig::build_cmd (C++ member)</a>
 </li>
       <li><a href="rpc.html#_CPPv4N22BenchmarkDynamicConfig7run_cmdE">BenchmarkDynamicConfig::run_cmd (C++ member)</a>
+</li>
+      <li><a href="llvm/api.html#compiler_gym.envs.llvm.BenchmarkFromCommandLine">BenchmarkFromCommandLine (class in compiler_gym.envs.llvm)</a>
 </li>
       <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.BenchmarkInitError">BenchmarkInitError (class in compiler_gym.datasets)</a>
 </li>
@@ -496,8 +529,14 @@
 </li>
       <li><a href="llvm/api.html#compiler_gym.envs.llvm.datasets.CLgenDataset">CLgenDataset (class in compiler_gym.envs.llvm.datasets)</a>
 </li>
-      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.close">close() (compiler_gym.envs.CompilerEnv method)</a>
+      <li><a href="compiler_gym/service.html#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv">ClientServiceCompilerEnv (class in compiler_gym.service.client_service_compiler_env)</a>
 </li>
+      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.close">close() (compiler_gym.envs.CompilerEnv method)</a>
+
+      <ul>
+        <li><a href="compiler_gym/service.html#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.close">(compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv method)</a>
+</li>
+      </ul></li>
       <li><a href="compiler_gym/service.html#compiler_gym.service.CompilerGymServiceConnection.closed">closed (compiler_gym.service.CompilerGymServiceConnection property)</a>
 </li>
       <li><a href="rpc.html#_CPPv47Command">Command (C++ struct)</a>
@@ -517,6 +556,8 @@
 </li>
         <li><a href="compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.commandline">(compiler_gym.envs.LlvmEnv method)</a>
 </li>
+        <li><a href="compiler_gym/service.html#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.commandline">(compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv method)</a>
+</li>
         <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.Commandline.commandline">(compiler_gym.spaces.Commandline method)</a>
 </li>
       </ul></li>
@@ -524,6 +565,8 @@
 
       <ul>
         <li><a href="compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.commandline_to_actions">(compiler_gym.envs.LlvmEnv method)</a>
+</li>
+        <li><a href="compiler_gym/service.html#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.commandline_to_actions">(compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv method)</a>
 </li>
       </ul></li>
       <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.CommandlineFlag">CommandlineFlag (class in compiler_gym.spaces)</a>
@@ -534,7 +577,9 @@
 </li>
       <li><a href="compiler_gym/service.html#compiler_gym.service.CompilationSession">CompilationSession (class in compiler_gym.service)</a>
 </li>
-      <li><a href="cc/compiler_gym/envs/llvm/service.html#_CPPv412compiler_gym">compiler_gym (C++ type)</a>, <a href="cc/compiler_gym/envs/llvm/service.html#_CPPv412compiler_gym">[1]</a>, <a href="cc/compiler_gym/envs/llvm/service.html#_CPPv412compiler_gym">[2]</a>, <a href="cc/compiler_gym/envs/llvm/service.html#_CPPv412compiler_gym">[3]</a>, <a href="cc/compiler_gym/envs/llvm/service.html#_CPPv412compiler_gym">[4]</a>, <a href="cc/compiler_gym/envs/llvm/service.html#_CPPv412compiler_gym">[5]</a>, <a href="cc/compiler_gym/envs/llvm/service.html#_CPPv412compiler_gym">[6]</a>, <a href="cc/compiler_gym/service.html#_CPPv412compiler_gym">[7]</a>, <a href="cc/compiler_gym/service/runtime.html#_CPPv412compiler_gym">[8]</a>, <a href="cc/compiler_gym/service/runtime.html#_CPPv412compiler_gym">[9]</a>, <a href="cc/compiler_gym/service/runtime.html#_CPPv412compiler_gym">[10]</a>, <a href="cc/compiler_gym/util.html#_CPPv412compiler_gym">[11]</a>, <a href="cc/compiler_gym/util.html#_CPPv412compiler_gym">[12]</a>, <a href="cc/compiler_gym/util.html#_CPPv412compiler_gym">[13]</a>, <a href="cc/compiler_gym/util.html#_CPPv412compiler_gym">[14]</a>
+      <li><a href="llvm/api.html#compiler_gym.envs.llvm.BenchmarkFromCommandLine.compile">compile() (compiler_gym.envs.llvm.BenchmarkFromCommandLine method)</a>
+</li>
+      <li><a href="cc/compiler_gym/envs/llvm/service.html#_CPPv412compiler_gym">compiler_gym (C++ type)</a>, <a href="cc/compiler_gym/envs/llvm/service.html#_CPPv412compiler_gym">[1]</a>, <a href="cc/compiler_gym/envs/llvm/service.html#_CPPv412compiler_gym">[2]</a>, <a href="cc/compiler_gym/envs/llvm/service.html#_CPPv412compiler_gym">[3]</a>, <a href="cc/compiler_gym/envs/llvm/service.html#_CPPv412compiler_gym">[4]</a>, <a href="cc/compiler_gym/envs/llvm/service.html#_CPPv412compiler_gym">[5]</a>, <a href="cc/compiler_gym/envs/llvm/service.html#_CPPv412compiler_gym">[6]</a>, <a href="cc/compiler_gym/service.html#_CPPv412compiler_gym">[7]</a>, <a href="cc/compiler_gym/service/proto.html#_CPPv412compiler_gym">[8]</a>, <a href="cc/compiler_gym/service/runtime.html#_CPPv412compiler_gym">[9]</a>, <a href="cc/compiler_gym/service/runtime.html#_CPPv412compiler_gym">[10]</a>, <a href="cc/compiler_gym/service/runtime.html#_CPPv412compiler_gym">[11]</a>, <a href="cc/compiler_gym/util.html#_CPPv412compiler_gym">[12]</a>, <a href="cc/compiler_gym/util.html#_CPPv412compiler_gym">[13]</a>, <a href="cc/compiler_gym/util.html#_CPPv412compiler_gym">[14]</a>, <a href="cc/compiler_gym/util.html#_CPPv412compiler_gym">[15]</a>
 </li>
       <li>
     compiler_gym.bin.manual_env
@@ -743,6 +788,8 @@
 </li>
       <li><a href="cc/compiler_gym/envs/llvm/service.html#_CPPv4N12compiler_gym12llvm_service7BitcodeE">compiler_gym::llvm_service::Bitcode (C++ type)</a>
 </li>
+      <li><a href="cc/compiler_gym/envs/llvm/service.html#_CPPv4N12compiler_gym12llvm_service36createBenchmarkScratchDirectoryOrDieERKN5boost10filesystem4pathE">compiler_gym::llvm_service::createBenchmarkScratchDirectoryOrDie (C++ function)</a>
+</li>
       <li><a href="cc/compiler_gym/envs/llvm/service.html#_CPPv4N12compiler_gym12llvm_service37kDefaultBuildtimesPerObservationCountE">compiler_gym::llvm_service::kDefaultBuildtimesPerObservationCount (C++ member)</a>
 </li>
       <li><a href="cc/compiler_gym/envs/llvm/service.html#_CPPv4N12compiler_gym12llvm_service35kDefaultRuntimesPerObservationCountE">compiler_gym::llvm_service::kDefaultRuntimesPerObservationCount (C++ member)</a>
@@ -791,12 +838,12 @@
 </li>
       <li><a href="cc/compiler_gym/envs/llvm/service.html#_CPPv4N12compiler_gym12llvm_service20LlvmObservationSpace23IR_INSTRUCTION_COUNT_O0E">compiler_gym::llvm_service::LlvmObservationSpace::IR_INSTRUCTION_COUNT_O0 (C++ enumerator)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cc/compiler_gym/envs/llvm/service.html#_CPPv4N12compiler_gym12llvm_service20LlvmObservationSpace23IR_INSTRUCTION_COUNT_O3E">compiler_gym::llvm_service::LlvmObservationSpace::IR_INSTRUCTION_COUNT_O3 (C++ enumerator)</a>
 </li>
       <li><a href="cc/compiler_gym/envs/llvm/service.html#_CPPv4N12compiler_gym12llvm_service20LlvmObservationSpace23IR_INSTRUCTION_COUNT_OZE">compiler_gym::llvm_service::LlvmObservationSpace::IR_INSTRUCTION_COUNT_OZ (C++ enumerator)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cc/compiler_gym/envs/llvm/service.html#_CPPv4N12compiler_gym12llvm_service20LlvmObservationSpace7IR_SHA1E">compiler_gym::llvm_service::LlvmObservationSpace::IR_SHA1 (C++ enumerator)</a>
 </li>
       <li><a href="cc/compiler_gym/envs/llvm/service.html#_CPPv4N12compiler_gym12llvm_service20LlvmObservationSpace12IS_BUILDABLEE">compiler_gym::llvm_service::LlvmObservationSpace::IS_BUILDABLE (C++ enumerator)</a>
@@ -967,6 +1014,22 @@
 </li>
       <li><a href="cc/compiler_gym/service/runtime.html#_CPPv4N12compiler_gym7runtime20kEvictionSizeInBytesE">compiler_gym::runtime::kEvictionSizeInBytes (C++ member)</a>
 </li>
+      <li><a href="cc/compiler_gym/service/proto.html#_CPPv4N12compiler_gym25SpaceContainsEventCheckerE">compiler_gym::SpaceContainsEventChecker (C++ struct)</a>
+</li>
+      <li><a href="cc/compiler_gym/service/proto.html#_CPPv4NK12compiler_gym25SpaceContainsEventChecker13checkContainsERK5SpaceRK5Event">compiler_gym::SpaceContainsEventChecker::checkContains (C++ function)</a>
+</li>
+      <li><a href="cc/compiler_gym/service/proto.html#_CPPv4NK12compiler_gym25SpaceContainsEventChecker8containsERK5SpaceRK5Eventb">compiler_gym::SpaceContainsEventChecker::contains (C++ function)</a>
+</li>
+      <li><a href="cc/compiler_gym/service/proto.html#_CPPv4N12compiler_gym25SpaceContainsEventChecker7contextEv">compiler_gym::SpaceContainsEventChecker::context (C++ function)</a>, <a href="cc/compiler_gym/service/proto.html#_CPPv4NK12compiler_gym25SpaceContainsEventChecker7contextEv">[1]</a>
+</li>
+      <li><a href="cc/compiler_gym/service/proto.html#_CPPv4N12compiler_gym25SpaceContainsEventChecker7ContextE">compiler_gym::SpaceContainsEventChecker::Context (C++ struct)</a>
+</li>
+      <li><a href="cc/compiler_gym/service/proto.html#_CPPv4N12compiler_gym25SpaceContainsEventChecker7Context13typeIdFuncMapE">compiler_gym::SpaceContainsEventChecker::Context::typeIdFuncMap (C++ member)</a>
+</li>
+      <li><a href="cc/compiler_gym/service/proto.html#_CPPv4N12compiler_gym25SpaceContainsEventChecker4ctx_E">compiler_gym::SpaceContainsEventChecker::ctx_ (C++ member)</a>
+</li>
+      <li><a href="cc/compiler_gym/service/proto.html#_CPPv4N12compiler_gym25SpaceContainsEventChecker13TypeIdFuncMapE">compiler_gym::SpaceContainsEventChecker::TypeIdFuncMap (C++ type)</a>
+</li>
       <li><a href="cc/compiler_gym/util.html#_CPPv4N12compiler_gym4utilE">compiler_gym::util (C++ type)</a>, <a href="cc/compiler_gym/util.html#_CPPv4N12compiler_gym4utilE">[1]</a>, <a href="cc/compiler_gym/util.html#_CPPv4N12compiler_gym4utilE">[2]</a>, <a href="cc/compiler_gym/util.html#_CPPv4N12compiler_gym4utilE">[3]</a>
 </li>
       <li><a href="cc/compiler_gym/util.html#_CPPv4I0EN12compiler_gym4util33createPascalCaseToEnumLookupTableENSt13unordered_mapINSt6stringE4EnumEEv">compiler_gym::util::createPascalCaseToEnumLookupTable (C++ function)</a>
@@ -1032,6 +1095,8 @@
       <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.compiler_version">compiler_version (compiler_gym.envs.CompilerEnv property)</a>
 
       <ul>
+        <li><a href="compiler_gym/service.html#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.compiler_version">(compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv property)</a>
+</li>
         <li><a href="compiler_gym/service.html#compiler_gym.service.CompilationSession.compiler_version">(compiler_gym.service.CompilationSession attribute)</a>
 </li>
       </ul></li>
@@ -1063,6 +1128,8 @@
 
       <ul>
         <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.Sequence.contains">(compiler_gym.spaces.Sequence method)</a>
+</li>
+        <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.SpaceSequence.contains">(compiler_gym.spaces.SpaceSequence method)</a>
 </li>
       </ul></li>
       <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.BenchmarkSource.contents">contents (compiler_gym.datasets.BenchmarkSource attribute)</a>
@@ -1149,10 +1216,20 @@
 </li>
       <li><a href="compiler_gym/service.html#compiler_gym.service.EnvironmentNotSupported">EnvironmentNotSupported</a>
 </li>
+      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.episode_reward">episode_reward (compiler_gym.envs.CompilerEnv property)</a>
+
+      <ul>
+        <li><a href="compiler_gym/service.html#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.episode_reward">(compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv property)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.episode_walltime">episode_walltime (compiler_gym.envs.CompilerEnv property)</a>
+
+      <ul>
+        <li><a href="compiler_gym/service.html#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.episode_walltime">(compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv property)</a>
 </li>
+      </ul></li>
       <li><a href="compiler_gym/compiler_gym.html#compiler_gym.ValidationResult.error_details">error_details (compiler_gym.ValidationResult property)</a>
 </li>
       <li><a href="compiler_gym/compiler_gym.html#compiler_gym.ValidationResult.errors">errors (compiler_gym.ValidationResult attribute)</a>
@@ -1189,16 +1266,22 @@
 </li>
       <li><a href="rpc.html#_CPPv411FloatTensor">FloatTensor (C++ struct)</a>
 </li>
+      <li><a href="compiler_gym/wrappers.html#compiler_gym.wrappers.SynchronousSqliteLogger.flush">flush() (compiler_gym.wrappers.SynchronousSqliteLogger method)</a>
+</li>
       <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.fork">fork() (compiler_gym.envs.CompilerEnv method)</a>
 
       <ul>
         <li><a href="compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.fork">(compiler_gym.envs.LlvmEnv method)</a>
+</li>
+        <li><a href="compiler_gym/service.html#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.fork">(compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv method)</a>
 </li>
         <li><a href="compiler_gym/service.html#compiler_gym.service.CompilationSession.fork">(compiler_gym.service.CompilationSession method)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compiler_gym/wrappers.html#compiler_gym.wrappers.ForkOnStep">ForkOnStep (class in compiler_gym.wrappers)</a>
+</li>
       <li><a href="compiler_gym/service/runtime.html#compiler_gym.service.runtime.compiler_gym_service.CompilerGymService.ForkSession">ForkSession() (compiler_gym.service.runtime.compiler_gym_service.CompilerGymService method)</a>
 </li>
       <li><a href="rpc.html#_CPPv416ForkSessionReply">ForkSessionReply (C++ struct)</a>
@@ -1261,6 +1344,8 @@
 </li>
       <li><a href="compiler_gym/service.html#compiler_gym.service.CompilationSession.get_observation">get_observation() (compiler_gym.service.CompilationSession method)</a>
 </li>
+      <li><a href="llvm/api.html#compiler_gym.envs.llvm.get_system_library_flags">get_system_library_flags() (in module compiler_gym.envs.llvm)</a>
+</li>
       <li><a href="compiler_gym/service/runtime.html#compiler_gym.service.runtime.compiler_gym_service.CompilerGymService.GetSpaces">GetSpaces() (compiler_gym.service.runtime.compiler_gym_service.CompilerGymService method)</a>
 </li>
       <li><a href="rpc.html#_CPPv414GetSpacesReply">GetSpacesReply (C++ struct)</a>
@@ -1300,7 +1385,11 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.in_episode">in_episode (compiler_gym.envs.CompilerEnv property)</a>
+
+      <ul>
+        <li><a href="compiler_gym/service.html#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.in_episode">(compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv property)</a>
 </li>
+      </ul></li>
       <li><a href="compiler_gym/service.html#compiler_gym.service.ConnectionOpts.init_max_attempts">init_max_attempts (compiler_gym.service.ConnectionOpts attribute)</a>
 </li>
       <li><a href="compiler_gym/service.html#compiler_gym.service.ConnectionOpts.init_max_seconds">init_max_seconds (compiler_gym.service.ConnectionOpts attribute)</a>
@@ -1376,6 +1465,8 @@
       <ul>
         <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.logger">(compiler_gym.envs.CompilerEnv property)</a>
 </li>
+        <li><a href="compiler_gym/service.html#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.logger">(compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv property)</a>
+</li>
       </ul></li>
   </ul></td>
 </tr></table>
@@ -1389,6 +1480,8 @@
         <li><a href="llvm/api.html#compiler_gym.envs.llvm.make_benchmark">(in module compiler_gym.envs.llvm)</a>
 </li>
       </ul></li>
+      <li><a href="compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.make_benchmark_from_command_line">make_benchmark_from_command_line() (compiler_gym.envs.LlvmEnv method)</a>
+</li>
       <li><a href="compiler_gym/views.html#compiler_gym.views.ObservationSpaceSpec.make_derived_space">make_derived_space() (compiler_gym.views.ObservationSpaceSpec method)</a>
 </li>
       <li><a href="compiler_gym/service/runtime.html#compiler_gym.service.runtime.benchmark_cache.BenchmarkCache.max_size_in_bytes">max_size_in_bytes (compiler_gym.service.runtime.benchmark_cache.BenchmarkCache property)</a>
@@ -1421,7 +1514,11 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.multistep">multistep() (compiler_gym.envs.CompilerEnv method)</a>
+
+      <ul>
+        <li><a href="compiler_gym/service.html#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.multistep">(compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv method)</a>
 </li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -1454,20 +1551,30 @@
 </li>
       <li><a href="compiler_gym/envs.html#compiler_gym.envs.GccEnv.obj_size">obj_size (compiler_gym.envs.GccEnv property)</a>
 </li>
+      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.observation">observation (compiler_gym.envs.CompilerEnv property)</a>
+
+      <ul>
+        <li><a href="compiler_gym/service.html#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.observation">(compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv property)</a>
+</li>
+      </ul></li>
       <li><a href="compiler_gym/wrappers.html#compiler_gym.wrappers.ObservationWrapper.observation">observation() (compiler_gym.wrappers.ObservationWrapper method)</a>
 </li>
       <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.observation_space">observation_space (compiler_gym.envs.CompilerEnv property)</a>
+
+      <ul>
+        <li><a href="compiler_gym/service.html#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.observation_space">(compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv property)</a>
 </li>
+      </ul></li>
       <li><a href="compiler_gym/service.html#compiler_gym.service.CompilationSession.observation_spaces">observation_spaces (compiler_gym.service.CompilationSession attribute)</a>
 </li>
       <li><a href="rpc.html#_CPPv416ObservationSpace">ObservationSpace (C++ struct)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rpc.html#_CPPv4N16ObservationSpace19default_observationE">ObservationSpace::default_observation (C++ member)</a>
 </li>
       <li><a href="rpc.html#_CPPv4N16ObservationSpace13deterministicE">ObservationSpace::deterministic (C++ member)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rpc.html#_CPPv4N16ObservationSpace18platform_dependentE">ObservationSpace::platform_dependent (C++ member)</a>
 </li>
       <li><a href="compiler_gym/views.html#compiler_gym.views.ObservationSpaceSpec">ObservationSpaceSpec (class in compiler_gym.views)</a>
@@ -1496,6 +1603,8 @@
 </li>
       <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.BenchmarkUri.path">path (compiler_gym.datasets.BenchmarkUri attribute)</a>
 </li>
+      <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.Permutation">Permutation (class in compiler_gym.spaces)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="llvm/api.html#compiler_gym.envs.llvm.datasets.POJ104Dataset">POJ104Dataset (class in compiler_gym.envs.llvm.datasets)</a>
@@ -1520,7 +1629,7 @@
 </li>
       <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.Reward.range">range (compiler_gym.spaces.Reward property)</a>
 </li>
-      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.raw_step">raw_step() (compiler_gym.envs.CompilerEnv method)</a>
+      <li><a href="compiler_gym/service.html#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.raw_step">raw_step() (compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv method)</a>
 </li>
       <li><a href="compiler_gym/compiler_gym.html#compiler_gym.CompilerEnvStateReader.read_paths">read_paths() (compiler_gym.CompilerEnvStateReader static method)</a>
 </li>
@@ -1531,6 +1640,8 @@
       <ul>
         <li><a href="compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.render">(compiler_gym.envs.LlvmEnv method)</a>
 </li>
+        <li><a href="compiler_gym/service.html#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.render">(compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv method)</a>
+</li>
       </ul></li>
       <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.reset">reset() (compiler_gym.envs.CompilerEnv method)</a>
 
@@ -1538,6 +1649,8 @@
         <li><a href="compiler_gym/envs.html#compiler_gym.envs.GccEnv.reset">(compiler_gym.envs.GccEnv method)</a>
 </li>
         <li><a href="compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.reset">(compiler_gym.envs.LlvmEnv method)</a>
+</li>
+        <li><a href="compiler_gym/service.html#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.reset">(compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv method)</a>
 </li>
         <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.Reward.reset">(compiler_gym.spaces.Reward method)</a>
 </li>
@@ -1550,22 +1663,38 @@
 </li>
       <li><a href="compiler_gym/service.html#compiler_gym.service.ConnectionOpts.retry_wait_seconds">retry_wait_seconds (compiler_gym.service.ConnectionOpts attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cc/compiler_gym/util.html#c.RETURN_IF_ERROR">RETURN_IF_ERROR (C macro)</a>
 </li>
       <li><a href="compiler_gym/wrappers.html#compiler_gym.wrappers.ActionWrapper.reverse_action">reverse_action() (compiler_gym.wrappers.ActionWrapper method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.Reward">Reward (class in compiler_gym.spaces)</a>
 </li>
       <li><a href="compiler_gym/compiler_gym.html#compiler_gym.CompilerEnvState.reward">reward (compiler_gym.CompilerEnvState attribute)</a>
+
+      <ul>
+        <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.reward">(compiler_gym.envs.CompilerEnv property)</a>
 </li>
+        <li><a href="compiler_gym/service.html#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.reward">(compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv property)</a>
+</li>
+      </ul></li>
       <li><a href="compiler_gym/wrappers.html#compiler_gym.wrappers.RewardWrapper.reward">reward() (compiler_gym.wrappers.RewardWrapper method)</a>
 </li>
       <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.Reward.reward_on_error">reward_on_error() (compiler_gym.spaces.Reward method)</a>
 </li>
-      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.reward_space">reward_space (compiler_gym.envs.CompilerEnv property)</a>
+      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.reward_range">reward_range (compiler_gym.envs.CompilerEnv property)</a>
+
+      <ul>
+        <li><a href="compiler_gym/service.html#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.reward_range">(compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv property)</a>
 </li>
+      </ul></li>
+      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.reward_space">reward_space (compiler_gym.envs.CompilerEnv property)</a>
+
+      <ul>
+        <li><a href="compiler_gym/service.html#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.reward_space">(compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv property)</a>
+</li>
+      </ul></li>
       <li><a href="compiler_gym/compiler_gym.html#compiler_gym.ValidationResult.reward_validated">reward_validated (compiler_gym.ValidationResult attribute)</a>
 </li>
       <li><a href="compiler_gym/compiler_gym.html#compiler_gym.ValidationResult.reward_validation_failed">reward_validation_failed (compiler_gym.ValidationResult attribute)</a>
@@ -1594,10 +1723,14 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.Scalar.sample">sample() (compiler_gym.spaces.Scalar method)</a>
+      <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.Permutation.sample">sample() (compiler_gym.spaces.Permutation method)</a>
 
       <ul>
+        <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.Scalar.sample">(compiler_gym.spaces.Scalar method)</a>
+</li>
         <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.Sequence.sample">(compiler_gym.spaces.Sequence method)</a>
+</li>
+        <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.SpaceSequence.sample">(compiler_gym.spaces.SpaceSequence method)</a>
 </li>
       </ul></li>
       <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.Scalar">Scalar (class in compiler_gym.spaces)</a>
@@ -1612,9 +1745,9 @@
 </li>
       <li><a href="compiler_gym/service.html#compiler_gym.service.ConnectionOpts.script_env">script_env (compiler_gym.service.ConnectionOpts attribute)</a>
 </li>
-      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.send_param">send_param() (compiler_gym.envs.CompilerEnv method)</a>
+      <li><a href="compiler_gym/service.html#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.send_param">send_param() (compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv method)</a>
 </li>
-      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.send_params">send_params() (compiler_gym.envs.CompilerEnv method)</a>
+      <li><a href="compiler_gym/service.html#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.send_params">send_params() (compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv method)</a>
 </li>
       <li><a href="compiler_gym/service/runtime.html#compiler_gym.service.runtime.compiler_gym_service.CompilerGymService.SendSessionParameter">SendSessionParameter() (compiler_gym.service.runtime.compiler_gym_service.CompilerGymService method)</a>
 </li>
@@ -1631,6 +1764,8 @@
       <li><a href="compiler_gym/service.html#compiler_gym.service.ServiceInitError">ServiceInitError</a>
 </li>
       <li><a href="compiler_gym/service.html#compiler_gym.service.ServiceIsClosed">ServiceIsClosed</a>
+</li>
+      <li><a href="compiler_gym/service.html#compiler_gym.service.client_service_compiler_env.ServiceMessageConverters">ServiceMessageConverters (class in compiler_gym.service.client_service_compiler_env)</a>
 </li>
       <li><a href="compiler_gym/service.html#compiler_gym.service.ServiceTransportError">ServiceTransportError</a>
 </li>
@@ -1670,6 +1805,12 @@
 </li>
       <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Benchmark.sources">sources (compiler_gym.datasets.Benchmark property)</a>
 </li>
+      <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.SpaceSequence">SpaceSequence (class in compiler_gym.spaces)</a>
+</li>
+      <li><a href="rpc.html#_CPPv418SpaceSequenceSpace">SpaceSequenceSpace (C++ struct)</a>
+</li>
+      <li><a href="rpc.html#_CPPv4N18SpaceSequenceSpace12length_rangeE">SpaceSequenceSpace::length_range (C++ member)</a>
+</li>
       <li><a href="compiler_gym/service/runtime.html#compiler_gym.service.runtime.compiler_gym_service.CompilerGymService.StartSession">StartSession() (compiler_gym.service.runtime.compiler_gym_service.CompilerGymService method)</a>
 </li>
       <li><a href="rpc.html#_CPPv417StartSessionReply">StartSessionReply (C++ struct)</a>
@@ -1687,11 +1828,17 @@
       <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.state">state (compiler_gym.envs.CompilerEnv property)</a>
 
       <ul>
+        <li><a href="compiler_gym/service.html#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.state">(compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv property)</a>
+</li>
         <li><a href="compiler_gym/compiler_gym.html#compiler_gym.ValidationResult.state">(compiler_gym.ValidationResult attribute)</a>
 </li>
       </ul></li>
       <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.step">step() (compiler_gym.envs.CompilerEnv method)</a>
+
+      <ul>
+        <li><a href="compiler_gym/service.html#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.step">(compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv method)</a>
 </li>
+      </ul></li>
       <li><a href="compiler_gym/service/runtime.html#compiler_gym.service.runtime.compiler_gym_service.CompilerGymService.Step">Step() (compiler_gym.service.runtime.compiler_gym_service.CompilerGymService method)</a>
 </li>
       <li><a href="rpc.html#_CPPv49StepReply">StepReply (C++ struct)</a>
@@ -1713,6 +1860,8 @@
       <li><a href="rpc.html#_CPPv411StringSpace">StringSpace (C++ struct)</a>
 </li>
       <li><a href="rpc.html#_CPPv412StringTensor">StringTensor (C++ struct)</a>
+</li>
+      <li><a href="compiler_gym/wrappers.html#compiler_gym.wrappers.SynchronousSqliteLogger">SynchronousSqliteLogger (class in compiler_gym.wrappers)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1746,12 +1895,14 @@
 <h2 id="U">U</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Dataset.uninstall">uninstall() (compiler_gym.datasets.Dataset method)</a>
+      <li><a href="compiler_gym/wrappers.html#compiler_gym.wrappers.ForkOnStep.undo">undo() (compiler_gym.wrappers.ForkOnStep method)</a>
 </li>
-      <li><a href="cc/compiler_gym/util.html#c.UNREACHABLE">UNREACHABLE (C macro)</a>
+      <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Dataset.uninstall">uninstall() (compiler_gym.datasets.Dataset method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="cc/compiler_gym/util.html#c.UNREACHABLE">UNREACHABLE (C macro)</a>
+</li>
       <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.Reward.update">update() (compiler_gym.spaces.Reward method)</a>
 </li>
       <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Benchmark.uri">uri (compiler_gym.datasets.Benchmark property)</a>
@@ -1768,6 +1919,8 @@
 
       <ul>
         <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.validate">(compiler_gym.envs.CompilerEnv method)</a>
+</li>
+        <li><a href="compiler_gym/service.html#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.validate">(compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv method)</a>
 </li>
       </ul></li>
       <li><a href="compiler_gym/compiler_gym.html#compiler_gym.validate_states">validate_states() (in module compiler_gym)</a>
@@ -1787,8 +1940,10 @@
 </li>
         <li><a href="compiler_gym/envs/gcc.html#compiler_gym.envs.gcc.gcc.GccSpec.version">(compiler_gym.envs.gcc.gcc.GccSpec attribute)</a>
 </li>
+        <li><a href="compiler_gym/service.html#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.version">(compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv property)</a>
+</li>
       </ul></li>
-      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.versions">versions (compiler_gym.envs.CompilerEnv property)</a>
+      <li><a href="compiler_gym/service.html#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.versions">versions (compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv property)</a>
 </li>
   </ul></td>
 </tr></table>

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.envs.gcc.gcc_env &mdash; CompilerGym 0.2.3 documentation</title>
+  <title>compiler_gym.envs.gcc.gcc_env &mdash; CompilerGym 0.2.4 documentation</title>
   
 
   
@@ -71,7 +71,7 @@
             
             
               <div class="version">
-                0.2.3
+                0.2.4
               </div>
             
           
@@ -111,6 +111,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../envs/gcc.html">GCC Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../envs/loop_tool.html">loop_tool Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../envs/mlir.html">MLIR Environment Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul>
@@ -210,20 +211,22 @@
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets</span> <span class="kn">import</span> <span class="n">Benchmark</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.envs.compiler_env</span> <span class="kn">import</span> <span class="n">CompilerEnv</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.envs.gcc.datasets</span> <span class="kn">import</span> <span class="n">get_gcc_datasets</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.envs.gcc.gcc</span> <span class="kn">import</span> <span class="n">Gcc</span><span class="p">,</span> <span class="n">GccSpec</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.envs.gcc.gcc_rewards</span> <span class="kn">import</span> <span class="n">AsmSizeReward</span><span class="p">,</span> <span class="n">ObjSizeReward</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.service</span> <span class="kn">import</span> <span class="n">ConnectionOpts</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.service.client_service_compiler_env</span> <span class="kn">import</span> <span class="n">ClientServiceCompilerEnv</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.spaces</span> <span class="kn">import</span> <span class="n">Reward</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.decorators</span> <span class="kn">import</span> <span class="n">memoized_property</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.util.gym_type_hints</span> <span class="kn">import</span> <span class="n">ObservationType</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.gym_type_hints</span> <span class="kn">import</span> <span class="n">ObservationType</span><span class="p">,</span> <span class="n">OptionalArgumentValue</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.views</span> <span class="kn">import</span> <span class="n">ObservationSpaceSpec</span>
 
 <span class="c1"># The default gcc_bin argument.</span>
 <span class="n">DEFAULT_GCC</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;docker:gcc:11.2.0&quot;</span>
 
 
-<div class="viewcode-block" id="GccEnv"><a class="viewcode-back" href="../../../../compiler_gym/envs.html#compiler_gym.envs.GccEnv">[docs]</a><span class="k">class</span> <span class="nc">GccEnv</span><span class="p">(</span><span class="n">CompilerEnv</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;A specialized CompilerEnv for GCC.</span>
+<div class="viewcode-block" id="GccEnv"><a class="viewcode-back" href="../../../../compiler_gym/envs.html#compiler_gym.envs.GccEnv">[docs]</a><span class="k">class</span> <span class="nc">GccEnv</span><span class="p">(</span><span class="n">ClientServiceCompilerEnv</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A specialized ClientServiceCompilerEnv for GCC.</span>
 
 <span class="sd">    This class exposes the optimization space of GCC&#39;s command line flags</span>
 <span class="sd">    as an environment for reinforcement learning. For further details, see the</span>
@@ -290,11 +293,19 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">benchmark</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Benchmark</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">action_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">retry_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">observation_space</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
+            <span class="n">OptionalArgumentValue</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ObservationSpaceSpec</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="n">OptionalArgumentValue</span><span class="o">.</span><span class="n">UNCHANGED</span><span class="p">,</span>
+        <span class="n">reward_space</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
+            <span class="n">OptionalArgumentValue</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Reward</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="n">OptionalArgumentValue</span><span class="o">.</span><span class="n">UNCHANGED</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ObservationType</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Reset the environment. This additionally sets the timeout to the</span>
-<span class="sd">        correct value.&quot;&quot;&quot;</span>
-        <span class="n">observation</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">benchmark</span><span class="p">,</span> <span class="n">action_space</span><span class="p">,</span> <span class="n">retry_count</span><span class="p">)</span>
+        <span class="n">observation</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span>
+            <span class="n">benchmark</span><span class="o">=</span><span class="n">benchmark</span><span class="p">,</span>
+            <span class="n">action_space</span><span class="o">=</span><span class="n">action_space</span><span class="p">,</span>
+            <span class="n">observation_space</span><span class="o">=</span><span class="n">observation_space</span><span class="p">,</span>
+            <span class="n">reward_space</span><span class="o">=</span><span class="n">reward_space</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timeout</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">send_param</span><span class="p">(</span><span class="s2">&quot;timeout&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_timeout</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">observation</span></div>

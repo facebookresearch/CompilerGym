@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym &mdash; CompilerGym 0.2.2 documentation</title>
+  <title>compiler_gym &mdash; CompilerGym 0.2.4 documentation</title>
   
 
   
@@ -46,7 +46,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="compiler_gym.datasets" href="datasets.html" />
-    <link rel="prev" title="loop_tool Environment Reference" href="../envs/loop_tool.html" /> 
+    <link rel="prev" title="MLIR Environment Reference" href="../envs/mlir.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -73,7 +73,7 @@
             
             
               <div class="version">
-                0.2.2
+                0.2.4
               </div>
             
           
@@ -113,6 +113,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../envs/gcc.html">GCC Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../envs/loop_tool.html">loop_tool Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../envs/mlir.html">MLIR Environment Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul class="current">
@@ -347,7 +348,7 @@ contains the information required to reproduce the result.</p>
 <h2><a class="toc-backref" href="#id2">Validation</a><a class="headerlink" href="#validation" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="compiler_gym.ValidationResult">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.</span></span><span class="sig-name descname"><span class="pre">ValidationResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#compiler_gym.CompilerEnvState" title="compiler_gym.compiler_env_state.CompilerEnvState"><span class="pre">compiler_gym.compiler_env_state.CompilerEnvState</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">walltime</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reward_validated</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions_replay_failed</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reward_validation_failed</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">benchmark_semantics_validated</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">benchmark_semantics_validation_failed</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#compiler_gym.ValidationError" title="compiler_gym.validation_error.ValidationError"><span class="pre">compiler_gym.validation_error.ValidationError</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/validation_result.html#ValidationResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.ValidationResult" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.</span></span><span class="sig-name descname"><span class="pre">ValidationResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#compiler_gym.CompilerEnvState" title="compiler_gym.compiler_env_state.CompilerEnvState"><span class="pre">compiler_gym.compiler_env_state.CompilerEnvState</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">walltime</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reward_validated</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions_replay_failed</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reward_validation_failed</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">benchmark_semantics_validated</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">benchmark_semantics_validation_failed</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#compiler_gym.ValidationError" title="compiler_gym.errors.validation_errors.ValidationError"><span class="pre">compiler_gym.errors.validation_errors.ValidationError</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/validation_result.html#ValidationResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.ValidationResult" title="Permalink to this definition">¶</a></dt>
 <dd><p>A tuple that represents the result of validating a compiler environment state.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="compiler_gym.ValidationResult.actions_replay_failed">
@@ -375,7 +376,7 @@ contains the information required to reproduce the result.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="compiler_gym.ValidationResult.errors">
-<span class="sig-name descname"><span class="pre">errors</span></span><em class="property"><span class="pre">:</span> <span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#compiler_gym.ValidationError" title="compiler_gym.validation_error.ValidationError"><span class="pre">compiler_gym.validation_error.ValidationError</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#compiler_gym.ValidationResult.errors" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">errors</span></span><em class="property"><span class="pre">:</span> <span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#compiler_gym.ValidationError" title="compiler_gym.errors.validation_errors.ValidationError"><span class="pre">compiler_gym.errors.validation_errors.ValidationError</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#compiler_gym.ValidationResult.errors" title="Permalink to this definition">¶</a></dt>
 <dd><p>A list of <a class="reference internal" href="#compiler_gym.ValidationError" title="compiler_gym.ValidationError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValidationError</span></code></a></p>
 </dd></dl>
 
@@ -419,7 +420,7 @@ contains the information required to reproduce the result.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="compiler_gym.ValidationError">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.</span></span><span class="sig-name descname"><span class="pre">ValidationError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/validation_error.html#ValidationError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.ValidationError" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.</span></span><span class="sig-name descname"><span class="pre">ValidationError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/errors/validation_errors.html#ValidationError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.ValidationError" title="Permalink to this definition">¶</a></dt>
 <dd><p>A ValidationError describes an error encountered in a call to
 <a class="reference internal" href="envs.html#compiler_gym.envs.CompilerEnv.validate" title="compiler_gym.envs.CompilerEnv.validate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.validate()</span></code></a>.</p>
 <dl class="py attribute">
@@ -472,9 +473,11 @@ differ from the input states.</p>
 <span class="sig-prename descclassname"><span class="pre">compiler_gym.</span></span><span class="sig-name descname"><span class="pre">cache_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">relpath</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">pathlib.Path</span><a class="reference internal" href="../_modules/compiler_gym/util/runfiles_path.html#cache_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.cache_path" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a path within the cache directory.</p>
 <p>CompilerGym uses a directory to cache files in, such as downloaded content.
-The default location for this cache is <code class="code docutils literal notranslate"><span class="pre">~/.cache/compiler_gym</span></code>. Set
-the environment variable <code class="code docutils literal notranslate"><span class="pre">$COMPILER_GYM_CACHE</span></code> to override this
+The default location for this cache is <code class="code docutils literal notranslate"><span class="pre">~/.local/cache/compiler_gym</span></code>.
+Set the environment variable <code class="code docutils literal notranslate"><span class="pre">$COMPILER_GYM_CACHE</span></code> to override this
 default location.</p>
+<p>It is safe to delete this directory, so long as no CompilerGym environments
+are running.</p>
 <p>No checks are to made to ensure that the path, or the containing directory,
 exist.</p>
 <dl class="field-list simple">
@@ -491,11 +494,15 @@ exist.</p>
 <dt class="sig sig-object py" id="compiler_gym.site_data_path">
 <span class="sig-prename descclassname"><span class="pre">compiler_gym.</span></span><span class="sig-name descname"><span class="pre">site_data_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">relpath</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">pathlib.Path</span><a class="reference internal" href="../_modules/compiler_gym/util/runfiles_path.html#site_data_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.site_data_path" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a path within the site data directory.</p>
-<p>CompilerGym uses a directory to store persistent site data files in, such as benchmark datasets.
-The default location is <code class="code docutils literal notranslate"><span class="pre">~/.local/share/compiler_gym</span></code>. Set the environment variable
+<p>CompilerGym uses a directory to store persistent site data files in, such as
+benchmark datasets. The default location is
+<code class="code docutils literal notranslate"><span class="pre">~/.local/share/compiler_gym</span></code>. Set the environment variable
 <code class="code docutils literal notranslate"><span class="pre">$COMPILER_GYM_SITE_DATA</span></code> to override this default location.</p>
 <p>No checks are to made to ensure that the path, or the containing directory,
 exist.</p>
+<p>Files in this directory are intended to be long lived (this is not a cache),
+but it is safe to delete this directory, so long as no CompilerGym
+environments are running.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>relpath</strong> – The relative path within the site data tree.</p>
@@ -516,6 +523,9 @@ temporary filesystem <code class="code docutils literal notranslate"><span class
 <a class="reference internal" href="#compiler_gym.cache_path" title="compiler_gym.cache_path"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cache_path()</span></code></a> is used as a fallback. Set
 the environment variable <code class="code docutils literal notranslate"><span class="pre">$COMPILER_GYM_TRANSIENT_CACHE</span></code> to override
 the default location.</p>
+<p>Files in this directory are not meant to outlive the lifespan of the
+CompilerGym environment that creates them. It is safe to delete this
+directory, so long as no CompilerGym environments are running.</p>
 <p>No checks are to made to ensure that the path, or the containing directory,
 exist.</p>
 <dl class="field-list simple">
@@ -622,7 +632,7 @@ For granular control of logging information, consider instead setting a
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
         <a href="datasets.html" class="btn btn-neutral float-right" title="compiler_gym.datasets" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="../envs/loop_tool.html" class="btn btn-neutral float-left" title="loop_tool Environment Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../envs/mlir.html" class="btn btn-neutral float-left" title="MLIR Environment Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

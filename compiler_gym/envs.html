@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.envs &mdash; CompilerGym 0.2.2 documentation</title>
+  <title>compiler_gym.envs &mdash; CompilerGym 0.2.4 documentation</title>
   
 
   
@@ -73,7 +73,7 @@
             
             
               <div class="version">
-                0.2.2
+                0.2.4
               </div>
             
           
@@ -113,6 +113,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../envs/gcc.html">GCC Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../envs/loop_tool.html">loop_tool Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../envs/mlir.html">MLIR Environment Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul class="current">
@@ -226,7 +227,7 @@ environment classes are available:</p>
 <h2><a class="toc-backref" href="#id1">CompilerEnv</a><a class="headerlink" href="#compilerenv" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="compiler_gym.envs.CompilerEnv">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.envs.</span></span><span class="sig-name descname"><span class="pre">CompilerEnv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="spaces.html#compiler_gym.spaces.Reward" title="compiler_gym.spaces.reward.Reward"><span class="pre">compiler_gym.spaces.reward.Reward</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datasets</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="datasets.html#compiler_gym.datasets.Dataset" title="compiler_gym.datasets.dataset.Dataset"><span class="pre">compiler_gym.datasets.dataset.Dataset</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">benchmark</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="datasets.html#compiler_gym.datasets.Benchmark" title="compiler_gym.datasets.benchmark.Benchmark"><span class="pre">compiler_gym.datasets.benchmark.Benchmark</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observation_space</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="views.html#compiler_gym.views.ObservationSpaceSpec" title="compiler_gym.views.observation_space_spec.ObservationSpaceSpec"><span class="pre">compiler_gym.views.observation_space_spec.ObservationSpaceSpec</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reward_space</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="spaces.html#compiler_gym.spaces.Reward" title="compiler_gym.spaces.reward.Reward"><span class="pre">compiler_gym.spaces.reward.Reward</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_space</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">derived_observation_spaces</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection_settings</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="service.html#compiler_gym.service.ConnectionOpts" title="compiler_gym.service.connection.ConnectionOpts"><span class="pre">compiler_gym.service.connection.ConnectionOpts</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">service_connection</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="service.html#compiler_gym.service.CompilerGymServiceConnection" title="compiler_gym.service.connection.CompilerGymServiceConnection"><span class="pre">compiler_gym.service.connection.CompilerGymServiceConnection</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">logging.Logger</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/envs/compiler_env.html#CompilerEnv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.CompilerEnv" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.envs.</span></span><span class="sig-name descname"><span class="pre">CompilerEnv</span></span><a class="reference internal" href="../_modules/compiler_gym/envs/compiler_env.html#CompilerEnv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.CompilerEnv" title="Permalink to this definition">¶</a></dt>
 <dd><p>An OpenAI gym environment for compiler optimizations.</p>
 <p>The easiest way to create a CompilerGym environment is to call
 <code class="code docutils literal notranslate"><span class="pre">gym.make()</span></code> on one of the registered environments:</p>
@@ -238,7 +239,7 @@ environment names.</p>
 <p>Alternatively, an environment can be constructed directly, such as by
 connecting to a running compiler service at <code class="code docutils literal notranslate"><span class="pre">localhost:8080</span></code> (see
 <a class="reference internal" href="service.html"><span class="doc">this document</span></a> for more details):</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span> <span class="o">=</span> <span class="n">CompilerEnv</span><span class="p">(</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span> <span class="o">=</span> <span class="n">ClientServiceCompilerEnv</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">service</span><span class="o">=</span><span class="s2">&quot;localhost:8080&quot;</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">observation_space</span><span class="o">=</span><span class="s2">&quot;features&quot;</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">reward_space</span><span class="o">=</span><span class="s2">&quot;runtime&quot;</span><span class="p">,</span>
@@ -260,80 +261,21 @@ regular <code class="code docutils literal notranslate"><span class="pre">gym.En
 <span class="go">Reward after 100 steps: -0.32123</span>
 </pre></div>
 </div>
-<dl class="field-list simple">
-<dt class="field-odd">Variables</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>service</strong> (<a class="reference internal" href="service.html#compiler_gym.service.CompilerGymServiceConnection" title="compiler_gym.service.CompilerGymServiceConnection"><em>compiler_gym.service.CompilerGymServiceConnection</em></a>) – A connection to the underlying compiler service.</p></li>
-<li><p><strong>action_spaces</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – A list of supported action space names.</p></li>
-<li><p><strong>actions</strong> (<em>List</em><em>[</em><em>ActionType</em><em>]</em>) – The list of actions that have been performed since the
-previous call to <a class="reference internal" href="#compiler_gym.envs.CompilerEnv.reset" title="compiler_gym.envs.CompilerEnv.reset"><code class="xref py py-func docutils literal notranslate"><span class="pre">reset()</span></code></a>.</p></li>
-<li><p><strong>reward_range</strong> (<a class="reference internal" href="spaces.html#compiler_gym.spaces.Tuple" title="compiler_gym.spaces.Tuple"><em>Tuple</em></a><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em>) – A tuple indicating the range of reward values. Default
-range is (-inf, +inf).</p></li>
-<li><p><strong>observation</strong> (<a class="reference internal" href="views.html#compiler_gym.views.ObservationView" title="compiler_gym.views.ObservationView"><em>compiler_gym.views.ObservationView</em></a>) – A view of the available observation spaces that permits
-on-demand computation of observations.</p></li>
-<li><p><strong>reward</strong> (<a class="reference internal" href="views.html#compiler_gym.views.RewardView" title="compiler_gym.views.RewardView"><em>compiler_gym.views.RewardView</em></a>) – A view of the available reward spaces that permits on-demand
-computation of rewards.</p></li>
-<li><p><strong>episode_reward</strong> (<em>float</em>) – If <code class="xref py py-func docutils literal notranslate"><span class="pre">CompilerEnv.reward_space</span></code> is set, this value is the
-sum of all rewards for the current episode.</p></li>
-</ul>
-</dd>
-</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="compiler_gym.envs.CompilerEnv.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="spaces.html#compiler_gym.spaces.Reward" title="compiler_gym.spaces.reward.Reward"><span class="pre">compiler_gym.spaces.reward.Reward</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datasets</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="datasets.html#compiler_gym.datasets.Dataset" title="compiler_gym.datasets.dataset.Dataset"><span class="pre">compiler_gym.datasets.dataset.Dataset</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">benchmark</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="datasets.html#compiler_gym.datasets.Benchmark" title="compiler_gym.datasets.benchmark.Benchmark"><span class="pre">compiler_gym.datasets.benchmark.Benchmark</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observation_space</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="views.html#compiler_gym.views.ObservationSpaceSpec" title="compiler_gym.views.observation_space_spec.ObservationSpaceSpec"><span class="pre">compiler_gym.views.observation_space_spec.ObservationSpaceSpec</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reward_space</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="spaces.html#compiler_gym.spaces.Reward" title="compiler_gym.spaces.reward.Reward"><span class="pre">compiler_gym.spaces.reward.Reward</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_space</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">derived_observation_spaces</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection_settings</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="service.html#compiler_gym.service.ConnectionOpts" title="compiler_gym.service.connection.ConnectionOpts"><span class="pre">compiler_gym.service.connection.ConnectionOpts</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">service_connection</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="service.html#compiler_gym.service.CompilerGymServiceConnection" title="compiler_gym.service.connection.CompilerGymServiceConnection"><span class="pre">compiler_gym.service.connection.CompilerGymServiceConnection</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">logging.Logger</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/envs/compiler_env.html#CompilerEnv.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Construct and initialize a CompilerGym environment.</p>
-<p>In normal use you should use <code class="code docutils literal notranslate"><span class="pre">gym.make(...)</span></code> rather than calling
-the constructor directly.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>service</strong> – The hostname and port of a service that implements the
-CompilerGym service interface, or the path of a binary file which
-provides the CompilerGym service interface when executed. See
-<a class="reference internal" href="service.html"><span class="doc">compiler_gym.service</span></a> for details.</p></li>
-<li><p><strong>rewards</strong> – The reward spaces that this environment supports.
-Rewards are typically calculated based on observations generated by
-the service. See <a class="reference internal" href="spaces.html#compiler_gym.spaces.Reward" title="compiler_gym.spaces.Reward"><code class="xref py py-class docutils literal notranslate"><span class="pre">Reward</span></code></a> for
-details.</p></li>
-<li><p><strong>benchmark</strong> – The benchmark to use for this environment. Either a
-URI string, or a <a class="reference internal" href="datasets.html#compiler_gym.datasets.Benchmark" title="compiler_gym.datasets.Benchmark"><code class="xref py py-class docutils literal notranslate"><span class="pre">Benchmark</span></code></a> instance. If not provided, the
-first benchmark as returned by
-<code class="code docutils literal notranslate"><span class="pre">next(env.datasets.benchmarks())</span></code> will be used as the default.</p></li>
-<li><p><strong>observation_space</strong> – Compute and return observations at each
-<a class="reference internal" href="#compiler_gym.envs.CompilerEnv.step" title="compiler_gym.envs.CompilerEnv.step"><code class="xref py py-func docutils literal notranslate"><span class="pre">step()</span></code></a> from this space. Accepts a string name or an
-<a class="reference internal" href="views.html#compiler_gym.views.ObservationSpaceSpec" title="compiler_gym.views.ObservationSpaceSpec"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObservationSpaceSpec</span></code></a>. If not provided,
-<a class="reference internal" href="#compiler_gym.envs.CompilerEnv.step" title="compiler_gym.envs.CompilerEnv.step"><code class="xref py py-func docutils literal notranslate"><span class="pre">step()</span></code></a> returns <code class="code docutils literal notranslate"><span class="pre">None</span></code> for the observation value. Can
-be set later using <a class="reference internal" href="#compiler_gym.envs.CompilerEnv.observation_space" title="compiler_gym.envs.CompilerEnv.observation_space"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.observation_space</span></code></a>. For available
-spaces, see <a class="reference internal" href="views.html#compiler_gym.views.ObservationView" title="compiler_gym.views.ObservationView"><code class="xref py py-class docutils literal notranslate"><span class="pre">env.observation.spaces</span></code></a>.</p></li>
-<li><p><strong>reward_space</strong> – Compute and return reward at each <a class="reference internal" href="#compiler_gym.envs.CompilerEnv.step" title="compiler_gym.envs.CompilerEnv.step"><code class="xref py py-func docutils literal notranslate"><span class="pre">step()</span></code></a>
-from this space. Accepts a string name or a <a class="reference internal" href="spaces.html#compiler_gym.spaces.Reward" title="compiler_gym.spaces.Reward"><code class="xref py py-class docutils literal notranslate"><span class="pre">Reward</span></code></a>. If not provided, <a class="reference internal" href="#compiler_gym.envs.CompilerEnv.step" title="compiler_gym.envs.CompilerEnv.step"><code class="xref py py-func docutils literal notranslate"><span class="pre">step()</span></code></a>
-returns <code class="code docutils literal notranslate"><span class="pre">None</span></code> for the reward value. Can be set later using
-<a class="reference internal" href="#compiler_gym.envs.CompilerEnv.reward_space" title="compiler_gym.envs.CompilerEnv.reward_space"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.reward_space</span></code></a>. For available spaces,
-see <a class="reference internal" href="views.html#compiler_gym.views.RewardView" title="compiler_gym.views.RewardView"><code class="xref py py-class docutils literal notranslate"><span class="pre">env.reward.spaces</span></code></a>.</p></li>
-<li><p><strong>action_space</strong> – The name of the action space to use. If not
-specified, the default action space for this compiler is used.</p></li>
-<li><p><strong>derived_observation_spaces</strong> – An optional list of arguments to be
-passed to <code class="xref py py-meth docutils literal notranslate"><span class="pre">env.observation.add_derived_space()</span></code>.</p></li>
-<li><p><strong>connection_settings</strong> – The settings used to establish a connection
-with the remote service.</p></li>
-<li><p><strong>service_connection</strong> – An existing compiler gym service connection
-to use.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>FileNotFoundError</strong> – If service is a path to a file that is not
-found.</p></li>
-<li><p><strong>TimeoutError</strong> – If the compiler service fails to initialize within
-the parameters provided in <code class="code docutils literal notranslate"><span class="pre">connection_settings</span></code>.</p></li>
-</ul>
-</dd>
-</dl>
+<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/envs/compiler_env.html#CompilerEnv.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct an environment.</p>
+<p>Do not construct an environment directly. Use <code class="code docutils literal notranslate"><span class="pre">gym.make()</span></code> on one
+of the registered environments:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;llvm-v0&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">env</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">pass</span>  <span class="c1"># Use environment</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="compiler_gym.envs.CompilerEnv.action_space">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">action_space</span></span><em class="property"><span class="pre">:</span> <span class="pre">gym.spaces.space.Space</span></em><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.action_space" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">action_space</span></span><em class="property"><span class="pre">:</span> <span class="pre">gym.spaces.space.Space</span></em><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.action_space" title="Permalink to this definition">¶</a></dt>
 <dd><p>The current action space.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Getter</dt>
@@ -347,13 +289,19 @@ selected.</p>
 </dl>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.envs.CompilerEnv.action_spaces">
+<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">action_spaces</span></span><em class="property"><span class="pre">:</span> <span class="pre">List[str]</span></em><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.action_spaces" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list of supported action space names.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="compiler_gym.envs.CompilerEnv.apply">
-<span class="sig-name descname"><span class="pre">apply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="compiler_gym.html#compiler_gym.CompilerEnvState" title="compiler_gym.compiler_env_state.CompilerEnvState"><span class="pre">compiler_gym.compiler_env_state.CompilerEnvState</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="reference internal" href="../_modules/compiler_gym/envs/compiler_env.html#CompilerEnv.apply"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.apply" title="Permalink to this definition">¶</a></dt>
-<dd><p>Replay this state on the given an environment.</p>
+<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">apply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="compiler_gym.html#compiler_gym.CompilerEnvState" title="compiler_gym.compiler_env_state.CompilerEnvState"><span class="pre">compiler_gym.compiler_env_state.CompilerEnvState</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="reference internal" href="../_modules/compiler_gym/envs/compiler_env.html#CompilerEnv.apply"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.apply" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replay this state on the given environment.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>env</strong> – A <a class="reference internal" href="#compiler_gym.envs.CompilerEnv" title="compiler_gym.envs.CompilerEnv"><code class="xref py py-class docutils literal notranslate"><span class="pre">CompilerEnv</span></code></a>
+<dd class="field-odd"><p><strong>state</strong> – A <a class="reference internal" href="compiler_gym.html#compiler_gym.CompilerEnvState" title="compiler_gym.CompilerEnvState"><code class="xref py py-class docutils literal notranslate"><span class="pre">CompilerEnvState</span></code></a>
 instance.</p>
 </dd>
 <dt class="field-even">Raises</dt>
@@ -364,7 +312,7 @@ instance.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="compiler_gym.envs.CompilerEnv.benchmark">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">benchmark</span></span><em class="property"><span class="pre">:</span> <span class="pre">compiler_gym.datasets.benchmark.Benchmark</span></em><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.benchmark" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">benchmark</span></span><em class="property"><span class="pre">:</span> <span class="pre">compiler_gym.datasets.benchmark.Benchmark</span></em><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.benchmark" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get or set the benchmark to use.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Getter</dt>
@@ -385,36 +333,26 @@ benchmark as in <a class="reference internal" href="datasets.html#compiler_gym.d
 
 <dl class="py method">
 <dt class="sig sig-object py" id="compiler_gym.envs.CompilerEnv.close">
-<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/envs/compiler_env.html#CompilerEnv.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.close" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/envs/compiler_env.html#CompilerEnv.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.close" title="Permalink to this definition">¶</a></dt>
 <dd><p>Close the environment.</p>
 <p>Once closed, <a class="reference internal" href="#compiler_gym.envs.CompilerEnv.reset" title="compiler_gym.envs.CompilerEnv.reset"><code class="xref py py-func docutils literal notranslate"><span class="pre">reset()</span></code></a> must be called before the environment is used
 again.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Internally, CompilerGym environments may launch subprocesses and use
-temporary files to communicate between the environment and the
-underlying compiler (see <a class="reference internal" href="service.html#compiler-gym-service"><span class="std std-ref">compiler_gym.service</span></a> for details). This
-means it is important to call <a class="reference internal" href="#compiler_gym.envs.CompilerEnv.close" title="compiler_gym.envs.CompilerEnv.close"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.close()</span></code></a> after use to free up
-resources and prevent orphan subprocesses or files. We recommend
-using the <code class="code docutils literal notranslate"><span class="pre">with</span></code>-statement pattern for creating environments:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;llvm-autophase-ic-v0&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">env</span><span class="p">:</span>
-<span class="gp">... </span>   <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
-<span class="gp">... </span>   <span class="c1"># use env how you like</span>
-</pre></div>
-</div>
-<p>This removes the need to call <a class="reference internal" href="#compiler_gym.envs.CompilerEnv.close" title="compiler_gym.envs.CompilerEnv.close"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.close()</span></code></a> yourself.</p>
+<p>You must make sure to call <code class="code docutils literal notranslate"><span class="pre">env.close()</span></code> on a CompilerGym
+environment when you are done with it. This is needed to perform
+manual tidying up of temporary files and processes. See <a class="reference internal" href="../faq.html#do-i-need-to-call-env-close"><span class="std std-ref">the
+FAQ</span></a> for more details.</p>
 </div>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="compiler_gym.envs.CompilerEnv.commandline">
-<span class="sig-name descname"><span class="pre">commandline</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">str</span><a class="reference internal" href="../_modules/compiler_gym/envs/compiler_env.html#CompilerEnv.commandline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.commandline" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">commandline</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">str</span><a class="reference internal" href="../_modules/compiler_gym/envs/compiler_env.html#CompilerEnv.commandline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.commandline" title="Permalink to this definition">¶</a></dt>
 <dd><p>Interface for <a class="reference internal" href="#compiler_gym.envs.CompilerEnv" title="compiler_gym.envs.CompilerEnv"><code class="xref py py-class docutils literal notranslate"><span class="pre">CompilerEnv</span></code></a>
 subclasses to provide an equivalent commandline invocation to the
 current environment state.</p>
 <p>See also <a class="reference internal" href="#compiler_gym.envs.CompilerEnv.commandline_to_actions" title="compiler_gym.envs.CompilerEnv.commandline_to_actions"><code class="xref py py-meth docutils literal notranslate"><span class="pre">commandline_to_actions()</span></code></a>.</p>
-<p>Calling this method on a <a class="reference internal" href="#compiler_gym.envs.CompilerEnv" title="compiler_gym.envs.CompilerEnv"><code class="xref py py-class docutils literal notranslate"><span class="pre">CompilerEnv</span></code></a> instance raises
-<code class="code docutils literal notranslate"><span class="pre">NotImplementedError</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>A string commandline invocation.</p>
@@ -424,13 +362,11 @@ current environment state.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="compiler_gym.envs.CompilerEnv.commandline_to_actions">
-<span class="sig-name descname"><span class="pre">commandline_to_actions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">commandline</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">compiler_gym.util.gym_type_hints.ActionType</span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/compiler_gym/envs/compiler_env.html#CompilerEnv.commandline_to_actions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.commandline_to_actions" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">commandline_to_actions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">commandline</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">compiler_gym.util.gym_type_hints.ActionType</span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/compiler_gym/envs/compiler_env.html#CompilerEnv.commandline_to_actions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.commandline_to_actions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Interface for <a class="reference internal" href="#compiler_gym.envs.CompilerEnv" title="compiler_gym.envs.CompilerEnv"><code class="xref py py-class docutils literal notranslate"><span class="pre">CompilerEnv</span></code></a>
 subclasses to convert from a commandline invocation to a sequence of
 actions.</p>
 <p>See also <a class="reference internal" href="#compiler_gym.envs.CompilerEnv.commandline" title="compiler_gym.envs.CompilerEnv.commandline"><code class="xref py py-meth docutils literal notranslate"><span class="pre">commandline()</span></code></a>.</p>
-<p>Calling this method on a <a class="reference internal" href="#compiler_gym.envs.CompilerEnv" title="compiler_gym.envs.CompilerEnv"><code class="xref py py-class docutils literal notranslate"><span class="pre">CompilerEnv</span></code></a> instance raises
-<code class="code docutils literal notranslate"><span class="pre">NotImplementedError</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>A list of actions.</p>
@@ -440,20 +376,36 @@ actions.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="compiler_gym.envs.CompilerEnv.compiler_version">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">compiler_version</span></span><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.compiler_version" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">compiler_version</span></span><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.compiler_version" title="Permalink to this definition">¶</a></dt>
 <dd><p>The version string of the underlying compiler that this service supports.</p>
 </dd></dl>
 
 <dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.envs.CompilerEnv.episode_reward">
+<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">episode_reward</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional[float]</span></em><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.episode_reward" title="Permalink to this definition">¶</a></dt>
+<dd><p><cite>CompilerEnv.reward_space
+&lt;compiler_gym.envs.CompilerGym.reward_space&gt;</cite> is set, this value is the
+sum of all rewards for the current episode.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>If</p>
+</dd>
+<dt class="field-even">Type</dt>
+<dd class="field-even"><p>func</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="compiler_gym.envs.CompilerEnv.episode_walltime">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">episode_walltime</span></span><em class="property"><span class="pre">:</span> <span class="pre">float</span></em><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.episode_walltime" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">episode_walltime</span></span><em class="property"><span class="pre">:</span> <span class="pre">float</span></em><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.episode_walltime" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the amount of time in seconds since the last call to
-<code class="xref py py-meth docutils literal notranslate"><span class="pre">reset()</span></code>.</p>
+<a class="reference internal" href="#compiler_gym.envs.CompilerEnv.reset" title="compiler_gym.envs.CompilerEnv.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reset()</span></code></a>.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="compiler_gym.envs.CompilerEnv.fork">
-<span class="sig-name descname"><span class="pre">fork</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#compiler_gym.envs.CompilerEnv" title="compiler_gym.envs.compiler_env.CompilerEnv"><span class="pre">compiler_gym.envs.compiler_env.CompilerEnv</span></a><a class="reference internal" href="../_modules/compiler_gym/envs/compiler_env.html#CompilerEnv.fork"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.fork" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">fork</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#compiler_gym.envs.CompilerEnv" title="compiler_gym.envs.compiler_env.CompilerEnv"><span class="pre">compiler_gym.envs.compiler_env.CompilerEnv</span></a><a class="reference internal" href="../_modules/compiler_gym/envs/compiler_env.html#CompilerEnv.fork"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.fork" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fork a new environment with exactly the same state.</p>
 <p>This creates a duplicate environment instance with the current state.
 The new environment is entirely independently of the source environment.
@@ -480,7 +432,7 @@ on the original and new environments.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="compiler_gym.envs.CompilerEnv.in_episode">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">in_episode</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.in_episode" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">in_episode</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.in_episode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Whether the service is ready for <a class="reference internal" href="#compiler_gym.envs.CompilerEnv.step" title="compiler_gym.envs.CompilerEnv.step"><code class="xref py py-func docutils literal notranslate"><span class="pre">step()</span></code></a> to be called,
 i.e. <a class="reference internal" href="#compiler_gym.envs.CompilerEnv.reset" title="compiler_gym.envs.CompilerEnv.reset"><code class="xref py py-func docutils literal notranslate"><span class="pre">reset()</span></code></a> has been called and <a class="reference internal" href="#compiler_gym.envs.CompilerEnv.close" title="compiler_gym.envs.CompilerEnv.close"><code class="xref py py-func docutils literal notranslate"><span class="pre">close()</span></code></a> has not.</p>
 <dl class="field-list simple">
@@ -492,18 +444,15 @@ i.e. <a class="reference internal" href="#compiler_gym.envs.CompilerEnv.reset" t
 
 <dl class="py property">
 <dt class="sig sig-object py" id="compiler_gym.envs.CompilerEnv.logger">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.logger" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.logger" title="Permalink to this definition">¶</a></dt>
 <dd><div class="deprecated">
 <p><span class="versionmodified deprecated">Deprecated since version 0.2.1.</span></p>
 </div>
-<p>The <cite>CompilerEnv.logger</cite> attribute is deprecated. All
-CompilerEnv instances share a logger named
-compiler_gym.envs.compiler_env</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="compiler_gym.envs.CompilerEnv.multistep">
-<span class="sig-name descname"><span class="pre">multistep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actions</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">compiler_gym.util.gym_type_hints.ActionType</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observation_spaces</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="views.html#compiler_gym.views.ObservationSpaceSpec" title="compiler_gym.views.observation_space_spec.ObservationSpaceSpec"><span class="pre">compiler_gym.views.observation_space_spec.ObservationSpaceSpec</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reward_spaces</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="spaces.html#compiler_gym.spaces.Reward" title="compiler_gym.spaces.reward.Reward"><span class="pre">compiler_gym.spaces.reward.Reward</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observations</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="views.html#compiler_gym.views.ObservationSpaceSpec" title="compiler_gym.views.observation_space_spec.ObservationSpaceSpec"><span class="pre">compiler_gym.views.observation_space_spec.ObservationSpaceSpec</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="spaces.html#compiler_gym.spaces.Reward" title="compiler_gym.spaces.reward.Reward"><span class="pre">compiler_gym.spaces.reward.Reward</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/envs/compiler_env.html#CompilerEnv.multistep"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.multistep" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">multistep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actions</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">compiler_gym.util.gym_type_hints.ActionType</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observation_spaces</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="views.html#compiler_gym.views.ObservationSpaceSpec" title="compiler_gym.views.observation_space_spec.ObservationSpaceSpec"><span class="pre">compiler_gym.views.observation_space_spec.ObservationSpaceSpec</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reward_spaces</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="spaces.html#compiler_gym.spaces.Reward" title="compiler_gym.spaces.reward.Reward"><span class="pre">compiler_gym.spaces.reward.Reward</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observations</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="views.html#compiler_gym.views.ObservationSpaceSpec" title="compiler_gym.views.observation_space_spec.ObservationSpaceSpec"><span class="pre">compiler_gym.views.observation_space_spec.ObservationSpaceSpec</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="spaces.html#compiler_gym.spaces.Reward" title="compiler_gym.spaces.reward.Reward"><span class="pre">compiler_gym.spaces.reward.Reward</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/envs/compiler_env.html#CompilerEnv.multistep"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.multistep" title="Permalink to this definition">¶</a></dt>
 <dd><p>Take a sequence of steps and return the final observation and reward.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -524,15 +473,19 @@ tuple to be a list of rewards from the requested spaces. The default
 <dd class="field-even"><p>A tuple of observation, reward, done, and info. Observation and
 reward are None if default observation/reward is not set.</p>
 </dd>
-<dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><a class="reference internal" href="service.html#compiler_gym.service.SessionNotFound" title="compiler_gym.service.SessionNotFound"><strong>SessionNotFound</strong></a> – If <a class="reference internal" href="#compiler_gym.envs.CompilerEnv.reset" title="compiler_gym.envs.CompilerEnv.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reset()</span></code></a> has not been called.</p>
-</dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.envs.CompilerEnv.observation">
+<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">observation</span></span><em class="property"><span class="pre">:</span> <span class="pre">compiler_gym.views.observation.ObservationView</span></em><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.observation" title="Permalink to this definition">¶</a></dt>
+<dd><p>A view of the available observation spaces that permits
+on-demand computation of observations.</p>
+</dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="compiler_gym.envs.CompilerEnv.observation_space">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">observation_space</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional[gym.spaces.space.Space]</span></em><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.observation_space" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">observation_space</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional[gym.spaces.space.Space]</span></em><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.observation_space" title="Permalink to this definition">¶</a></dt>
 <dd><p>The observation space that is used to return an observation value in
 <a class="reference internal" href="#compiler_gym.envs.CompilerEnv.step" title="compiler_gym.envs.CompilerEnv.step"><code class="xref py py-func docutils literal notranslate"><span class="pre">step()</span></code></a>.</p>
 <dl class="field-list simple">
@@ -547,44 +500,9 @@ not set.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="compiler_gym.envs.CompilerEnv.raw_step">
-<span class="sig-name descname"><span class="pre">raw_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actions</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">compiler_gym.util.gym_type_hints.ActionType</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observation_spaces</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="views.html#compiler_gym.views.ObservationSpaceSpec" title="compiler_gym.views.observation_space_spec.ObservationSpaceSpec"><span class="pre">compiler_gym.views.observation_space_spec.ObservationSpaceSpec</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reward_spaces</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="spaces.html#compiler_gym.spaces.Reward" title="compiler_gym.spaces.reward.Reward"><span class="pre">compiler_gym.spaces.reward.Reward</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">compiler_gym.util.gym_type_hints.ObservationType</span><span class="p"><span class="pre">,</span> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">compiler_gym.util.gym_type_hints.ObservationType</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><span class="pre">bool</span><span class="p"><span class="pre">,</span> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/compiler_gym/envs/compiler_env.html#CompilerEnv.raw_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.raw_step" title="Permalink to this definition">¶</a></dt>
-<dd><p>Take a step.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>actions</strong> – A list of actions to be applied.</p></li>
-<li><p><strong>observations</strong> – A list of observations spaces to compute
-observations from. These are evaluated after the actions are
-applied.</p></li>
-<li><p><strong>rewards</strong> – A list of reward spaces to compute rewards from. These
-are evaluated after the actions are applied.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A tuple of observations, rewards, done, and info. Observations
-and rewards are lists.</p>
-</dd>
-<dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><a class="reference internal" href="service.html#compiler_gym.service.SessionNotFound" title="compiler_gym.service.SessionNotFound"><strong>SessionNotFound</strong></a> – If <a class="reference internal" href="#compiler_gym.envs.CompilerEnv.reset" title="compiler_gym.envs.CompilerEnv.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reset()</span></code></a> has not been called.</p>
-</dd>
-</dl>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Don’t call this method directly, use <a class="reference internal" href="#compiler_gym.envs.CompilerEnv.step" title="compiler_gym.envs.CompilerEnv.step"><code class="xref py py-meth docutils literal notranslate"><span class="pre">step()</span></code></a> or <a class="reference internal" href="#compiler_gym.envs.CompilerEnv.multistep" title="compiler_gym.envs.CompilerEnv.multistep"><code class="xref py py-meth docutils literal notranslate"><span class="pre">multistep()</span></code></a> instead. The
-<a class="reference internal" href="#compiler_gym.envs.CompilerEnv.step" title="compiler_gym.envs.CompilerEnv.step"><code class="xref py py-meth docutils literal notranslate"><span class="pre">raw_step()</span></code></a> method is an
-implementation detail.</p>
-</div>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="compiler_gym.envs.CompilerEnv.render">
-<span class="sig-name descname"><span class="pre">render</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'human'</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/compiler_gym/envs/compiler_env.html#CompilerEnv.render"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.render" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">render</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'human'</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/compiler_gym/envs/compiler_env.html#CompilerEnv.render"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.render" title="Permalink to this definition">¶</a></dt>
 <dd><p>Render the environment.</p>
-<p>CompilerEnv instances support two render modes: “human”, which prints
-the current environment state to the terminal and return nothing; and
-“ansi”, which returns a string representation of the current environment
-state.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>mode</strong> – The render mode to use.</p>
@@ -598,7 +516,7 @@ requested render mode does not exist.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="compiler_gym.envs.CompilerEnv.reset">
-<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">benchmark</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="datasets.html#compiler_gym.datasets.Benchmark" title="compiler_gym.datasets.benchmark.Benchmark"><span class="pre">compiler_gym.datasets.benchmark.Benchmark</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_space</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_count</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">compiler_gym.util.gym_type_hints.ObservationType</span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/compiler_gym/envs/compiler_env.html#CompilerEnv.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.reset" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">benchmark:</span> <span class="pre">Optional[Union[str</span></em>, <em class="sig-param"><span class="pre">compiler_gym.datasets.benchmark.Benchmark]]</span> <span class="pre">=</span> <span class="pre">None</span></em>, <em class="sig-param"><span class="pre">action_space:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">None</span></em>, <em class="sig-param"><span class="pre">observation_space:</span> <span class="pre">Union[compiler_gym.util.gym_type_hints.OptionalArgumentValue</span></em>, <em class="sig-param"><span class="pre">str</span></em>, <em class="sig-param"><span class="pre">compiler_gym.views.observation_space_spec.ObservationSpaceSpec]</span> <span class="pre">=</span> <span class="pre">&lt;OptionalArgumentValue.UNCHANGED:</span> <span class="pre">1&gt;</span></em>, <em class="sig-param"><span class="pre">reward_space:</span> <span class="pre">Union[compiler_gym.util.gym_type_hints.OptionalArgumentValue</span></em>, <em class="sig-param"><span class="pre">str</span></em>, <em class="sig-param"><span class="pre">compiler_gym.spaces.reward.Reward]</span> <span class="pre">=</span> <span class="pre">&lt;OptionalArgumentValue.UNCHANGED:</span> <span class="pre">1&gt;</span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">compiler_gym.util.gym_type_hints.ObservationType</span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/compiler_gym/envs/compiler_env.html#CompilerEnv.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.reset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reset the environment state.</p>
 <p>This method must be called before <a class="reference internal" href="#compiler_gym.envs.CompilerEnv.step" title="compiler_gym.envs.CompilerEnv.step"><code class="xref py py-func docutils literal notranslate"><span class="pre">step()</span></code></a>.</p>
 <dl class="field-list simple">
@@ -614,6 +532,19 @@ use.</p></li>
 it overrides any value that set during <a class="reference internal" href="#compiler_gym.envs.CompilerEnv.__init__" title="compiler_gym.envs.CompilerEnv.__init__"><code class="xref py py-func docutils literal notranslate"><span class="pre">__init__()</span></code></a>, and
 subsequent calls to <code class="code docutils literal notranslate"><span class="pre">reset()</span></code> will use this action space. If
 no action space is provided, the default action space is used.</p></li>
+<li><p><strong>observation_space</strong> – Compute and return observations at each
+<a class="reference internal" href="#compiler_gym.envs.CompilerEnv.step" title="compiler_gym.envs.CompilerEnv.step"><code class="xref py py-func docutils literal notranslate"><span class="pre">step()</span></code></a> from this space. Accepts a string name or an
+<a class="reference internal" href="views.html#compiler_gym.views.ObservationSpaceSpec" title="compiler_gym.views.ObservationSpaceSpec"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObservationSpaceSpec</span></code></a>. If <code class="code docutils literal notranslate"><span class="pre">None</span></code>,
+<a class="reference internal" href="#compiler_gym.envs.CompilerEnv.step" title="compiler_gym.envs.CompilerEnv.step"><code class="xref py py-func docutils literal notranslate"><span class="pre">step()</span></code></a> returns <code class="code docutils literal notranslate"><span class="pre">None</span></code> for the observation value. If
+<code class="code docutils literal notranslate"><span class="pre">OptionalArgumentValue.UNCHANGED</span></code> (the default value), the
+observation space remains unchanged from the previous episode. For
+available spaces, see <a class="reference internal" href="views.html#compiler_gym.views.ObservationView" title="compiler_gym.views.ObservationView"><code class="xref py py-class docutils literal notranslate"><span class="pre">env.observation.spaces</span></code></a>.</p></li>
+<li><p><strong>reward_space</strong> – Compute and return reward at each <a class="reference internal" href="#compiler_gym.envs.CompilerEnv.step" title="compiler_gym.envs.CompilerEnv.step"><code class="xref py py-func docutils literal notranslate"><span class="pre">step()</span></code></a>
+from this space. Accepts a string name or a <a class="reference internal" href="spaces.html#compiler_gym.spaces.Reward" title="compiler_gym.spaces.Reward"><code class="xref py py-class docutils literal notranslate"><span class="pre">Reward</span></code></a>. If <code class="code docutils literal notranslate"><span class="pre">None</span></code>, <a class="reference internal" href="#compiler_gym.envs.CompilerEnv.step" title="compiler_gym.envs.CompilerEnv.step"><code class="xref py py-func docutils literal notranslate"><span class="pre">step()</span></code></a>
+returns <code class="code docutils literal notranslate"><span class="pre">None</span></code> for the reward value.  If
+<code class="code docutils literal notranslate"><span class="pre">OptionalArgumentValue.UNCHANGED</span></code> (the default value), the
+observation space remains unchanged from the previous episode. For
+available spaces, see <a class="reference internal" href="views.html#compiler_gym.views.RewardView" title="compiler_gym.views.RewardView"><code class="xref py py-class docutils literal notranslate"><span class="pre">env.reward.spaces</span></code></a>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -631,8 +562,22 @@ does not have a default benchmark to select from.</p></li>
 </dd></dl>
 
 <dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.envs.CompilerEnv.reward">
+<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">reward</span></span><em class="property"><span class="pre">:</span> <span class="pre">compiler_gym.views.reward.RewardView</span></em><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.reward" title="Permalink to this definition">¶</a></dt>
+<dd><p>A view of the available reward spaces that permits on-demand
+computation of rewards.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.envs.CompilerEnv.reward_range">
+<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">reward_range</span></span><em class="property"><span class="pre">:</span> <span class="pre">Tuple[float,</span> <span class="pre">float]</span></em><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.reward_range" title="Permalink to this definition">¶</a></dt>
+<dd><p>A tuple indicating the range of reward values.</p>
+<p>Default range is (-inf, +inf).</p>
+</dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="compiler_gym.envs.CompilerEnv.reward_space">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">reward_space</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional[compiler_gym.spaces.reward.Reward]</span></em><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.reward_space" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">reward_space</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional[compiler_gym.spaces.reward.Reward]</span></em><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.reward_space" title="Permalink to this definition">¶</a></dt>
 <dd><p>The default reward space that is used to return a reward value from
 <a class="reference internal" href="#compiler_gym.envs.CompilerEnv.step" title="compiler_gym.envs.CompilerEnv.step"><code class="xref py py-func docutils literal notranslate"><span class="pre">step()</span></code></a>.</p>
 <dl class="field-list simple">
@@ -646,64 +591,15 @@ or <code class="code docutils literal notranslate"><span class="pre">None</span>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="compiler_gym.envs.CompilerEnv.send_param">
-<span class="sig-name descname"><span class="pre">send_param</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">str</span><a class="reference internal" href="../_modules/compiler_gym/envs/compiler_env.html#CompilerEnv.send_param"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.send_param" title="Permalink to this definition">¶</a></dt>
-<dd><p>Send a single &lt;key, value&gt; parameter to the compiler service.</p>
-<p>See <a class="reference internal" href="#compiler_gym.envs.CompilerEnv.send_params" title="compiler_gym.envs.CompilerEnv.send_params"><code class="xref py py-meth docutils literal notranslate"><span class="pre">send_params()</span></code></a>
-for more information.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>key</strong> – The parameter key.</p></li>
-<li><p><strong>value</strong> – The parameter value.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The response from the compiler service.</p>
-</dd>
-<dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><a class="reference internal" href="service.html#compiler_gym.service.SessionNotFound" title="compiler_gym.service.SessionNotFound"><strong>SessionNotFound</strong></a> – If called before <a class="reference internal" href="#compiler_gym.envs.CompilerEnv.reset" title="compiler_gym.envs.CompilerEnv.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reset()</span></code></a>.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="compiler_gym.envs.CompilerEnv.send_params">
-<span class="sig-name descname"><span class="pre">send_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/compiler_gym/envs/compiler_env.html#CompilerEnv.send_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.send_params" title="Permalink to this definition">¶</a></dt>
-<dd><p>Send a list of &lt;key, value&gt; parameters to the compiler service.</p>
-<p>This provides a mechanism to send messages to the backend compilation
-session in a way that doesn’t conform to the normal communication
-pattern. This can be useful for things like configuring runtime
-debugging settings, or applying “meta actions” to the compiler that are
-not exposed in the compiler’s action space. Consult the documentation
-for a specific compiler service to see what parameters, if any, are
-supported.</p>
-<p>Must have called <a class="reference internal" href="#compiler_gym.envs.CompilerEnv.reset" title="compiler_gym.envs.CompilerEnv.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reset()</span></code></a>
-first.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>params</strong> – A list of parameters, where each parameter is a
-<code class="code docutils literal notranslate"><span class="pre">(key,</span> <span class="pre">value)</span></code> tuple.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A list of string responses, one per parameter.</p>
-</dd>
-<dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><a class="reference internal" href="service.html#compiler_gym.service.SessionNotFound" title="compiler_gym.service.SessionNotFound"><strong>SessionNotFound</strong></a> – If called before <a class="reference internal" href="#compiler_gym.envs.CompilerEnv.reset" title="compiler_gym.envs.CompilerEnv.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reset()</span></code></a>.</p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="compiler_gym.envs.CompilerEnv.state">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">state</span></span><em class="property"><span class="pre">:</span> <span class="pre">compiler_gym.compiler_env_state.CompilerEnvState</span></em><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.state" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">state</span></span><em class="property"><span class="pre">:</span> <span class="pre">compiler_gym.compiler_env_state.CompilerEnvState</span></em><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.state" title="Permalink to this definition">¶</a></dt>
 <dd><p>The tuple representation of the current environment state.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="compiler_gym.envs.CompilerEnv.step">
-<span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">compiler_gym.util.gym_type_hints.ActionType</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observation_spaces</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="views.html#compiler_gym.views.ObservationSpaceSpec" title="compiler_gym.views.observation_space_spec.ObservationSpaceSpec"><span class="pre">compiler_gym.views.observation_space_spec.ObservationSpaceSpec</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reward_spaces</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="spaces.html#compiler_gym.spaces.Reward" title="compiler_gym.spaces.reward.Reward"><span class="pre">compiler_gym.spaces.reward.Reward</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observations</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="views.html#compiler_gym.views.ObservationSpaceSpec" title="compiler_gym.views.observation_space_spec.ObservationSpaceSpec"><span class="pre">compiler_gym.views.observation_space_spec.ObservationSpaceSpec</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="spaces.html#compiler_gym.spaces.Reward" title="compiler_gym.spaces.reward.Reward"><span class="pre">compiler_gym.spaces.reward.Reward</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">compiler_gym.util.gym_type_hints.ObservationType</span><span class="p"><span class="pre">,</span> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">compiler_gym.util.gym_type_hints.ObservationType</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><span class="pre">bool</span><span class="p"><span class="pre">,</span> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/compiler_gym/envs/compiler_env.html#CompilerEnv.step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.step" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">compiler_gym.util.gym_type_hints.ActionType</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observation_spaces</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="views.html#compiler_gym.views.ObservationSpaceSpec" title="compiler_gym.views.observation_space_spec.ObservationSpaceSpec"><span class="pre">compiler_gym.views.observation_space_spec.ObservationSpaceSpec</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reward_spaces</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="spaces.html#compiler_gym.spaces.Reward" title="compiler_gym.spaces.reward.Reward"><span class="pre">compiler_gym.spaces.reward.Reward</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observations</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="views.html#compiler_gym.views.ObservationSpaceSpec" title="compiler_gym.views.observation_space_spec.ObservationSpaceSpec"><span class="pre">compiler_gym.views.observation_space_spec.ObservationSpaceSpec</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="spaces.html#compiler_gym.spaces.Reward" title="compiler_gym.spaces.reward.Reward"><span class="pre">compiler_gym.spaces.reward.Reward</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">compiler_gym.util.gym_type_hints.ObservationType</span><span class="p"><span class="pre">,</span> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">compiler_gym.util.gym_type_hints.ObservationType</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><span class="pre">bool</span><span class="p"><span class="pre">,</span> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/compiler_gym/envs/compiler_env.html#CompilerEnv.step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.step" title="Permalink to this definition">¶</a></dt>
 <dd><p>Take a step.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -724,15 +620,12 @@ tuple to be a list of rewards from the requested spaces. The default
 <dd class="field-even"><p>A tuple of observation, reward, done, and info. Observation and
 reward are None if default observation/reward is not set.</p>
 </dd>
-<dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><a class="reference internal" href="service.html#compiler_gym.service.SessionNotFound" title="compiler_gym.service.SessionNotFound"><strong>SessionNotFound</strong></a> – If <a class="reference internal" href="#compiler_gym.envs.CompilerEnv.reset" title="compiler_gym.envs.CompilerEnv.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reset()</span></code></a> has not been called.</p>
-</dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="compiler_gym.envs.CompilerEnv.validate">
-<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="compiler_gym.html#compiler_gym.CompilerEnvState" title="compiler_gym.compiler_env_state.CompilerEnvState"><span class="pre">compiler_gym.compiler_env_state.CompilerEnvState</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="compiler_gym.html#compiler_gym.ValidationResult" title="compiler_gym.validation_result.ValidationResult"><span class="pre">compiler_gym.validation_result.ValidationResult</span></a><a class="reference internal" href="../_modules/compiler_gym/envs/compiler_env.html#CompilerEnv.validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.validate" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="compiler_gym.html#compiler_gym.CompilerEnvState" title="compiler_gym.compiler_env_state.CompilerEnvState"><span class="pre">compiler_gym.compiler_env_state.CompilerEnvState</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="compiler_gym.html#compiler_gym.ValidationResult" title="compiler_gym.validation_result.ValidationResult"><span class="pre">compiler_gym.validation_result.ValidationResult</span></a><a class="reference internal" href="../_modules/compiler_gym/envs/compiler_env.html#CompilerEnv.validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.validate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Validate an environment’s state.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -747,14 +640,8 @@ is validated.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="compiler_gym.envs.CompilerEnv.version">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">version</span></span><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.version" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">version</span></span><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.version" title="Permalink to this definition">¶</a></dt>
 <dd><p>The version string of the compiler service.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="compiler_gym.envs.CompilerEnv.versions">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">versions</span></span><em class="property"><span class="pre">:</span> <span class="pre">compiler_gym.service.proto.compiler_gym_service_pb2.GetVersionReply</span></em><a class="headerlink" href="#compiler_gym.envs.CompilerEnv.versions" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the version numbers from the compiler service.</p>
 </dd></dl>
 
 </dd></dl>
@@ -765,8 +652,8 @@ is validated.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="compiler_gym.envs.LlvmEnv">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.envs.</span></span><span class="sig-name descname"><span class="pre">LlvmEnv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">benchmark</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="datasets.html#compiler_gym.datasets.Benchmark" title="compiler_gym.datasets.benchmark.Benchmark"><span class="pre">compiler_gym.datasets.benchmark.Benchmark</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datasets_site_path</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/envs/llvm/llvm_env.html#LlvmEnv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.LlvmEnv" title="Permalink to this definition">¶</a></dt>
-<dd><p>A specialized CompilerEnv for LLVM.</p>
-<p>This extends the default <a class="reference internal" href="#compiler_gym.envs.CompilerEnv" title="compiler_gym.envs.CompilerEnv"><code class="xref py py-class docutils literal notranslate"><span class="pre">CompilerEnv</span></code></a> environment, adding extra LLVM
+<dd><p>A specialized ClientServiceCompilerEnv for LLVM.</p>
+<p>This extends the default <code class="xref py py-class docutils literal notranslate"><span class="pre">ClientServiceCompilerEnv</span></code> environment, adding extra LLVM
 functionality. Specifically, the actions use the <a class="reference internal" href="spaces.html#compiler_gym.spaces.CommandlineFlag" title="compiler_gym.spaces.CommandlineFlag"><code class="xref py py-class docutils literal notranslate"><span class="pre">CommandlineFlag</span></code></a> space, which is a type of
 <code class="code docutils literal notranslate"><span class="pre">Discrete</span></code> space that provides additional documentation about each
 action, and the <a class="reference internal" href="#compiler_gym.envs.LlvmEnv.commandline" title="compiler_gym.envs.LlvmEnv.commandline"><code class="xref py py-meth docutils literal notranslate"><span class="pre">LlvmEnv.commandline()</span></code></a> method can be used to produce an
@@ -895,7 +782,7 @@ bitcode benchmark that can be passed to
 <a class="reference external" href="https://llvm.org/docs/DeveloperPolicy.html#ir-backwards-compatibility">LLVM docs</a>).
 You must ensure that any <code class="code docutils literal notranslate"><span class="pre">.bc</span></code> and <code class="code docutils literal notranslate"><span class="pre">.ll</span></code> files are
 compatible with the LLVM version used by CompilerGym, which can be
-reported using <a class="reference internal" href="#compiler_gym.envs.CompilerEnv.compiler_version" title="compiler_gym.envs.CompilerEnv.compiler_version"><code class="xref py py-func docutils literal notranslate"><span class="pre">env.compiler_version</span></code></a>.</p>
+reported using <code class="xref py py-func docutils literal notranslate"><span class="pre">env.compiler_version</span></code>.</p>
 </div>
 <p>E.g. for single-source C/C++ programs, you can pass the path of the source
 file:</p>
@@ -961,10 +848,73 @@ seconds.</p></li>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="compiler_gym.envs.LlvmEnv.make_benchmark_from_command_line">
+<span class="sig-name descname"><span class="pre">make_benchmark_from_command_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace_driver</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system_includes</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">600</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="datasets.html#compiler_gym.datasets.Benchmark" title="compiler_gym.datasets.benchmark.Benchmark"><span class="pre">compiler_gym.datasets.benchmark.Benchmark</span></a><a class="reference internal" href="../_modules/compiler_gym/envs/llvm/llvm_env.html#LlvmEnv.make_benchmark_from_command_line"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.LlvmEnv.make_benchmark_from_command_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a benchmark for use with this environment.</p>
+<p>This function takes a command line compiler invocation as input,
+modifies it to produce an unoptimized LLVM-IR bitcode, and then runs the
+modified command line to produce a bitcode benchmark.</p>
+<p>For example, the command line:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">benchmark</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">make_benchmark_from_command_line</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="s2">&quot;gcc&quot;</span><span class="p">,</span> <span class="s2">&quot;-DNDEBUG&quot;</span><span class="p">,</span> <span class="s2">&quot;a.c&quot;</span><span class="p">,</span> <span class="s2">&quot;b.c&quot;</span><span class="p">,</span> <span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="s2">&quot;-lm&quot;</span><span class="p">]</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Will compile a.c and b.c to an unoptimized benchmark that can be then
+passed to <code class="xref py py-meth docutils literal notranslate"><span class="pre">reset()</span></code>.</p>
+<p>The way this works is to change the first argument of the command line
+invocation to the version of clang shipped with CompilerGym, and to then
+append command line flags that causes the compiler to produce LLVM-IR
+with optimizations disabled. For example the input command line:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gcc</span> <span class="o">-</span><span class="n">DNDEBUG</span> <span class="n">a</span><span class="o">.</span><span class="n">c</span> <span class="n">b</span><span class="o">.</span><span class="n">c</span> <span class="o">-</span><span class="n">o</span> <span class="n">foo</span> <span class="o">-</span><span class="n">lm</span>
+</pre></div>
+</div>
+<p>Will be rewritten to be roughly equivalent to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">compiler_gym</span><span class="o">/</span><span class="n">clang</span> <span class="o">-</span><span class="n">DNDEG</span> <span class="n">a</span><span class="o">.</span><span class="n">c</span> <span class="n">b</span><span class="o">.</span><span class="n">c</span> \
+    <span class="o">-</span><span class="n">Xclang</span> <span class="o">-</span><span class="n">disable</span><span class="o">-</span><span class="n">llvm</span><span class="o">-</span><span class="n">passes</span> <span class="o">-</span><span class="n">Xclang</span> <span class="o">-</span><span class="n">disable</span><span class="o">-</span><span class="n">llvm</span><span class="o">-</span><span class="n">optzns</span> \ <span class="o">-</span><span class="n">c</span>
+    <span class="o">-</span><span class="n">emit</span><span class="o">-</span><span class="n">llvm</span>  <span class="o">-</span><span class="n">o</span> <span class="o">-</span>
+</pre></div>
+</div>
+<p>The generated benchmark then has a method <code class="xref py py-meth docutils literal notranslate"><span class="pre">compile()</span></code> which
+completes the linking and compilatilion to executable. For the above
+example, this would be roughly equivalent to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">compiler_gym</span><span class="o">/</span><span class="n">clang</span> <span class="n">environment</span><span class="o">-</span><span class="n">bitcode</span><span class="o">.</span><span class="n">bc</span> <span class="o">-</span><span class="n">o</span> <span class="n">foo</span> <span class="o">-</span><span class="n">lm</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cmd</strong> – A command line compiler invocation, either as a list of
+arguments (e.g. <code class="code docutils literal notranslate"><span class="pre">[&quot;clang&quot;,</span> <span class="pre">&quot;in.c&quot;]</span></code>) or as a single shell
+string (e.g. <code class="code docutils literal notranslate"><span class="pre">&quot;clang</span> <span class="pre">in.c&quot;</span></code>).</p></li>
+<li><p><strong>replace_driver</strong> – Whether to replace the first argument of the
+command with the clang driver used by this environment.</p></li>
+<li><p><strong>system_includes</strong> – Whether to include the system standard libraries
+during compilation jobs. This requires a system toolchain. See
+<code class="xref py py-func docutils literal notranslate"><span class="pre">get_system_library_flags()</span></code>.</p></li>
+<li><p><strong>timeout</strong> – The maximum number of seconds to allow the compilation
+job to run before terminating.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A <a class="reference internal" href="../llvm/api.html#compiler_gym.envs.llvm.BenchmarkFromCommandLine" title="compiler_gym.envs.llvm.BenchmarkFromCommandLine"><code class="xref py py-class docutils literal notranslate"><span class="pre">BenchmarkFromCommandLine</span></code></a> instance.</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ValueError</strong> – If no command line is provided.</p></li>
+<li><p><a class="reference internal" href="datasets.html#compiler_gym.datasets.BenchmarkInitError" title="compiler_gym.datasets.BenchmarkInitError"><strong>BenchmarkInitError</strong></a> – If executing the command line fails.</p></li>
+<li><p><strong>TimeoutExpired</strong> – If a compilation job exceeds <code class="code docutils literal notranslate"><span class="pre">timeout</span></code>
+seconds.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="compiler_gym.envs.LlvmEnv.render">
 <span class="sig-name descname"><span class="pre">render</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'human'</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/compiler_gym/envs/llvm/llvm_env.html#LlvmEnv.render"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.LlvmEnv.render" title="Permalink to this definition">¶</a></dt>
 <dd><p>Render the environment.</p>
-<p>CompilerEnv instances support two render modes: “human”, which prints
+<p>ClientServiceCompilerEnv instances support two render modes: “human”, which prints
 the current environment state to the terminal and return nothing; and
 “ansi”, which returns a string representation of the current environment
 state.</p>
@@ -997,6 +947,19 @@ use.</p></li>
 it overrides any value that set during <code class="xref py py-func docutils literal notranslate"><span class="pre">__init__()</span></code>, and
 subsequent calls to <code class="code docutils literal notranslate"><span class="pre">reset()</span></code> will use this action space. If
 no action space is provided, the default action space is used.</p></li>
+<li><p><strong>observation_space</strong> – Compute and return observations at each
+<code class="xref py py-func docutils literal notranslate"><span class="pre">step()</span></code> from this space. Accepts a string name or an
+<a class="reference internal" href="views.html#compiler_gym.views.ObservationSpaceSpec" title="compiler_gym.views.ObservationSpaceSpec"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObservationSpaceSpec</span></code></a>. If <code class="code docutils literal notranslate"><span class="pre">None</span></code>,
+<code class="xref py py-func docutils literal notranslate"><span class="pre">step()</span></code> returns <code class="code docutils literal notranslate"><span class="pre">None</span></code> for the observation value. If
+<code class="code docutils literal notranslate"><span class="pre">OptionalArgumentValue.UNCHANGED</span></code> (the default value), the
+observation space remains unchanged from the previous episode. For
+available spaces, see <a class="reference internal" href="views.html#compiler_gym.views.ObservationView" title="compiler_gym.views.ObservationView"><code class="xref py py-class docutils literal notranslate"><span class="pre">env.observation.spaces</span></code></a>.</p></li>
+<li><p><strong>reward_space</strong> – Compute and return reward at each <code class="xref py py-func docutils literal notranslate"><span class="pre">step()</span></code>
+from this space. Accepts a string name or a <a class="reference internal" href="spaces.html#compiler_gym.spaces.Reward" title="compiler_gym.spaces.Reward"><code class="xref py py-class docutils literal notranslate"><span class="pre">Reward</span></code></a>. If <code class="code docutils literal notranslate"><span class="pre">None</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">step()</span></code>
+returns <code class="code docutils literal notranslate"><span class="pre">None</span></code> for the reward value.  If
+<code class="code docutils literal notranslate"><span class="pre">OptionalArgumentValue.UNCHANGED</span></code> (the default value), the
+observation space remains unchanged from the previous episode. For
+available spaces, see <a class="reference internal" href="views.html#compiler_gym.views.RewardView" title="compiler_gym.views.RewardView"><code class="xref py py-class docutils literal notranslate"><span class="pre">env.reward.spaces</span></code></a>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1108,7 +1071,7 @@ observation is requested.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="compiler_gym.envs.GccEnv">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.envs.</span></span><span class="sig-name descname"><span class="pre">GccEnv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gcc_bin</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'docker:gcc:11.2.0'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">benchmark</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="datasets.html#compiler_gym.datasets.Benchmark" title="compiler_gym.datasets.benchmark.Benchmark"><span class="pre">compiler_gym.datasets.benchmark.Benchmark</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'benchmark://chstone-v0/adpcm'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datasets_site_path</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection_settings</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="service.html#compiler_gym.service.ConnectionOpts" title="compiler_gym.service.connection.ConnectionOpts"><span class="pre">compiler_gym.service.connection.ConnectionOpts</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/envs/gcc/gcc_env.html#GccEnv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.GccEnv" title="Permalink to this definition">¶</a></dt>
-<dd><p>A specialized CompilerEnv for GCC.</p>
+<dd><p>A specialized ClientServiceCompilerEnv for GCC.</p>
 <p>This class exposes the optimization space of GCC’s command line flags
 as an environment for reinforcement learning. For further details, see the
 <a class="reference internal" href="../envs/gcc.html#installation"><span class="std std-ref">GCC Environment Reference</span></a>.</p>
@@ -1183,9 +1146,49 @@ needed.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="compiler_gym.envs.GccEnv.reset">
-<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">benchmark</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="datasets.html#compiler_gym.datasets.Benchmark" title="compiler_gym.datasets.benchmark.Benchmark"><span class="pre">compiler_gym.datasets.benchmark.Benchmark</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_space</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_count</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">compiler_gym.util.gym_type_hints.ObservationType</span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/compiler_gym/envs/gcc/gcc_env.html#GccEnv.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.GccEnv.reset" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reset the environment. This additionally sets the timeout to the
-correct value.</p>
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">benchmark:</span> <span class="pre">Optional[Union[str</span></em>, <em class="sig-param"><span class="pre">compiler_gym.datasets.benchmark.Benchmark]]</span> <span class="pre">=</span> <span class="pre">None</span></em>, <em class="sig-param"><span class="pre">action_space:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">None</span></em>, <em class="sig-param"><span class="pre">observation_space:</span> <span class="pre">Union[compiler_gym.util.gym_type_hints.OptionalArgumentValue</span></em>, <em class="sig-param"><span class="pre">str</span></em>, <em class="sig-param"><span class="pre">compiler_gym.views.observation_space_spec.ObservationSpaceSpec]</span> <span class="pre">=</span> <span class="pre">&lt;OptionalArgumentValue.UNCHANGED:</span> <span class="pre">1&gt;</span></em>, <em class="sig-param"><span class="pre">reward_space:</span> <span class="pre">Union[compiler_gym.util.gym_type_hints.OptionalArgumentValue</span></em>, <em class="sig-param"><span class="pre">str</span></em>, <em class="sig-param"><span class="pre">compiler_gym.spaces.reward.Reward]</span> <span class="pre">=</span> <span class="pre">&lt;OptionalArgumentValue.UNCHANGED:</span> <span class="pre">1&gt;</span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">compiler_gym.util.gym_type_hints.ObservationType</span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/compiler_gym/envs/gcc/gcc_env.html#GccEnv.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.GccEnv.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset the environment state.</p>
+<p>This method must be called before <code class="xref py py-func docutils literal notranslate"><span class="pre">step()</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>benchmark</strong> – The name of the benchmark to use. If provided, it
+overrides any value that was set during <code class="xref py py-func docutils literal notranslate"><span class="pre">__init__()</span></code>, and
+becomes subsequent calls to <code class="code docutils literal notranslate"><span class="pre">reset()</span></code> will use this benchmark.
+If no benchmark is provided, and no benchmark was provided to
+<code class="xref py py-func docutils literal notranslate"><span class="pre">__init___()</span></code>, the service will randomly select a benchmark to
+use.</p></li>
+<li><p><strong>action_space</strong> – The name of the action space to use. If provided,
+it overrides any value that set during <code class="xref py py-func docutils literal notranslate"><span class="pre">__init__()</span></code>, and
+subsequent calls to <code class="code docutils literal notranslate"><span class="pre">reset()</span></code> will use this action space. If
+no action space is provided, the default action space is used.</p></li>
+<li><p><strong>observation_space</strong> – Compute and return observations at each
+<code class="xref py py-func docutils literal notranslate"><span class="pre">step()</span></code> from this space. Accepts a string name or an
+<a class="reference internal" href="views.html#compiler_gym.views.ObservationSpaceSpec" title="compiler_gym.views.ObservationSpaceSpec"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObservationSpaceSpec</span></code></a>. If <code class="code docutils literal notranslate"><span class="pre">None</span></code>,
+<code class="xref py py-func docutils literal notranslate"><span class="pre">step()</span></code> returns <code class="code docutils literal notranslate"><span class="pre">None</span></code> for the observation value. If
+<code class="code docutils literal notranslate"><span class="pre">OptionalArgumentValue.UNCHANGED</span></code> (the default value), the
+observation space remains unchanged from the previous episode. For
+available spaces, see <a class="reference internal" href="views.html#compiler_gym.views.ObservationView" title="compiler_gym.views.ObservationView"><code class="xref py py-class docutils literal notranslate"><span class="pre">env.observation.spaces</span></code></a>.</p></li>
+<li><p><strong>reward_space</strong> – Compute and return reward at each <code class="xref py py-func docutils literal notranslate"><span class="pre">step()</span></code>
+from this space. Accepts a string name or a <a class="reference internal" href="spaces.html#compiler_gym.spaces.Reward" title="compiler_gym.spaces.Reward"><code class="xref py py-class docutils literal notranslate"><span class="pre">Reward</span></code></a>. If <code class="code docutils literal notranslate"><span class="pre">None</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">step()</span></code>
+returns <code class="code docutils literal notranslate"><span class="pre">None</span></code> for the reward value.  If
+<code class="code docutils literal notranslate"><span class="pre">OptionalArgumentValue.UNCHANGED</span></code> (the default value), the
+observation space remains unchanged from the previous episode. For
+available spaces, see <a class="reference internal" href="views.html#compiler_gym.views.RewardView" title="compiler_gym.views.RewardView"><code class="xref py py-class docutils literal notranslate"><span class="pre">env.reward.spaces</span></code></a>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The initial observation.</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><a class="reference internal" href="datasets.html#compiler_gym.datasets.BenchmarkInitError" title="compiler_gym.datasets.BenchmarkInitError"><strong>BenchmarkInitError</strong></a> – If the benchmark is invalid. In this case,
+another benchmark must be used.</p></li>
+<li><p><strong>TypeError</strong> – If no benchmark has been set, and the environment
+does not have a default benchmark to select from.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py property">

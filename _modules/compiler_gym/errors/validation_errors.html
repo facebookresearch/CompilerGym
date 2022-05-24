@@ -7,19 +7,19 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.validation_error &mdash; CompilerGym 0.2.3 documentation</title>
+  <title>compiler_gym.errors.validation_errors &mdash; CompilerGym 0.2.4 documentation</title>
   
 
   
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
 
   
   
-    <link rel="shortcut icon" href="../../_static/favicon.png"/>
+    <link rel="shortcut icon" href="../../../_static/favicon.png"/>
   
 
   
@@ -29,22 +29,22 @@
 
   
   <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
     
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/doctools.js"></script>
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
     
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
     
-    <link rel="author" title="About these documents" href="../../about.html" />
-    <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" /> 
+    <link rel="author" title="About these documents" href="../../../about.html" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -58,12 +58,12 @@
           
 
           
-            <a href="../../index.html">
+            <a href="../../../index.html">
           
 
           
             
-            <img src="../../_static/logo.png" class="logo" alt="Logo"/>
+            <img src="../../../_static/logo.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -71,14 +71,14 @@
             
             
               <div class="version">
-                0.2.3
+                0.2.4
               </div>
             
           
 
           
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -98,40 +98,41 @@
             
               <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../about.html">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command Line Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../rpc.html">RPC Service Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command Line Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rpc.html">RPC Service Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../faq.html">Frequently Asked Questions</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Environments</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../llvm/index.html">LLVM Environment Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../envs/gcc.html">GCC Environment Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../envs/loop_tool.html">loop_tool Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../llvm/index.html">LLVM Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../envs/gcc.html">GCC Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../envs/loop_tool.html">loop_tool Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../envs/mlir.html">MLIR Environment Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/compiler_gym.html">compiler_gym</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/envs.html">compiler_gym.envs</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/envs/gcc.html">compiler_gym.envs.gcc</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../llvm/api.html">compiler_gym.envs.llvm</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/service.html">compiler_gym.service</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/service/runtime.html">compiler_gym.service.runtime</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/views.html">compiler_gym.views</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/compiler_gym.html">compiler_gym</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/envs/gcc.html">compiler_gym.envs.gcc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../llvm/api.html">compiler_gym.envs.llvm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/service.html">compiler_gym.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/service/runtime.html">compiler_gym.service.runtime</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/views.html">compiler_gym.views</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
 </ul>
 <p class="caption"><span class="caption-text">C++ API Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../cc/compiler_gym/service.html">compiler_gym/service</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../cc/compiler_gym/service/runtime.html">compiler_gym/service/runtime</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../cc/compiler_gym/util.html">compiler_gym/util</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cc/compiler_gym/service.html">compiler_gym/service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cc/compiler_gym/service/runtime.html">compiler_gym/service/runtime</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cc/compiler_gym/util.html">compiler_gym/util</a></li>
 </ul>
 
             
@@ -147,7 +148,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">CompilerGym</a>
+          <a href="../../../index.html">CompilerGym</a>
         
       </nav>
 
@@ -178,11 +179,11 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
         
-          <li><a href="../index.html">Module code</a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>compiler_gym.validation_error</li>
+      <li>compiler_gym.errors.validation_errors</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -197,18 +198,18 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for compiler_gym.validation_error</h1><div class="highlight"><pre>
+  <h1>Source code for compiler_gym.errors.validation_errors</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright (c) Facebook, Inc. and its affiliates.</span>
 <span class="c1">#</span>
 <span class="c1"># This source code is licensed under the MIT license found in the</span>
 <span class="c1"># LICENSE file in the root directory of this source tree.</span>
-<span class="sd">&quot;&quot;&quot;This module defines the validation error` tuple.&quot;&quot;&quot;</span>
+<span class="sd">&quot;&quot;&quot;This module defines validation errors.&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
 
 <span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span>
 
 
-<div class="viewcode-block" id="ValidationError"><a class="viewcode-back" href="../../compiler_gym/compiler_gym.html#compiler_gym.ValidationError">[docs]</a><span class="k">class</span> <span class="nc">ValidationError</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<div class="viewcode-block" id="ValidationError"><a class="viewcode-back" href="../../../compiler_gym/compiler_gym.html#compiler_gym.ValidationError">[docs]</a><span class="k">class</span> <span class="nc">ValidationError</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A ValidationError describes an error encountered in a call to</span>
 <span class="sd">    :meth:`env.validate() &lt;compiler_gym.envs.CompilerEnv.validate&gt;`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>

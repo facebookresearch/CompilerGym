@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.envs.gcc.gcc &mdash; CompilerGym 0.2.3 documentation</title>
+  <title>compiler_gym.envs.gcc.gcc &mdash; CompilerGym 0.2.4 documentation</title>
   
 
   
@@ -71,7 +71,7 @@
             
             
               <div class="version">
-                0.2.3
+                0.2.4
               </div>
             
           
@@ -111,6 +111,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../envs/gcc.html">GCC Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../envs/loop_tool.html">loop_tool Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../envs/mlir.html">MLIR Environment Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul>
@@ -228,7 +229,7 @@
 
 <span class="kn">import</span> <span class="nn">docker</span>
 
-<span class="kn">from</span> <span class="nn">compiler_gym.service</span> <span class="kn">import</span> <span class="n">EnvironmentNotSupported</span><span class="p">,</span> <span class="n">ServiceError</span><span class="p">,</span> <span class="n">ServiceInitError</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.errors</span> <span class="kn">import</span> <span class="n">EnvironmentNotSupported</span><span class="p">,</span> <span class="n">ServiceError</span><span class="p">,</span> <span class="n">ServiceInitError</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.filesystem</span> <span class="kn">import</span> <span class="n">atomic_file_write</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.runfiles_path</span> <span class="kn">import</span> <span class="n">site_data_path</span>
 

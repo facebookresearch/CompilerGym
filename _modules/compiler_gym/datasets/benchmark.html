@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.datasets.benchmark &mdash; CompilerGym 0.2.3 documentation</title>
+  <title>compiler_gym.datasets.benchmark &mdash; CompilerGym 0.2.4 documentation</title>
   
 
   
@@ -71,7 +71,7 @@
             
             
               <div class="version">
-                0.2.3
+                0.2.4
               </div>
             
           
@@ -111,6 +111,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../envs/gcc.html">GCC Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../envs/loop_tool.html">loop_tool Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../envs/mlir.html">MLIR Environment Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul>
@@ -206,12 +207,13 @@
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
+<span class="kn">import</span> <span class="nn">compiler_gym.errors</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets.uri</span> <span class="kn">import</span> <span class="n">BenchmarkUri</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.errors</span> <span class="kn">import</span> <span class="n">ValidationError</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">Benchmark</span> <span class="k">as</span> <span class="n">BenchmarkProto</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">File</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util</span> <span class="kn">import</span> <span class="n">thread_pool</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.decorators</span> <span class="kn">import</span> <span class="n">memoized_property</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.validation_error</span> <span class="kn">import</span> <span class="n">ValidationError</span>
 
 <span class="c1"># A validation callback is a function that takes a single CompilerEnv instance</span>
 <span class="c1"># as its argument and returns an iterable sequence of zero or more</span>
@@ -512,8 +514,10 @@
         <span class="k">return</span> <span class="bp">self</span> <span class="o">&lt;</span> <span class="n">other</span> <span class="ow">or</span> <span class="bp">self</span> <span class="o">==</span> <span class="n">other</span></div>
 
 
-<div class="viewcode-block" id="BenchmarkInitError"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.BenchmarkInitError">[docs]</a><span class="k">class</span> <span class="nc">BenchmarkInitError</span><span class="p">(</span><span class="ne">OSError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Base class for errors raised if a benchmark fails to initialize.&quot;&quot;&quot;</span></div>
+<span class="c1"># Deprecated since v0.2.4.</span>
+<span class="c1"># This type is for backwards compatibility that will be removed in a future release.</span>
+<span class="c1"># Please, use errors from `compiler_gym.errors`.</span>
+<span class="n">BenchmarkInitError</span> <span class="o">=</span> <span class="n">compiler_gym</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">BenchmarkInitError</span>
 
 
 <span class="k">class</span> <span class="nc">BenchmarkWithSource</span><span class="p">(</span><span class="n">Benchmark</span><span class="p">):</span>

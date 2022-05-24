@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.util.download &mdash; CompilerGym 0.2.3 documentation</title>
+  <title>compiler_gym.util.download &mdash; CompilerGym 0.2.4 documentation</title>
   
 
   
@@ -71,7 +71,7 @@
             
             
               <div class="version">
-                0.2.3
+                0.2.4
               </div>
             
           
@@ -111,6 +111,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../envs/gcc.html">GCC Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../envs/loop_tool.html">loop_tool Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../envs/mlir.html">MLIR Environment Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul>
@@ -210,6 +211,7 @@
 <span class="kn">import</span> <span class="nn">fasteners</span>
 <span class="kn">import</span> <span class="nn">requests</span>
 
+<span class="kn">import</span> <span class="nn">compiler_gym.errors</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.filesystem</span> <span class="kn">import</span> <span class="n">atomic_file_write</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.runfiles_path</span> <span class="kn">import</span> <span class="n">cache_path</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.truncate</span> <span class="kn">import</span> <span class="n">truncate</span>
@@ -217,12 +219,15 @@
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">DownloadFailed</span><span class="p">(</span><span class="ne">IOError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Error thrown if a download fails.&quot;&quot;&quot;</span>
+<span class="c1"># Deprecated since v0.2.4.</span>
+<span class="c1"># This type is for backwards compatibility that will be removed in a future release.</span>
+<span class="c1"># Please, use errors from `compiler_gym.errors`.</span>
+<span class="n">DownloadFailed</span> <span class="o">=</span> <span class="n">compiler_gym</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">DownloadFailed</span>
 
-
-<span class="k">class</span> <span class="nc">TooManyRequests</span><span class="p">(</span><span class="n">DownloadFailed</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Error thrown by HTTP 429 response.&quot;&quot;&quot;</span>
+<span class="c1"># Deprecated since v0.2.4.</span>
+<span class="c1"># This type is for backwards compatibility that will be removed in a future release.</span>
+<span class="c1"># Please, use errors from `compiler_gym.errors`.</span>
+<span class="n">TooManyRequests</span> <span class="o">=</span> <span class="n">compiler_gym</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">TooManyRequests</span>
 
 
 <span class="k">def</span> <span class="nf">_get_url_data</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>

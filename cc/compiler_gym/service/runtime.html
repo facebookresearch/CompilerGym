@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym/service/runtime &mdash; CompilerGym 0.2.2 documentation</title>
+  <title>compiler_gym/service/runtime &mdash; CompilerGym 0.2.4 documentation</title>
   
 
   
@@ -73,7 +73,7 @@
             
             
               <div class="version">
-                0.2.2
+                0.2.4
               </div>
             
           
@@ -113,6 +113,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../envs/gcc.html">GCC Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../envs/loop_tool.html">loop_tool Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../envs/mlir.html">MLIR Environment Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul>
@@ -272,7 +273,7 @@ that can be used by the Python frontend.</p>
 <span class="target" id="namespacecompiler__gym_1_1runtime"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">runtime</span></span></span><br /></dt>
 <dd><dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4I0EN12compiler_gym7runtime18CompilerGymServiceE">
-<span id="_CPPv3I0EN12compiler_gym7runtime18CompilerGymServiceE"></span><span id="_CPPv2I0EN12compiler_gym7runtime18CompilerGymServiceE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CompilationSessionType</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classcompiler__gym_1_1runtime_1_1_compiler_gym_service"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CompilerGymService</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="../envs/llvm/service.html#_CPPv412compiler_gym" title="compiler_gym"><span class="n"><span class="pre">compiler_gym</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">CompilerGymService</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Service</span></span><a class="headerlink" href="#_CPPv4I0EN12compiler_gym7runtime18CompilerGymServiceE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3I0EN12compiler_gym7runtime18CompilerGymServiceE"></span><span id="_CPPv2I0EN12compiler_gym7runtime18CompilerGymServiceE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CompilationSessionType</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classcompiler__gym_1_1runtime_1_1_compiler_gym_service"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CompilerGymService</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">Service</span></span><a class="headerlink" href="#_CPPv4I0EN12compiler_gym7runtime18CompilerGymServiceE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><em>#include &lt;CompilerGymService.h&gt;</em><p>A default implementation of the <a class="reference internal" href="#classcompiler__gym_1_1runtime_1_1_compiler_gym_service"><span class="std std-ref">CompilerGymService</span></a>. </p>
 <p>When parametrized by a <a class="reference internal" href="../service.html#classcompiler__gym_1_1_compilation_session"><span class="std std-ref">CompilationSession</span></a> subclass, this provides the RPC handling logic to run a gym service. User should call <a class="reference internal" href="#namespacecompiler__gym_1_1runtime_1a31eeef0c5f302ea2e7362cb83d930e94"><span class="std std-ref">createAndRunCompilerGymService()</span></a> rather than interacting with this class directly. </p>
 <div class="breathe-sectiondef docutils container">
@@ -324,7 +325,7 @@ that can be used by the Python frontend.</p>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym7runtime18CompilerGymService10benchmarksEv">
-<span id="_CPPv3N12compiler_gym7runtime18CompilerGymService10benchmarksEv"></span><span id="_CPPv2N12compiler_gym7runtime18CompilerGymService10benchmarksEv"></span><span id="compiler_gym::runtime::CompilerGymService::benchmarks"></span><span class="target" id="classcompiler__gym_1_1runtime_1_1_compiler_gym_service_1aaa6d590a62d7c28b2e24f2bc1b90f71e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12compiler_gym7runtime14BenchmarkCacheE" title="compiler_gym::runtime::BenchmarkCache"><span class="n"><span class="pre">BenchmarkCache</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">benchmarks</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12compiler_gym7runtime18CompilerGymService10benchmarksEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N12compiler_gym7runtime18CompilerGymService10benchmarksEv"></span><span id="_CPPv2N12compiler_gym7runtime18CompilerGymService10benchmarksEv"></span><span id="compiler_gym::runtime::CompilerGymService::benchmarks"></span><span class="target" id="classcompiler__gym_1_1runtime_1_1_compiler_gym_service_1a566cfe56060e23af984a12b36256422a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12compiler_gym7runtime14BenchmarkCacheE" title="compiler_gym::runtime::BenchmarkCache"><span class="n"><span class="pre">BenchmarkCache</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">benchmarks</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12compiler_gym7runtime18CompilerGymService10benchmarksEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">
@@ -357,7 +358,7 @@ that can be used by the Python frontend.</p>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym7runtime18CompilerGymService16workingDirectoryEv">
-<span id="_CPPv3NK12compiler_gym7runtime18CompilerGymService16workingDirectoryEv"></span><span id="_CPPv2NK12compiler_gym7runtime18CompilerGymService16workingDirectoryEv"></span><span id="compiler_gym::runtime::CompilerGymService::workingDirectoryC"></span><span class="target" id="classcompiler__gym_1_1runtime_1_1_compiler_gym_service_1a6a5e27704072cbec0a3cc46b116ad343"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">boost</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">filesystem</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">path</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">workingDirectory</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym7runtime18CompilerGymService16workingDirectoryEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3NK12compiler_gym7runtime18CompilerGymService16workingDirectoryEv"></span><span id="_CPPv2NK12compiler_gym7runtime18CompilerGymService16workingDirectoryEv"></span><span id="compiler_gym::runtime::CompilerGymService::workingDirectoryC"></span><span class="target" id="classcompiler__gym_1_1runtime_1_1_compiler_gym_service_1a36454eacc099ac39415f4e11692870cf"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">boost</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">filesystem</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">path</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">workingDirectory</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym7runtime18CompilerGymService16workingDirectoryEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">

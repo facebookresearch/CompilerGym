@@ -73,8 +73,65 @@ In either case, calling :meth:`env.reset()
 new episode.
 
 
+Where does CompilerGym store files?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+CompilerGym is a python library, and is located in the `site packages
+<https://docs.python.org/3/library/site.html#site.getsitepackages>`_ directory.
+Remove it using :code:`pip uninstall compiler_gym`. In addition, CompilerGym
+uses the following file system locations to store files:
+
+- :code:`~/.local/cache/compiler_gym` is used to cache files such as downloaded
+  datasets. Set environment variable :code:`$COMPILER_GYM_CACHE` to override
+  this default location.
+
+- :code:`~/.local/share/compiler_gym` is used to store additional datasets and
+  files that are not included in the core CompilerGym library. Set environment
+  variable :code:`$COMPILER_GYM_SITE_DATA` to override this default location.
+
+- :code:`/dev/shm/compiler_gym_${USER}` is used as an in-memory cache on Linux
+  systems which support it. Files in this cache are should not outlive the
+  lifespan of the CompilerGym environments that created them. Set environment
+  variable :code:`$COMPILER_GYM_TRANSIENT_CACHE` to override this default
+  location.
+
+- :code:`~/logs/compiler_gym` is used by some of the example scripts to store
+  logs and experiment artifacts. Set environment variable
+  :code:`$COMPILER_GYM_LOGS` to override this default location.
+
+It is perfectly safe to delete all of the above directories, so long as there
+are no active Python processes using CompilerGym. After deleting the above
+directories, you may notice a delay the next time you launch a CompilerGym
+environment as files and datasets are re-downloaded and unpacked.
+
+
+Do I need to call env.close()?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Yes! You must ensure that :meth:`env.close()
+<compiler_gym.envs.CompilerEnv.close>` is called once you are done with an
+environment. This is because CompilerGym environments may launch subprocesses
+and create temporary files that must be tidied up when the environment is
+discarded. We recommend using the :code:`with`-statement pattern for creating
+environments:
+
+    >>> with gym.make("llvm-v0") as env:
+    ...    pass  # use env how you like
+
+This removes the need to call :meth:`env.close()
+<compiler_gym.envs.ClientServiceCompilerEnv.close>` yourself since it is closed
+automatically when leaving the scope of the :code:`with`-statement. If this is
+not possible, use :code:`try`/:code:`finally` blocks:
+
+    >>> env = compiler_gym.make("llvm-v0")
+    >>> try:
+    ...     pass  # use env how you like
+    ... finally:
+    ...     env.close()
+
+
 How do I debug crashes or errors?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The first step is to produce a minimal, reproducible example. The easiest way to
 do this is usually to copy your code into a new file and to iteratively remove
@@ -136,8 +193,8 @@ What features are going to be added in the future?
 See :ref:`roadmap <about:roadmap>`.
 
 
-I want to modify a CompilerGym environment, where do I start?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+I want to modify one of the environments, where do I start?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Many modifications to CompilerGym environments can be achieved through
 :mod:`wrappers <compiler_gym.wrappers>`. For example, you can use the existing
@@ -165,8 +222,8 @@ of the compiler service you would wish to modify, e.g.
 <llvm/index>`. Once done, send us a pull request!
 
 
-I want to add a new CompilerGym environment, where do I start?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+I want to add a new compiler environment, where do I start?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To add a new environment, you must implement the :class:`CompilationSession
 <compiler_gym.service.CompilationSession>` interface to provide a new

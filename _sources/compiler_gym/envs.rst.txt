@@ -28,8 +28,19 @@ LlvmEnv
 .. autoclass:: LlvmEnv
    :members:
 
+
 GccEnv
 -------
 
 .. autoclass:: GccEnv
    :members:
+
+
+.. TODO(https://github.com/facebookresearch/CompilerGym/issues/688): Enable
+   the following once MlirEnv is unconditionally enabled in the wheel:
+
+.. MlirEnv
+.. -------
+
+.. .. autoclass:: MlirEnv
+..    :members:

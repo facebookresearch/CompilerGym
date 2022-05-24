@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Indices and tables &mdash; CompilerGym 0.2.2 documentation</title>
+  <title>Indices and tables &mdash; CompilerGym 0.2.4 documentation</title>
   
 
   
@@ -72,7 +72,7 @@
             
             
               <div class="version">
-                0.2.2
+                0.2.4
               </div>
             
           
@@ -112,6 +112,7 @@
 <li class="toctree-l1"><a class="reference internal" href="llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="envs/gcc.html">GCC Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="envs/loop_tool.html">loop_tool Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="envs/mlir.html">MLIR Environment Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul>
@@ -247,6 +248,16 @@ research. We aim to act as a catalyst for making compilers faster using ML.</p>
 <li class="toctree-l2"><a class="reference internal" href="envs/loop_tool.html#action-spaces">Action Spaces</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="envs/mlir.html">MLIR Environment Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="envs/mlir.html#environment-configuration">Environment Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="envs/mlir.html#observation-space">Observation Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="envs/mlir.html#reward-space">Reward Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="envs/mlir.html#action-space">Action Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="envs/mlir.html#rl-wrapper">RL Wrapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="envs/mlir.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="envs/mlir.html#example-usage">Example Usage</a></li>
+</ul>
+</li>
 </ul>
 </div>
 <div class="toctree-wrapper compound">
@@ -292,6 +303,7 @@ research. We aim to act as a catalyst for making compilers faster using ML.</p>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/service.html">compiler_gym.service</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="compiler_gym/service.html#the-compilationsession-interface">The CompilationSession Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/service.html#clientservicecompilerenv">ClientServiceCompilerEnv</a></li>
 <li class="toctree-l2"><a class="reference internal" href="compiler_gym/service.html#the-connection-object">The connection object</a></li>
 <li class="toctree-l2"><a class="reference internal" href="compiler_gym/service.html#configuring-the-connection">Configuring the connection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="compiler_gym/service.html#exceptions">Exceptions</a></li>
@@ -308,8 +320,10 @@ research. We aim to act as a catalyst for making compilers faster using ML.</p>
 <li class="toctree-l2"><a class="reference internal" href="compiler_gym/spaces.html#dict">Dict</a></li>
 <li class="toctree-l2"><a class="reference internal" href="compiler_gym/spaces.html#discrete">Discrete</a></li>
 <li class="toctree-l2"><a class="reference internal" href="compiler_gym/spaces.html#nameddiscrete">NamedDiscrete</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/spaces.html#permutation">Permutation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="compiler_gym/spaces.html#reward">Reward</a></li>
 <li class="toctree-l2"><a class="reference internal" href="compiler_gym/spaces.html#scalar">Scalar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/spaces.html#spacesequence">SpaceSequence</a></li>
 <li class="toctree-l2"><a class="reference internal" href="compiler_gym/spaces.html#sequence">Sequence</a></li>
 <li class="toctree-l2"><a class="reference internal" href="compiler_gym/spaces.html#tuple">Tuple</a></li>
 </ul>

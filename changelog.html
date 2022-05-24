@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Changelog &mdash; CompilerGym 0.2.2 documentation</title>
+  <title>Changelog &mdash; CompilerGym 0.2.4 documentation</title>
   
 
   
@@ -73,7 +73,7 @@
             
             
               <div class="version">
-                0.2.2
+                0.2.4
               </div>
             
           
@@ -105,6 +105,8 @@
 <li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rpc.html">RPC Service Reference</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#release-0-2-4-2022-05-24">Release 0.2.4 (2022-05-24)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#release-0-2-3-2022-03-18">Release 0.2.3 (2022-03-18)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#release-0-2-2-2022-01-19">Release 0.2.2 (2022-01-19)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#release-0-2-1-2021-11-17">Release 0.2.1 (2021-11-17)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#release-0-2-0-2021-09-28">Release 0.2.0 (2021-09-28)</a></li>
@@ -127,6 +129,7 @@
 <li class="toctree-l1"><a class="reference internal" href="llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="envs/gcc.html">GCC Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="envs/loop_tool.html">loop_tool Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="envs/mlir.html">MLIR Environment Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul>
@@ -217,6 +220,122 @@
             
   <div class="section" id="changelog">
 <h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="release-0-2-4-2022-05-24">
+<h2>Release 0.2.4 (2022-05-24)<a class="headerlink" href="#release-0-2-4-2022-05-24" title="Permalink to this headline">¶</a></h2>
+<p>This release adds a new compiler environment, new APIs, and a suite of
+backend improvements to improve the flexibility of CompilerGym
+environments. Many thanks to code contributors: &#64;sogartar, &#64;KyleHerndon,
+&#64;SoumyajitKarmakar, &#64;uduse, and &#64;anthony0727!</p>
+<p>Highlights of this release include:</p>
+<ul class="simple">
+<li><p>[mlir] Began work on a new environment for matrix multiplication
+using MLIR
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/652">#652</a>,
+thanks &#64;KyleHerndon and &#64;sogartar!). Note this environment is not yet
+included in the pypi package and must be <a class="reference external" href="https://github.com/facebookresearch/CompilerGym/blob/development/INSTALL.md#building-from-source-with-cmake">compiled from
+source</a>.</p></li>
+<li><p>[llvm] Added a new <code class="docutils literal notranslate"><span class="pre">env.benchmark_from_clang_invocation()</span></code> method
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/577">#577</a>)
+that can be used for constructing LLVM environment automatically from
+C/C++ compiler invocations. This makes it much easier to integrate
+CompilerGym with your existing build scripts.</p></li>
+<li><p>Added three new wrapper classes: <code class="docutils literal notranslate"><span class="pre">Counter</span></code>, that provides op counts
+for analysis
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/683">#683</a>);
+<code class="docutils literal notranslate"><span class="pre">SynchronousSqliteLogger</span></code>, that provides logging of environment
+interactions to a relational database
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/679">#679</a>),
+and <code class="docutils literal notranslate"><span class="pre">ForkOnStep</span></code> that provides an <code class="docutils literal notranslate"><span class="pre">undo()</span></code> operation
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/682">#682</a>).</p></li>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">reward_space</span></code> and <code class="docutils literal notranslate"><span class="pre">observation_space</span></code> parameters to
+<code class="docutils literal notranslate"><span class="pre">env.reset()</span></code>
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/659">#659</a>,
+thanks &#64;SoumyajitKarmakar!)</p></li>
+</ul>
+<p>This release includes a number of improvements to the backend APIs that
+make it easier to write new CompilerGym environments:</p>
+<ul class="simple">
+<li><p>Refactored the backend to make <code class="docutils literal notranslate"><span class="pre">CompilerEnv</span></code> an abstract interface,
+and <code class="docutils literal notranslate"><span class="pre">ClientServiceCompilerEnv</span></code> the concrete implementation of this
+interface. This enables new environments to be implemented without
+using gRPC
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/633">#633</a>,
+thanks &#64;sogartar!).</p></li>
+<li><p>Extended the support for different types of action and observation
+spaces
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/641">#641</a>,
+<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/643">#643</a>,
+thanks &#64;sogartar!), including new <code class="docutils literal notranslate"><span class="pre">Permutation</span></code> and
+<code class="docutils literal notranslate"><span class="pre">SpaceSequence</span></code> spaces
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/645">#645</a>,
+thanks &#64;sogartar!)..</p></li>
+<li><p>Added a new <code class="docutils literal notranslate"><span class="pre">disk/</span></code> subdirectory to compiler service’s working
+directories, which is symlinked to an on-disk location for devices
+which support in-memory working directories. This fixes a bug with
+leftover temporary directories from LLVM
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/672">#672</a>).</p></li>
+</ul>
+<p>This release also includes numerous bug fixes and improvements, many of
+which were reported or fixed by the community. For example, fixing a bug
+in cache file locations
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/656">#656</a>,
+thanks &#64;uduse!), and a missing flag definition in example code
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/684">#684</a>,
+thanks &#64;anthony0727!).</p>
+<p><strong>Full Changelog</strong>:
+<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/compare/v0.2.3">https://github.com/facebookresearch/CompilerGym/compare/v0.2.3</a>…v0.2.4</p>
+</div>
+<div class="section" id="release-0-2-3-2022-03-18">
+<h2>Release 0.2.3 (2022-03-18)<a class="headerlink" href="#release-0-2-3-2022-03-18" title="Permalink to this headline">¶</a></h2>
+<p>This release brings in deprecating changes to the core <code class="docutils literal notranslate"><span class="pre">env.step()</span></code>
+routine, and lays the groundwork for enabling new types of compiler
+optimizations to be exposed through CompilerGym. Many thanks to code
+contributors: &#64;mostafaelhoushi, &#64;sogartar, &#64;KyleHerndon, &#64;uduse,
+&#64;parthchadha, and &#64;xtremey!</p>
+<p>Highlights of this release include:</p>
+<ul class="simple">
+<li><p>Added a new <code class="docutils literal notranslate"><span class="pre">TextSizeInBytes</span></code> observation space for LLVM
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/575">#575</a>).</p></li>
+<li><p>Added a new PPO leaderboard entry
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/580">#580</a>.
+Thanks &#64;xtremey!</p></li>
+<li><p>Fixed a bug in which temporary directories created by the LLVM
+environment were not cleaned up
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/592">#592</a>).</p></li>
+<li><p><strong>[Backend]</strong> The function <code class="docutils literal notranslate"><span class="pre">createAndRunCompilerGymService</span></code> now
+returns an int, which is the exit return code
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/592">#592</a>).</p></li>
+<li><p>Improvements to the examples documentation
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/548">#548</a>)
+and FAQ
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/586">#586</a>)</p></li>
+</ul>
+<p>Deprecations and breaking changes:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">CompilerEnv.step</span></code> no longer accepts a list of actions
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/627">#627</a>).
+A new method, <code class="docutils literal notranslate"><span class="pre">CompilerEnv.multistep</span></code> provides this functionality.
+This is to provide compatibility with environments whose action
+spaces are lists. To update your code, replace any calls to
+<code class="docutils literal notranslate"><span class="pre">env.step()</span></code> which take a list of actions to use
+<code class="docutils literal notranslate"><span class="pre">env.multistep()</span></code>. Thanks &#64;sogartar!</p></li>
+<li><p>The arguments <code class="docutils literal notranslate"><span class="pre">observations</span></code> and <code class="docutils literal notranslate"><span class="pre">rewards</span></code> to <code class="docutils literal notranslate"><span class="pre">step()</span></code> have
+been renamed <code class="docutils literal notranslate"><span class="pre">observation_spaces</span></code> and <code class="docutils literal notranslate"><span class="pre">reward_spaces</span></code>,
+respectively
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/627">#627</a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Reward.id</span></code> has been renamed <code class="docutils literal notranslate"><span class="pre">Reward.name</span></code>
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/565">#565</a>,
+<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/612">#612</a>).
+Thanks &#64;parthchadha!</p></li>
+<li><p>The backend protocol buffer schema has been updated to natively
+support more types of observation and action, and to support nested
+spaces
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/531">#531</a>).
+Thanks &#64;sogartar!</p></li>
+</ul>
+<p><strong>Full Changelog</strong>:
+<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/compare/v0.2.2">https://github.com/facebookresearch/CompilerGym/compare/v0.2.2</a>…v0.2.3</p>
+</div>
 <div class="section" id="release-0-2-2-2022-01-19">
 <h2>Release 0.2.2 (2022-01-19)<a class="headerlink" href="#release-0-2-2-2022-01-19" title="Permalink to this headline">¶</a></h2>
 <p>Amongst the highlights of this release are support for building with

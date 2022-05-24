@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.envs.compiler_env &mdash; CompilerGym 0.2.2 documentation</title>
+  <title>compiler_gym.envs.compiler_env &mdash; CompilerGym 0.2.4 documentation</title>
   
 
   
@@ -71,7 +71,7 @@
             
             
               <div class="version">
-                0.2.2
+                0.2.4
               </div>
             
           
@@ -111,6 +111,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../envs/gcc.html">GCC Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../envs/loop_tool.html">loop_tool Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../envs/mlir.html">MLIR Environment Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul>
@@ -203,85 +204,27 @@
 <span class="c1"># This source code is licensed under the MIT license found in the</span>
 <span class="c1"># LICENSE file in the root directory of this source tree.</span>
 <span class="sd">&quot;&quot;&quot;This module defines the OpenAI gym interface for compilers.&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">numbers</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Iterable</span> <span class="k">as</span> <span class="n">IterableType</span>
-<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
-<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">isclose</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">gym</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">deprecated.sphinx</span> <span class="kn">import</span> <span class="n">deprecated</span>
 <span class="kn">from</span> <span class="nn">gym.spaces</span> <span class="kn">import</span> <span class="n">Space</span>
 
 <span class="kn">from</span> <span class="nn">compiler_gym.compiler_env_state</span> <span class="kn">import</span> <span class="n">CompilerEnvState</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.datasets</span> <span class="kn">import</span> <span class="n">Benchmark</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">Datasets</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.datasets.uri</span> <span class="kn">import</span> <span class="n">BenchmarkUri</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.service</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">CompilerGymServiceConnection</span><span class="p">,</span>
-    <span class="n">ConnectionOpts</span><span class="p">,</span>
-    <span class="n">ServiceError</span><span class="p">,</span>
-    <span class="n">ServiceOSError</span><span class="p">,</span>
-    <span class="n">ServiceTransportError</span><span class="p">,</span>
-    <span class="n">SessionNotFound</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.service.connection</span> <span class="kn">import</span> <span class="n">ServiceIsClosed</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">AddBenchmarkRequest</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">Benchmark</span> <span class="k">as</span> <span class="n">BenchmarkProto</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">EndSessionReply</span><span class="p">,</span>
-    <span class="n">EndSessionRequest</span><span class="p">,</span>
-    <span class="n">Event</span><span class="p">,</span>
-    <span class="n">ForkSessionReply</span><span class="p">,</span>
-    <span class="n">ForkSessionRequest</span><span class="p">,</span>
-    <span class="n">GetVersionReply</span><span class="p">,</span>
-    <span class="n">GetVersionRequest</span><span class="p">,</span>
-    <span class="n">SendSessionParameterReply</span><span class="p">,</span>
-    <span class="n">SendSessionParameterRequest</span><span class="p">,</span>
-    <span class="n">SessionParameter</span><span class="p">,</span>
-    <span class="n">StartSessionRequest</span><span class="p">,</span>
-    <span class="n">StepReply</span><span class="p">,</span>
-    <span class="n">StepRequest</span><span class="p">,</span>
-    <span class="n">proto_to_action_space</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.spaces</span> <span class="kn">import</span> <span class="n">DefaultRewardFromObservation</span><span class="p">,</span> <span class="n">NamedDiscrete</span><span class="p">,</span> <span class="n">Reward</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.datasets</span> <span class="kn">import</span> <span class="n">Benchmark</span><span class="p">,</span> <span class="n">BenchmarkUri</span><span class="p">,</span> <span class="n">Dataset</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.spaces</span> <span class="kn">import</span> <span class="n">Reward</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.gym_type_hints</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ActionType</span><span class="p">,</span>
     <span class="n">ObservationType</span><span class="p">,</span>
-    <span class="n">RewardType</span><span class="p">,</span>
+    <span class="n">OptionalArgumentValue</span><span class="p">,</span>
     <span class="n">StepType</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.util.shell_format</span> <span class="kn">import</span> <span class="n">plural</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.util.timer</span> <span class="kn">import</span> <span class="n">Timer</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.validation_error</span> <span class="kn">import</span> <span class="n">ValidationError</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.validation_result</span> <span class="kn">import</span> <span class="n">ValidationResult</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.views</span> <span class="kn">import</span> <span class="n">ObservationSpaceSpec</span><span class="p">,</span> <span class="n">ObservationView</span><span class="p">,</span> <span class="n">RewardView</span>
 
-<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
-<span class="c1"># NOTE(cummins): This is only required to prevent a name conflict with the now</span>
-<span class="c1"># deprecated CompilerEnv.logger attribute. This can be removed once the logger</span>
-<span class="c1"># attribute is removed, scheduled for release 0.2.3.</span>
-<span class="n">_logger</span> <span class="o">=</span> <span class="n">logger</span>
-
-
-<span class="k">def</span> <span class="nf">_wrapped_step</span><span class="p">(</span>
-    <span class="n">service</span><span class="p">:</span> <span class="n">CompilerGymServiceConnection</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">StepRequest</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StepReply</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Call the Step() RPC endpoint.&quot;&quot;&quot;</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">service</span><span class="p">(</span><span class="n">service</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">Step</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">FileNotFoundError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;Session not found&quot;</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">SessionNotFound</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
-        <span class="k">raise</span>
-
-
-<div class="viewcode-block" id="CompilerEnv"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv">[docs]</a><span class="k">class</span> <span class="nc">CompilerEnv</span><span class="p">(</span><span class="n">gym</span><span class="o">.</span><span class="n">Env</span><span class="p">):</span>
+<div class="viewcode-block" id="CompilerEnv"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv">[docs]</a><span class="k">class</span> <span class="nc">CompilerEnv</span><span class="p">(</span><span class="n">gym</span><span class="o">.</span><span class="n">Env</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;An OpenAI gym environment for compiler optimizations.</span>
 
 <span class="sd">    The easiest way to create a CompilerGym environment is to call</span>
@@ -296,7 +239,7 @@
 <span class="sd">    connecting to a running compiler service at :code:`localhost:8080` (see</span>
 <span class="sd">    :doc:`this document &lt;/compiler_gym/service&gt;` for more details):</span>
 
-<span class="sd">        &gt;&gt;&gt; env = CompilerEnv(</span>
+<span class="sd">        &gt;&gt;&gt; env = ClientServiceCompilerEnv(</span>
 <span class="sd">        ...     service=&quot;localhost:8080&quot;,</span>
 <span class="sd">        ...     observation_space=&quot;features&quot;,</span>
 <span class="sd">        ...     reward_space=&quot;runtime&quot;,</span>
@@ -316,320 +259,60 @@
 <span class="sd">        &gt;&gt;&gt;         break</span>
 <span class="sd">        &gt;&gt;&gt; print(f&quot;Reward after {i} steps: {cumulative_reward}&quot;)</span>
 <span class="sd">        Reward after 100 steps: -0.32123</span>
-
-<span class="sd">    :ivar service: A connection to the underlying compiler service.</span>
-
-<span class="sd">    :vartype service: compiler_gym.service.CompilerGymServiceConnection</span>
-
-<span class="sd">    :ivar action_spaces: A list of supported action space names.</span>
-
-<span class="sd">    :vartype action_spaces: List[str]</span>
-
-<span class="sd">    :ivar actions: The list of actions that have been performed since the</span>
-<span class="sd">        previous call to :func:`reset`.</span>
-
-<span class="sd">    :vartype actions: List[ActionType]</span>
-
-<span class="sd">    :ivar reward_range: A tuple indicating the range of reward values. Default</span>
-<span class="sd">        range is (-inf, +inf).</span>
-
-<span class="sd">    :vartype reward_range: Tuple[float, float]</span>
-
-<span class="sd">    :ivar observation: A view of the available observation spaces that permits</span>
-<span class="sd">        on-demand computation of observations.</span>
-
-<span class="sd">    :vartype observation: compiler_gym.views.ObservationView</span>
-
-<span class="sd">    :ivar reward: A view of the available reward spaces that permits on-demand</span>
-<span class="sd">        computation of rewards.</span>
-
-<span class="sd">    :vartype reward: compiler_gym.views.RewardView</span>
-
-<span class="sd">    :ivar episode_reward: If :func:`CompilerEnv.reward_space</span>
-<span class="sd">        &lt;compiler_gym.envs.CompilerGym.reward_space&gt;` is set, this value is the</span>
-<span class="sd">        sum of all rewards for the current episode.</span>
-
-<span class="sd">    :vartype episode_reward: float</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="CompilerEnv.__init__"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">service</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
-        <span class="n">rewards</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Reward</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">datasets</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Dataset</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">benchmark</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Benchmark</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">observation_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ObservationSpaceSpec</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">reward_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Reward</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">action_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">derived_observation_spaces</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">connection_settings</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ConnectionOpts</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">service_connection</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">CompilerGymServiceConnection</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">logger</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="CompilerEnv.__init__"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.__init__">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Construct an environment.</span>
+
+<span class="sd">        Do not construct an environment directly. Use :code:`gym.make()` on one</span>
+<span class="sd">        of the registered environments:</span>
+
+<span class="sd">        &gt;&gt;&gt; with gym.make(&quot;llvm-v0&quot;) as env:</span>
+<span class="sd">        ...     pass  # Use environment</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract class&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CompilerEnv.close"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.close">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Close the environment.</span>
+
+<span class="sd">        Once closed, :func:`reset` must be called before the environment is used</span>
+<span class="sd">        again.</span>
+
+<span class="sd">        .. note::</span>
+
+<span class="sd">            You must make sure to call :code:`env.close()` on a CompilerGym</span>
+<span class="sd">            environment when you are done with it. This is needed to perform</span>
+<span class="sd">            manual tidying up of temporary files and processes. See :ref:`the</span>
+<span class="sd">            FAQ &lt;faq:Do I need to call env.close()?&gt;` for more details.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">observation_space_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ObservationSpaceSpec</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span>
+
+    <span class="nd">@observation_space_spec</span><span class="o">.</span><span class="n">setter</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">observation_space_spec</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">observation_space_spec</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ObservationSpaceSpec</span><span class="p">]</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Construct and initialize a CompilerGym environment.</span>
-
-<span class="sd">        In normal use you should use :code:`gym.make(...)` rather than calling</span>
-<span class="sd">        the constructor directly.</span>
-
-<span class="sd">        :param service: The hostname and port of a service that implements the</span>
-<span class="sd">            CompilerGym service interface, or the path of a binary file which</span>
-<span class="sd">            provides the CompilerGym service interface when executed. See</span>
-<span class="sd">            :doc:`/compiler_gym/service` for details.</span>
-
-<span class="sd">        :param rewards: The reward spaces that this environment supports.</span>
-<span class="sd">            Rewards are typically calculated based on observations generated by</span>
-<span class="sd">            the service. See :class:`Reward &lt;compiler_gym.spaces.Reward&gt;` for</span>
-<span class="sd">            details.</span>
-
-<span class="sd">        :param benchmark: The benchmark to use for this environment. Either a</span>
-<span class="sd">            URI string, or a :class:`Benchmark</span>
-<span class="sd">            &lt;compiler_gym.datasets.Benchmark&gt;` instance. If not provided, the</span>
-<span class="sd">            first benchmark as returned by</span>
-<span class="sd">            :code:`next(env.datasets.benchmarks())` will be used as the default.</span>
-
-<span class="sd">        :param observation_space: Compute and return observations at each</span>
-<span class="sd">            :func:`step()` from this space. Accepts a string name or an</span>
-<span class="sd">            :class:`ObservationSpaceSpec</span>
-<span class="sd">            &lt;compiler_gym.views.ObservationSpaceSpec&gt;`. If not provided,</span>
-<span class="sd">            :func:`step()` returns :code:`None` for the observation value. Can</span>
-<span class="sd">            be set later using :meth:`env.observation_space</span>
-<span class="sd">            &lt;compiler_gym.envs.CompilerEnv.observation_space&gt;`. For available</span>
-<span class="sd">            spaces, see :class:`env.observation.spaces</span>
-<span class="sd">            &lt;compiler_gym.views.ObservationView&gt;`.</span>
-
-<span class="sd">        :param reward_space: Compute and return reward at each :func:`step()`</span>
-<span class="sd">            from this space. Accepts a string name or a :class:`Reward</span>
-<span class="sd">            &lt;compiler_gym.spaces.Reward&gt;`. If not provided, :func:`step()`</span>
-<span class="sd">            returns :code:`None` for the reward value. Can be set later using</span>
-<span class="sd">            :meth:`env.reward_space</span>
-<span class="sd">            &lt;compiler_gym.envs.CompilerEnv.reward_space&gt;`. For available spaces,</span>
-<span class="sd">            see :class:`env.reward.spaces &lt;compiler_gym.views.RewardView&gt;`.</span>
-
-<span class="sd">        :param action_space: The name of the action space to use. If not</span>
-<span class="sd">            specified, the default action space for this compiler is used.</span>
-
-<span class="sd">        :param derived_observation_spaces: An optional list of arguments to be</span>
-<span class="sd">            passed to :meth:`env.observation.add_derived_space()</span>
-<span class="sd">            &lt;compiler_gym.views.observation.Observation.add_derived_space&gt;`.</span>
-
-<span class="sd">        :param connection_settings: The settings used to establish a connection</span>
-<span class="sd">            with the remote service.</span>
-
-<span class="sd">        :param service_connection: An existing compiler gym service connection</span>
-<span class="sd">            to use.</span>
-
-<span class="sd">        :raises FileNotFoundError: If service is a path to a file that is not</span>
-<span class="sd">            found.</span>
-
-<span class="sd">        :raises TimeoutError: If the compiler service fails to initialize within</span>
-<span class="sd">            the parameters provided in :code:`connection_settings`.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># NOTE(cummins): Logger argument deprecated and scheduled to be removed</span>
-        <span class="c1"># in release 0.2.3.</span>
-        <span class="k">if</span> <span class="n">logger</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s2">&quot;The `logger` argument is deprecated on CompilerEnv.__init__() &quot;</span>
-                <span class="s2">&quot;and will be removed in a future release. All CompilerEnv &quot;</span>
-                <span class="s2">&quot;instances share a logger named compiler_gym.envs.compiler_env&quot;</span><span class="p">,</span>
-                <span class="ne">DeprecationWarning</span><span class="p">,</span>
-            <span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;render.modes&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;human&quot;</span><span class="p">,</span> <span class="s2">&quot;ansi&quot;</span><span class="p">]}</span>
-
-        <span class="c1"># A compiler service supports multiple simultaneous environments. This</span>
-        <span class="c1"># session ID is used to identify this environment.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_service_endpoint</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="n">service</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_connection_settings</span> <span class="o">=</span> <span class="n">connection_settings</span> <span class="ow">or</span> <span class="n">ConnectionOpts</span><span class="p">()</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">service</span> <span class="o">=</span> <span class="n">service_connection</span> <span class="ow">or</span> <span class="n">CompilerGymServiceConnection</span><span class="p">(</span>
-            <span class="n">endpoint</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_service_endpoint</span><span class="p">,</span>
-            <span class="n">opts</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_connection_settings</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">Datasets</span><span class="p">(</span><span class="n">datasets</span> <span class="ow">or</span> <span class="p">[])</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">action_space_name</span> <span class="o">=</span> <span class="n">action_space</span>
-
-        <span class="c1"># If no reward space is specified, generate some from numeric observation spaces</span>
-        <span class="n">rewards</span> <span class="o">=</span> <span class="n">rewards</span> <span class="ow">or</span> <span class="p">[</span>
-            <span class="n">DefaultRewardFromObservation</span><span class="p">(</span><span class="n">obs</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">obs</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">observation_spaces</span>
-            <span class="k">if</span> <span class="n">obs</span><span class="o">.</span><span class="n">default_observation</span><span class="o">.</span><span class="n">WhichOneof</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span>
-                <span class="nb">getattr</span><span class="p">(</span>
-                    <span class="n">obs</span><span class="o">.</span><span class="n">default_observation</span><span class="p">,</span> <span class="n">obs</span><span class="o">.</span><span class="n">default_observation</span><span class="o">.</span><span class="n">WhichOneof</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">)</span>
-                <span class="p">),</span>
-                <span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="p">]</span>
-
-        <span class="c1"># The benchmark that is currently being used, and the benchmark that</span>
-        <span class="c1"># will be used on the next call to reset(). These are equal except in</span>
-        <span class="c1"># the gap between the user setting the env.benchmark property while in</span>
-        <span class="c1"># an episode and the next call to env.reset().</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Benchmark</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use_proto</span><span class="p">:</span> <span class="n">BenchmarkProto</span> <span class="o">=</span> <span class="n">BenchmarkProto</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_next_benchmark</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Benchmark</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="c1"># Normally when the benchmark is changed the updated value is not</span>
-        <span class="c1"># reflected until the next call to reset(). We make an exception for the</span>
-        <span class="c1"># constructor-time benchmark as otherwise the behavior of the benchmark</span>
-        <span class="c1"># property is counter-intuitive:</span>
-        <span class="c1">#</span>
-        <span class="c1">#     &gt;&gt;&gt; env = gym.make(&quot;example-v0&quot;, benchmark=&quot;foo&quot;)</span>
-        <span class="c1">#     &gt;&gt;&gt; env.benchmark</span>
-        <span class="c1">#     None</span>
-        <span class="c1">#     &gt;&gt;&gt; env.reset()</span>
-        <span class="c1">#     &gt;&gt;&gt; env.benchmark</span>
-        <span class="c1">#     &quot;foo&quot;</span>
-        <span class="c1">#</span>
-        <span class="c1"># By forcing the _benchmark_in_use URI at constructor time, the first</span>
-        <span class="c1"># env.benchmark above returns the benchmark as expected.</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">benchmark</span> <span class="o">=</span> <span class="n">benchmark</span> <span class="ow">or</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">benchmarks</span><span class="p">())</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_next_benchmark</span>
-        <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
-            <span class="c1"># StopIteration raised on next(self.datasets.benchmarks()) if there</span>
-            <span class="c1"># are no benchmarks available. This is to allow CompilerEnv to be</span>
-            <span class="c1"># used without any datasets by setting a benchmark before/during the</span>
-            <span class="c1"># first reset() call.</span>
-            <span class="k">pass</span>
-
-        <span class="c1"># Process the available action, observation, and reward spaces.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">action_spaces</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">proto_to_action_space</span><span class="p">(</span><span class="n">space</span><span class="p">)</span> <span class="k">for</span> <span class="n">space</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">action_spaces</span>
-        <span class="p">]</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">observation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_observation_view_type</span><span class="p">(</span>
-            <span class="n">raw_step</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_step</span><span class="p">,</span>
-            <span class="n">spaces</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">observation_spaces</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">reward</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reward_view_type</span><span class="p">(</span><span class="n">rewards</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="p">)</span>
-
-        <span class="c1"># Register any derived observation spaces now so that the observation</span>
-        <span class="c1"># space can be set below.</span>
-        <span class="k">for</span> <span class="n">derived_observation_space</span> <span class="ow">in</span> <span class="n">derived_observation_spaces</span> <span class="ow">or</span> <span class="p">[]:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">add_derived_space_internal</span><span class="p">(</span><span class="o">**</span><span class="n">derived_observation_space</span><span class="p">)</span>
-
-        <span class="c1"># Lazily evaluated version strings.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_versions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GetVersionReply</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">action_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Space</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Space</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-
-        <span class="c1"># Mutable state initialized in reset().</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">reward_range</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">episode_reward</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">episode_start_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">actions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ActionType</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-
-        <span class="c1"># Initialize the default observation/reward spaces.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">observation_space_spec</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ObservationSpaceSpec</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">reward_space_spec</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Reward</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span> <span class="o">=</span> <span class="n">observation_space</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">reward_space</span> <span class="o">=</span> <span class="n">reward_space</span></div>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="nd">@deprecated</span><span class="p">(</span>
-        <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.2.1&quot;</span><span class="p">,</span>
-        <span class="n">reason</span><span class="o">=</span><span class="p">(</span>
-            <span class="s2">&quot;The `CompilerEnv.logger` attribute is deprecated. All CompilerEnv &quot;</span>
-            <span class="s2">&quot;instances share a logger named compiler_gym.envs.compiler_env&quot;</span>
-        <span class="p">),</span>
-    <span class="p">)</span>
-    <span class="k">def</span> <span class="nf">logger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">_logger</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">reward_space_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Reward</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span>
+
+    <span class="nd">@reward_space_spec</span><span class="o">.</span><span class="n">setter</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">reward_space_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Reward</span><span class="p">]):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">versions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GetVersionReply</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Get the version numbers from the compiler service.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_versions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_versions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">GetVersion</span><span class="p">,</span> <span class="n">GetVersionRequest</span><span class="p">()</span>
-            <span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_versions</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">version</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;The version string of the compiler service.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">versions</span><span class="o">.</span><span class="n">service_version</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">compiler_version</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;The version string of the underlying compiler that this service supports.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">versions</span><span class="o">.</span><span class="n">compiler_version</span>
-
-<div class="viewcode-block" id="CompilerEnv.commandline"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.commandline">[docs]</a>    <span class="k">def</span> <span class="nf">commandline</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Interface for :class:`CompilerEnv &lt;compiler_gym.envs.CompilerEnv&gt;`</span>
-<span class="sd">        subclasses to provide an equivalent commandline invocation to the</span>
-<span class="sd">        current environment state.</span>
-
-<span class="sd">        See also :meth:`commandline_to_actions()</span>
-<span class="sd">        &lt;compiler_gym.envs.CompilerEnv.commandline_to_actions&gt;`.</span>
-
-<span class="sd">        Calling this method on a :class:`CompilerEnv</span>
-<span class="sd">        &lt;compiler_gym.envs.CompilerEnv&gt;` instance raises</span>
-<span class="sd">        :code:`NotImplementedError`.</span>
-
-<span class="sd">        :return: A string commandline invocation.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="CompilerEnv.commandline_to_actions"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.commandline_to_actions">[docs]</a>    <span class="k">def</span> <span class="nf">commandline_to_actions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">commandline</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ActionType</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Interface for :class:`CompilerEnv &lt;compiler_gym.envs.CompilerEnv&gt;`</span>
-<span class="sd">        subclasses to convert from a commandline invocation to a sequence of</span>
-<span class="sd">        actions.</span>
-
-<span class="sd">        See also :meth:`commandline()</span>
-<span class="sd">        &lt;compiler_gym.envs.CompilerEnv.commandline&gt;`.</span>
-
-<span class="sd">        Calling this method on a :class:`CompilerEnv</span>
-<span class="sd">        &lt;compiler_gym.envs.CompilerEnv&gt;` instance raises</span>
-<span class="sd">        :code:`NotImplementedError`.</span>
-
-<span class="sd">        :return: A list of actions.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span></div>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">episode_walltime</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Return the amount of time in seconds since the last call to</span>
-<span class="sd">        :meth:`reset() &lt;compiler_env.envs.CompilerEnv.reset&gt;`.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">episode_start_time</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CompilerEnvState</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;The tuple representation of the current environment state.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">CompilerEnvState</span><span class="p">(</span>
-            <span class="n">benchmark</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">benchmark</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">benchmark</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">reward</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">episode_reward</span><span class="p">,</span>
-            <span class="n">walltime</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">episode_walltime</span><span class="p">,</span>
-            <span class="n">commandline</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">commandline</span><span class="p">(),</span>
-        <span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">action_space</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Space</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;The current action space.</span>
-
-<span class="sd">        :getter: Get the current action space.</span>
-<span class="sd">        :setter: Set the action space to use. Must be an entry in</span>
-<span class="sd">            :code:`action_spaces`. If :code:`None`, the default action space is</span>
-<span class="sd">            selected.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_action_space</span>
-
-    <span class="nd">@action_space</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">action_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">action_space_name</span> <span class="o">=</span> <span class="n">action_space</span>
-        <span class="n">index</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_spaces</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">action_space</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_space_name</span>
-            <span class="k">else</span> <span class="mi">0</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_action_space</span><span class="p">:</span> <span class="n">NamedDiscrete</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_spaces</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
-
-    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">benchmark</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Benchmark</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Get or set the benchmark to use.</span>
 
@@ -646,31 +329,116 @@
 <span class="sd">            Setting a new benchmark has no effect until</span>
 <span class="sd">            :func:`env.reset() &lt;compiler_gym.envs.CompilerEnv.reset&gt;` is called.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span>
 
     <span class="nd">@benchmark</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">benchmark</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">benchmark</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Benchmark</span><span class="p">,</span> <span class="n">BenchmarkUri</span><span class="p">]):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_episode</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s2">&quot;Changing the benchmark has no effect until reset() is called&quot;</span>
-            <span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">benchmark</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">benchmark_object</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">benchmark</span><span class="p">(</span><span class="n">benchmark</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Setting benchmark by name: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">benchmark_object</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_next_benchmark</span> <span class="o">=</span> <span class="n">benchmark_object</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">benchmark</span><span class="p">,</span> <span class="n">Benchmark</span><span class="p">):</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Setting benchmark: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">benchmark</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_next_benchmark</span> <span class="o">=</span> <span class="n">benchmark</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">benchmark</span><span class="p">,</span> <span class="n">BenchmarkUri</span><span class="p">):</span>
-            <span class="n">benchmark_object</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">benchmark_from_parsed_uri</span><span class="p">(</span><span class="n">benchmark</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Setting benchmark by name: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">benchmark_object</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_next_benchmark</span> <span class="o">=</span> <span class="n">benchmark_object</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Expected a Benchmark or str, received: &#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">benchmark</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
-            <span class="p">)</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">benchmark</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">benchmark</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Benchmark</span><span class="p">,</span> <span class="n">BenchmarkUri</span><span class="p">]]):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">datasets</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Dataset</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span>
+
+    <span class="nd">@datasets</span><span class="o">.</span><span class="n">setter</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">datasets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datasets</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Dataset</span><span class="p">]):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">episode_walltime</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the amount of time in seconds since the last call to</span>
+<span class="sd">        :meth:`reset() &lt;compiler_gym.envs.CompilerEnv.reset&gt;`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">in_episode</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Whether the service is ready for :func:`step` to be called,</span>
+<span class="sd">        i.e. :func:`reset` has been called and :func:`close` has not.</span>
+
+<span class="sd">        :return: :code:`True` if in an episode, else :code:`False`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">episode_reward</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;If :func:`CompilerEnv.reward_space</span>
+<span class="sd">        &lt;compiler_gym.envs.CompilerGym.reward_space&gt;` is set, this value is the</span>
+<span class="sd">        sum of all rewards for the current episode.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span>
+
+    <span class="nd">@episode_reward</span><span class="o">.</span><span class="n">setter</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">episode_reward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">episode_reward</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">actions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ActionType</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="nd">@deprecated</span><span class="p">(</span>
+        <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.2.1&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">logger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">version</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;The version string of the compiler service.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">compiler_version</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;The version string of the underlying compiler that this service supports.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CompilerEnvState</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;The tuple representation of the current environment state.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">action_space</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Space</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;The current action space.</span>
+
+<span class="sd">        :getter: Get the current action space.</span>
+<span class="sd">        :setter: Set the action space to use. Must be an entry in</span>
+<span class="sd">            :code:`action_spaces`. If :code:`None`, the default action space is</span>
+<span class="sd">            selected.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span>
+
+    <span class="nd">@action_space</span><span class="o">.</span><span class="n">setter</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">action_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">action_spaces</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;A list of supported action space names.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span>
+
+    <span class="nd">@action_spaces</span><span class="o">.</span><span class="n">setter</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">action_spaces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action_spaces</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">reward_space</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Reward</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;The default reward space that is used to return a reward value from</span>
 <span class="sd">        :func:`~step()`.</span>
@@ -679,45 +447,15 @@
 <span class="sd">            or :code:`None` if not set.</span>
 <span class="sd">        :setter: Set the default reward space.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_space_spec</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span>
 
     <span class="nd">@reward_space</span><span class="o">.</span><span class="n">setter</span>
+    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">reward_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reward_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Reward</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="c1"># Coerce the observation space into a string.</span>
-        <span class="n">reward_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">reward_space</span><span class="o">.</span><span class="n">name</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reward_space</span><span class="p">,</span> <span class="n">Reward</span><span class="p">)</span> <span class="k">else</span> <span class="n">reward_space</span>
-        <span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">reward_space</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">reward_space</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward</span><span class="o">.</span><span class="n">spaces</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reward space not found: </span><span class="si">{</span><span class="n">reward_space</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="c1"># The reward space remains unchanged, nothing to do.</span>
-            <span class="k">if</span> <span class="n">reward_space</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_space</span><span class="p">:</span>
-                <span class="k">return</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">reward_space_spec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="n">reward_space</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">reward_range</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">reward_space_spec</span><span class="o">.</span><span class="n">min</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">reward_space_spec</span><span class="o">.</span><span class="n">max</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="c1"># Reset any cumulative rewards, if we&#39;re in an episode.</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_episode</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">episode_reward</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># If no reward space is being used then set the reward range to</span>
-            <span class="c1"># unbounded.</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">reward_space_spec</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">reward_range</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">in_episode</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Whether the service is ready for :func:`step` to be called,</span>
-<span class="sd">        i.e. :func:`reset` has been called and :func:`close` has not.</span>
-
-<span class="sd">        :return: :code:`True` if in an episode, else :code:`False`.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-
-    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">observation_space</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Space</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;The observation space that is used to return an observation value in</span>
 <span class="sd">        :func:`~step()`.</span>
@@ -726,39 +464,52 @@
 <span class="sd">            not set.</span>
 <span class="sd">        :setter: Set the default observation space.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_space_spec</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_space_spec</span><span class="o">.</span><span class="n">space</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span>
 
     <span class="nd">@observation_space</span><span class="o">.</span><span class="n">setter</span>
+    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">observation_space</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">observation_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ObservationSpaceSpec</span><span class="p">]]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="c1"># Coerce the observation space into a string.</span>
-        <span class="n">observation_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">observation_space</span><span class="o">.</span><span class="n">id</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">observation_space</span><span class="p">,</span> <span class="n">ObservationSpaceSpec</span><span class="p">)</span>
-            <span class="k">else</span> <span class="n">observation_space</span>
-        <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">observation_space</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">observation_space</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">spaces</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Observation space not found: </span><span class="si">{</span><span class="n">observation_space</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">observation_space_spec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="n">observation_space</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">observation_space_spec</span> <span class="o">=</span> <span class="kc">None</span>
-
-    <span class="k">def</span> <span class="nf">_init_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Retturn a dictionary of keyword arguments used to initialize the</span>
-<span class="sd">        environment.</span>
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">observation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ObservationView</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;A view of the available observation spaces that permits</span>
+<span class="sd">        on-demand computation of observations.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;action_space&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_space</span><span class="p">,</span>
-            <span class="s2">&quot;benchmark&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">benchmark</span><span class="p">,</span>
-            <span class="s2">&quot;connection_settings&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connection_settings</span><span class="p">,</span>
-            <span class="s2">&quot;service&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_service_endpoint</span><span class="p">,</span>
-        <span class="p">}</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="CompilerEnv.fork"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.fork">[docs]</a>    <span class="k">def</span> <span class="nf">fork</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;CompilerEnv&quot;</span><span class="p">:</span>
+    <span class="nd">@observation</span><span class="o">.</span><span class="n">setter</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">observation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">observation</span><span class="p">:</span> <span class="n">ObservationView</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">reward_range</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;A tuple indicating the range of reward values.</span>
+
+<span class="sd">        Default range is (-inf, +inf).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">reward</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RewardView</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;A view of the available reward spaces that permits on-demand</span>
+<span class="sd">        computation of rewards.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span>
+
+    <span class="nd">@reward</span><span class="o">.</span><span class="n">setter</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">reward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reward</span><span class="p">:</span> <span class="n">RewardView</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CompilerEnv.fork"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.fork">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">fork</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;CompilerEnv&quot;</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Fork a new environment with exactly the same state.</span>
 
 <span class="sd">        This creates a duplicate environment instance with the current state.</span>
@@ -782,131 +533,19 @@
 
 <span class="sd">        :return: A new environment instance.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_episode</span><span class="p">:</span>
-            <span class="n">actions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">actions</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">actions</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Parent service of fork() has died, replaying state&quot;</span><span class="p">)</span>
-                <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">multistep</span><span class="p">(</span><span class="n">actions</span><span class="p">)</span>
-                <span class="k">assert</span> <span class="ow">not</span> <span class="n">done</span><span class="p">,</span> <span class="s2">&quot;Failed to replay action sequence&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span></div>
 
-        <span class="n">request</span> <span class="o">=</span> <span class="n">ForkSessionRequest</span><span class="p">(</span><span class="n">session_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span><span class="p">)</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">reply</span><span class="p">:</span> <span class="n">ForkSessionReply</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">ForkSession</span><span class="p">,</span> <span class="n">request</span>
-            <span class="p">)</span>
-
-            <span class="c1"># Create a new environment that shares the connection.</span>
-            <span class="n">new_env</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_kwargs</span><span class="p">(),</span> <span class="n">service_connection</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">)</span>
-
-            <span class="c1"># Set the session ID.</span>
-            <span class="n">new_env</span><span class="o">.</span><span class="n">_session_id</span> <span class="o">=</span> <span class="n">reply</span><span class="o">.</span><span class="n">session_id</span>  <span class="c1"># pylint: disable=protected-access</span>
-            <span class="n">new_env</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">session_id</span> <span class="o">=</span> <span class="n">reply</span><span class="o">.</span><span class="n">session_id</span>
-
-            <span class="c1"># Now that we have initialized the environment with the current</span>
-            <span class="c1"># state, set the benchmark so that calls to new_env.reset() will</span>
-            <span class="c1"># correctly revert the environment to the initial benchmark state.</span>
-            <span class="c1">#</span>
-            <span class="c1"># pylint: disable=protected-access</span>
-            <span class="n">new_env</span><span class="o">.</span><span class="n">_next_benchmark</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use</span>
-
-            <span class="c1"># Set the &quot;visible&quot; name of the current benchmark to hide the fact</span>
-            <span class="c1"># that we loaded from a custom benchmark file.</span>
-            <span class="n">new_env</span><span class="o">.</span><span class="n">_benchmark_in_use</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use</span>
-        <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>
-            <span class="c1"># Fallback implementation. If the compiler service does not support</span>
-            <span class="c1"># the Fork() operator then we create a new independent environment</span>
-            <span class="c1"># and apply the sequence of actions in the current environment to</span>
-            <span class="c1"># replay the state.</span>
-            <span class="n">new_env</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_kwargs</span><span class="p">())</span>
-            <span class="n">new_env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
-            <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">new_env</span><span class="o">.</span><span class="n">multistep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">actions</span><span class="p">)</span>
-            <span class="k">assert</span> <span class="ow">not</span> <span class="n">done</span><span class="p">,</span> <span class="s2">&quot;Failed to replay action sequence in forked environment&quot;</span>
-
-        <span class="c1"># Create copies of the mutable reward and observation spaces. This</span>
-        <span class="c1"># is required to correctly calculate incremental updates.</span>
-        <span class="n">new_env</span><span class="o">.</span><span class="n">reward</span><span class="o">.</span><span class="n">spaces</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reward</span><span class="o">.</span><span class="n">spaces</span><span class="p">)</span>
-        <span class="n">new_env</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">spaces</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">spaces</span><span class="p">)</span>
-
-        <span class="c1"># Set the default observation and reward types. Note the use of IDs here</span>
-        <span class="c1"># to prevent passing the spaces by reference.</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span><span class="p">:</span>
-            <span class="n">new_env</span><span class="o">.</span><span class="n">observation_space</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_space_spec</span><span class="o">.</span><span class="n">id</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_space</span><span class="p">:</span>
-            <span class="n">new_env</span><span class="o">.</span><span class="n">reward_space</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_space</span><span class="o">.</span><span class="n">name</span>
-
-        <span class="c1"># Copy over the mutable episode state.</span>
-        <span class="n">new_env</span><span class="o">.</span><span class="n">episode_reward</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">episode_reward</span>
-        <span class="n">new_env</span><span class="o">.</span><span class="n">episode_start_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">episode_start_time</span>
-        <span class="n">new_env</span><span class="o">.</span><span class="n">actions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">actions</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-
-        <span class="k">return</span> <span class="n">new_env</span></div>
-
-<div class="viewcode-block" id="CompilerEnv.close"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Close the environment.</span>
-
-<span class="sd">        Once closed, :func:`reset` must be called before the environment is used</span>
-<span class="sd">        again.</span>
-
-<span class="sd">        .. note::</span>
-
-<span class="sd">            Internally, CompilerGym environments may launch subprocesses and use</span>
-<span class="sd">            temporary files to communicate between the environment and the</span>
-<span class="sd">            underlying compiler (see :ref:`compiler_gym.service</span>
-<span class="sd">            &lt;compiler_gym/service:compiler_gym.service&gt;` for details). This</span>
-<span class="sd">            means it is important to call :meth:`env.close()</span>
-<span class="sd">            &lt;compiler_gym.envs.CompilerEnv.close&gt;` after use to free up</span>
-<span class="sd">            resources and prevent orphan subprocesses or files. We recommend</span>
-<span class="sd">            using the :code:`with`-statement pattern for creating environments:</span>
-
-<span class="sd">                &gt;&gt;&gt; with gym.make(&quot;llvm-autophase-ic-v0&quot;) as env:</span>
-<span class="sd">                ...    env.reset()</span>
-<span class="sd">                ...    # use env how you like</span>
-
-<span class="sd">            This removes the need to call :meth:`env.close()</span>
-<span class="sd">            &lt;compiler_gym.envs.CompilerEnv.close&gt;` yourself.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Try and close out the episode, but errors are okay.</span>
-        <span class="n">close_service</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_episode</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">reply</span><span class="p">:</span> <span class="n">EndSessionReply</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">EndSession</span><span class="p">,</span>
-                    <span class="n">EndSessionRequest</span><span class="p">(</span><span class="n">session_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span><span class="p">),</span>
-                <span class="p">)</span>
-                <span class="c1"># The service still has other sessions attached so we should</span>
-                <span class="c1"># not kill it.</span>
-                <span class="k">if</span> <span class="n">reply</span><span class="o">.</span><span class="n">remaining_sessions</span><span class="p">:</span>
-                    <span class="n">close_service</span> <span class="o">=</span> <span class="kc">False</span>
-            <span class="k">except</span> <span class="n">ServiceIsClosed</span><span class="p">:</span>
-                <span class="c1"># This error can be safely ignored as it means that the service</span>
-                <span class="c1"># is already offline.</span>
-                <span class="k">pass</span>
-            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                    <span class="s2">&quot;Failed to end active compiler session on close(): </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
-                    <span class="n">e</span><span class="p">,</span>
-                    <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
-                <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span> <span class="o">=</span> <span class="kc">None</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span> <span class="ow">and</span> <span class="n">close_service</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">service</span> <span class="o">=</span> <span class="kc">None</span></div>
-
-    <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c1"># Don&#39;t let the service be orphaned if user forgot to close(), or</span>
-        <span class="c1"># if an exception was thrown. The conditional guard is because this</span>
-        <span class="c1"># may be called in case of early error.</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;service&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;service&quot;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-
-<div class="viewcode-block" id="CompilerEnv.reset"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span>  <span class="c1"># pylint: disable=arguments-differ</span>
+<div class="viewcode-block" id="CompilerEnv.reset"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.reset">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span>  <span class="c1"># pylint: disable=arguments-differ</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">benchmark</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Benchmark</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">action_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">retry_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">observation_space</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
+            <span class="n">OptionalArgumentValue</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ObservationSpaceSpec</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="n">OptionalArgumentValue</span><span class="o">.</span><span class="n">UNCHANGED</span><span class="p">,</span>
+        <span class="n">reward_space</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
+            <span class="n">OptionalArgumentValue</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Reward</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="n">OptionalArgumentValue</span><span class="o">.</span><span class="n">UNCHANGED</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ObservationType</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Reset the environment state.</span>
 
@@ -924,6 +563,25 @@
 <span class="sd">            subsequent calls to :code:`reset()` will use this action space. If</span>
 <span class="sd">            no action space is provided, the default action space is used.</span>
 
+<span class="sd">        :param observation_space: Compute and return observations at each</span>
+<span class="sd">            :func:`step()` from this space. Accepts a string name or an</span>
+<span class="sd">            :class:`ObservationSpaceSpec</span>
+<span class="sd">            &lt;compiler_gym.views.ObservationSpaceSpec&gt;`. If :code:`None`,</span>
+<span class="sd">            :func:`step()` returns :code:`None` for the observation value. If</span>
+<span class="sd">            :code:`OptionalArgumentValue.UNCHANGED` (the default value), the</span>
+<span class="sd">            observation space remains unchanged from the previous episode. For</span>
+<span class="sd">            available spaces, see :class:`env.observation.spaces</span>
+<span class="sd">            &lt;compiler_gym.views.ObservationView&gt;`.</span>
+
+<span class="sd">        :param reward_space: Compute and return reward at each :func:`step()`</span>
+<span class="sd">            from this space. Accepts a string name or a :class:`Reward</span>
+<span class="sd">            &lt;compiler_gym.spaces.Reward&gt;`. If :code:`None`, :func:`step()`</span>
+<span class="sd">            returns :code:`None` for the reward value.  If</span>
+<span class="sd">            :code:`OptionalArgumentValue.UNCHANGED` (the default value), the</span>
+<span class="sd">            observation space remains unchanged from the previous episode. For</span>
+<span class="sd">            available spaces, see :class:`env.reward.spaces</span>
+<span class="sd">            &lt;compiler_gym.views.RewardView&gt;`.</span>
+
 <span class="sd">        :return: The initial observation.</span>
 
 <span class="sd">        :raises BenchmarkInitError: If the benchmark is invalid. In this case,</span>
@@ -932,301 +590,10 @@
 <span class="sd">        :raises TypeError: If no benchmark has been set, and the environment</span>
 <span class="sd">            does not have a default benchmark to select from.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span></div>
 
-        <span class="k">def</span> <span class="nf">_retry</span><span class="p">(</span><span class="n">error</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ObservationType</span><span class="p">]:</span>
-            <span class="sd">&quot;&quot;&quot;Abort and retry on error.&quot;&quot;&quot;</span>
-            <span class="c1"># Log the error that we are recovering from, but treat</span>
-            <span class="c1"># ServiceIsClosed errors as unimportant since we know what causes</span>
-            <span class="c1"># them.</span>
-            <span class="n">log_severity</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="n">ServiceIsClosed</span><span class="p">)</span> <span class="k">else</span> <span class="n">logger</span><span class="o">.</span><span class="n">warning</span>
-            <span class="p">)</span>
-            <span class="n">log_severity</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> during reset(): </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">:</span>
-                <span class="k">try</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-                <span class="k">except</span> <span class="n">ServiceError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                    <span class="c1"># close() can raise ServiceError if the service exists with</span>
-                    <span class="c1"># a non-zero return code. We swallow the error here as we</span>
-                    <span class="c1"># are about to retry.</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                        <span class="s2">&quot;Ignoring service error during reset() attempt: </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
-                        <span class="n">e</span><span class="p">,</span>
-                        <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
-                    <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">service</span> <span class="o">=</span> <span class="kc">None</span>
-
-            <span class="k">if</span> <span class="n">retry_count</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connection_settings</span><span class="o">.</span><span class="n">init_max_attempts</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span>
-                    <span class="s2">&quot;Failed to reset environment using benchmark &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">benchmark</span><span class="si">}</span><span class="s2"> after </span><span class="si">{</span><span class="n">retry_count</span> <span class="o">-</span> <span class="mi">1</span><span class="si">}</span><span class="s2"> attempts.</span><span class="se">\n</span><span class="s2">&quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;Last error (</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="p">)</span> <span class="kn">from</span> <span class="nn">error</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span>
-                    <span class="n">benchmark</span><span class="o">=</span><span class="n">benchmark</span><span class="p">,</span>
-                    <span class="n">action_space</span><span class="o">=</span><span class="n">action_space</span><span class="p">,</span>
-                    <span class="n">retry_count</span><span class="o">=</span><span class="n">retry_count</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
-                <span class="p">)</span>
-
-        <span class="k">def</span> <span class="nf">_call_with_error</span><span class="p">(</span>
-            <span class="n">stub_method</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
-        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="ne">Exception</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
-            <span class="sd">&quot;&quot;&quot;Call the given stub method. And return an &lt;error, return&gt; tuple.&quot;&quot;&quot;</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">(</span><span class="n">stub_method</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-            <span class="k">except</span> <span class="p">(</span><span class="n">ServiceError</span><span class="p">,</span> <span class="n">ServiceTransportError</span><span class="p">,</span> <span class="ne">TimeoutError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">e</span><span class="p">,</span> <span class="kc">None</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_next_benchmark</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="s2">&quot;No benchmark set. Set a benchmark using &quot;</span>
-                <span class="s2">&quot;`env.reset(benchmark=benchmark)`. Use `env.datasets` to &quot;</span>
-                <span class="s2">&quot;access the available benchmarks.&quot;</span>
-            <span class="p">)</span>
-
-        <span class="c1"># Start a new service if required.</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">service</span> <span class="o">=</span> <span class="n">CompilerGymServiceConnection</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_service_endpoint</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connection_settings</span>
-            <span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">action_space_name</span> <span class="o">=</span> <span class="n">action_space</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_space_name</span>
-
-        <span class="c1"># Stop an existing episode.</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_episode</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Ending session </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span><span class="p">)</span>
-            <span class="n">error</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_call_with_error</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">EndSession</span><span class="p">,</span>
-                <span class="n">EndSessionRequest</span><span class="p">(</span><span class="n">session_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span><span class="p">),</span>
-            <span class="p">)</span>
-            <span class="k">if</span> <span class="n">error</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                    <span class="s2">&quot;Failed to stop session </span><span class="si">%d</span><span class="s2"> with </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span><span class="p">,</span>
-                    <span class="nb">type</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
-                    <span class="n">error</span><span class="p">,</span>
-                <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span> <span class="o">=</span> <span class="kc">None</span>
-
-        <span class="c1"># Update the user requested benchmark, if provided.</span>
-        <span class="k">if</span> <span class="n">benchmark</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">benchmark</span> <span class="o">=</span> <span class="n">benchmark</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_next_benchmark</span>
-
-        <span class="c1"># When always_send_benchmark_on_reset option is enabled, the entire</span>
-        <span class="c1"># benchmark program is sent with every StartEpisode request. Otherwise</span>
-        <span class="c1"># only the URI of the benchmark is sent. In cases where benchmarks are</span>
-        <span class="c1"># reused between calls to reset(), sending the URI is more efficient as</span>
-        <span class="c1"># the service can cache the benchmark. In cases where reset() is always</span>
-        <span class="c1"># called with a different benchmark, this causes unnecessary roundtrips</span>
-        <span class="c1"># as every StartEpisodeRequest receives a FileNotFound response.</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">always_send_benchmark_on_reset</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use_proto</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use</span><span class="o">.</span><span class="n">proto</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use_proto</span><span class="o">.</span><span class="n">uri</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span>
-
-        <span class="n">start_session_request</span> <span class="o">=</span> <span class="n">StartSessionRequest</span><span class="p">(</span>
-            <span class="n">benchmark</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use_proto</span><span class="p">,</span>
-            <span class="n">action_space</span><span class="o">=</span><span class="p">(</span>
-                <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_spaces</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">action_space_name</span><span class="p">)</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_space_name</span>
-                <span class="k">else</span> <span class="mi">0</span>
-            <span class="p">),</span>
-            <span class="n">observation_space</span><span class="o">=</span><span class="p">(</span>
-                <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">observation_space_spec</span><span class="o">.</span><span class="n">index</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span> <span class="k">else</span> <span class="kc">None</span>
-            <span class="p">),</span>
-        <span class="p">)</span>
-
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">error</span><span class="p">,</span> <span class="n">reply</span> <span class="o">=</span> <span class="n">_call_with_error</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">StartSession</span><span class="p">,</span> <span class="n">start_session_request</span>
-            <span class="p">)</span>
-            <span class="k">if</span> <span class="n">error</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">_retry</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
-            <span class="c1"># The benchmark was not found, so try adding it and then repeating</span>
-            <span class="c1"># the request.</span>
-            <span class="n">error</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_call_with_error</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">AddBenchmark</span><span class="p">,</span>
-                <span class="n">AddBenchmarkRequest</span><span class="p">(</span><span class="n">benchmark</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use</span><span class="o">.</span><span class="n">proto</span><span class="p">]),</span>
-            <span class="p">)</span>
-            <span class="k">if</span> <span class="n">error</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">_retry</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
-            <span class="n">error</span><span class="p">,</span> <span class="n">reply</span> <span class="o">=</span> <span class="n">_call_with_error</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">StartSession</span><span class="p">,</span> <span class="n">start_session_request</span>
-            <span class="p">)</span>
-            <span class="k">if</span> <span class="n">error</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">_retry</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span> <span class="o">=</span> <span class="n">reply</span><span class="o">.</span><span class="n">session_id</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">session_id</span> <span class="o">=</span> <span class="n">reply</span><span class="o">.</span><span class="n">session_id</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">reward</span><span class="o">.</span><span class="n">get_cost</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="fm">__getitem__</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">episode_start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">actions</span> <span class="o">=</span> <span class="p">[]</span>
-
-        <span class="c1"># If the action space has changed, update it.</span>
-        <span class="k">if</span> <span class="n">reply</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;new_action_space&quot;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">action_space</span> <span class="o">=</span> <span class="n">proto_to_action_space</span><span class="p">(</span><span class="n">reply</span><span class="o">.</span><span class="n">new_action_space</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">reward</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">benchmark</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">benchmark</span><span class="p">,</span> <span class="n">observation_view</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_space</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">episode_reward</span> <span class="o">=</span> <span class="mf">0.0</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">reply</span><span class="o">.</span><span class="n">observation</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Expected one observation from service, received </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">reply</span><span class="o">.</span><span class="n">observation</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="p">)</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">observation_space_spec</span><span class="o">.</span><span class="n">id</span><span class="p">]</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span>
-                <span class="n">reply</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="p">)</span></div>
-
-<div class="viewcode-block" id="CompilerEnv.raw_step"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.raw_step">[docs]</a>    <span class="k">def</span> <span class="nf">raw_step</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">actions</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ActionType</span><span class="p">],</span>
-        <span class="n">observation_spaces</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ObservationSpaceSpec</span><span class="p">],</span>
-        <span class="n">reward_spaces</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Reward</span><span class="p">],</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StepType</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Take a step.</span>
-
-<span class="sd">        :param actions: A list of actions to be applied.</span>
-
-<span class="sd">        :param observations: A list of observations spaces to compute</span>
-<span class="sd">            observations from. These are evaluated after the actions are</span>
-<span class="sd">            applied.</span>
-
-<span class="sd">        :param rewards: A list of reward spaces to compute rewards from. These</span>
-<span class="sd">            are evaluated after the actions are applied.</span>
-
-<span class="sd">        :return: A tuple of observations, rewards, done, and info. Observations</span>
-<span class="sd">            and rewards are lists.</span>
-
-<span class="sd">        :raises SessionNotFound: If :meth:`reset()</span>
-<span class="sd">            &lt;compiler_gym.envs.CompilerEnv.reset&gt;` has not been called.</span>
-
-<span class="sd">        .. warning::</span>
-
-<span class="sd">            Don&#39;t call this method directly, use :meth:`step()</span>
-<span class="sd">            &lt;compiler_gym.envs.CompilerEnv.step&gt;` or :meth:`multistep()</span>
-<span class="sd">            &lt;compiler_gym.envs.CompilerEnv.multistep&gt;` instead. The</span>
-<span class="sd">            :meth:`raw_step() &lt;compiler_gym.envs.CompilerEnv.step&gt;` method is an</span>
-<span class="sd">            implementation detail.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_episode</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">SessionNotFound</span><span class="p">(</span><span class="s2">&quot;Must call reset() before step()&quot;</span><span class="p">)</span>
-
-        <span class="n">reward_observation_spaces</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ObservationSpaceSpec</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">reward_space</span> <span class="ow">in</span> <span class="n">reward_spaces</span><span class="p">:</span>
-            <span class="n">reward_observation_spaces</span> <span class="o">+=</span> <span class="p">[</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="n">obs</span><span class="p">]</span> <span class="k">for</span> <span class="n">obs</span> <span class="ow">in</span> <span class="n">reward_space</span><span class="o">.</span><span class="n">observation_spaces</span>
-            <span class="p">]</span>
-
-        <span class="n">observations_to_compute</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ObservationSpaceSpec</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
-            <span class="nb">set</span><span class="p">(</span><span class="n">observation_spaces</span><span class="p">)</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">reward_observation_spaces</span><span class="p">))</span>
-        <span class="p">)</span>
-        <span class="n">observation_space_index_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">ObservationSpaceSpec</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">observation_space</span><span class="p">:</span> <span class="n">i</span>
-            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">observation_space</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">observations_to_compute</span><span class="p">)</span>
-        <span class="p">}</span>
-
-        <span class="c1"># Record the actions.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">actions</span> <span class="o">+=</span> <span class="n">actions</span>
-
-        <span class="c1"># Send the request to the backend service.</span>
-        <span class="n">request</span> <span class="o">=</span> <span class="n">StepRequest</span><span class="p">(</span>
-            <span class="n">session_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span><span class="p">,</span>
-            <span class="n">action</span><span class="o">=</span><span class="p">[</span><span class="n">Event</span><span class="p">(</span><span class="n">int64_value</span><span class="o">=</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">actions</span><span class="p">],</span>
-            <span class="n">observation_space</span><span class="o">=</span><span class="p">[</span>
-                <span class="n">observation_space</span><span class="o">.</span><span class="n">index</span> <span class="k">for</span> <span class="n">observation_space</span> <span class="ow">in</span> <span class="n">observations_to_compute</span>
-            <span class="p">],</span>
-        <span class="p">)</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">reply</span> <span class="o">=</span> <span class="n">_wrapped_step</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
-        <span class="k">except</span> <span class="p">(</span>
-            <span class="n">ServiceError</span><span class="p">,</span>
-            <span class="n">ServiceTransportError</span><span class="p">,</span>
-            <span class="n">ServiceOSError</span><span class="p">,</span>
-            <span class="ne">TimeoutError</span><span class="p">,</span>
-            <span class="n">SessionNotFound</span><span class="p">,</span>
-        <span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="c1"># Gracefully handle &quot;expected&quot; error types. These non-fatal errors</span>
-            <span class="c1"># end the current episode and provide some diagnostic information to</span>
-            <span class="c1"># the user through the `info` dict.</span>
-            <span class="n">info</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s2">&quot;error_type&quot;</span><span class="p">:</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
-                <span class="s2">&quot;error_details&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span>
-            <span class="p">}</span>
-
-            <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-            <span class="k">except</span> <span class="n">ServiceError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="c1"># close() can raise ServiceError if the service exists with a</span>
-                <span class="c1"># non-zero return code. We swallow the error here but propagate</span>
-                <span class="c1"># the diagnostic message.</span>
-                <span class="n">info</span><span class="p">[</span>
-                    <span class="s2">&quot;error_details&quot;</span>
-                <span class="p">]</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;. Additional error during environment closing: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
-
-            <span class="n">default_observations</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">observation_space</span><span class="o">.</span><span class="n">default_value</span>
-                <span class="k">for</span> <span class="n">observation_space</span> <span class="ow">in</span> <span class="n">observation_spaces</span>
-            <span class="p">]</span>
-            <span class="n">default_rewards</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="nb">float</span><span class="p">(</span><span class="n">reward_space</span><span class="o">.</span><span class="n">reward_on_error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">episode_reward</span><span class="p">))</span>
-                <span class="k">for</span> <span class="n">reward_space</span> <span class="ow">in</span> <span class="n">reward_spaces</span>
-            <span class="p">]</span>
-            <span class="k">return</span> <span class="n">default_observations</span><span class="p">,</span> <span class="n">default_rewards</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">info</span>
-
-        <span class="c1"># If the action space has changed, update it.</span>
-        <span class="k">if</span> <span class="n">reply</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;new_action_space&quot;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">action_space</span> <span class="o">=</span> <span class="n">proto_to_action_space</span><span class="p">(</span><span class="n">reply</span><span class="o">.</span><span class="n">new_action_space</span><span class="p">)</span>
-
-        <span class="c1"># Translate observations to python representations.</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">reply</span><span class="o">.</span><span class="n">observation</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">observations_to_compute</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">ServiceError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Requested </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">observations_to_compute</span><span class="p">)</span><span class="si">}</span><span class="s2"> observations &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;but received </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">reply</span><span class="o">.</span><span class="n">observation</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
-        <span class="n">computed_observations</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">observation_space</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">observation_space</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
-                <span class="n">observations_to_compute</span><span class="p">,</span> <span class="n">reply</span><span class="o">.</span><span class="n">observation</span>
-            <span class="p">)</span>
-        <span class="p">]</span>
-
-        <span class="c1"># Get the user-requested observation.</span>
-        <span class="n">observations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ObservationType</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">computed_observations</span><span class="p">[</span><span class="n">observation_space_index_map</span><span class="p">[</span><span class="n">observation_space</span><span class="p">]]</span>
-            <span class="k">for</span> <span class="n">observation_space</span> <span class="ow">in</span> <span class="n">observation_spaces</span>
-        <span class="p">]</span>
-
-        <span class="c1"># Update and compute the rewards.</span>
-        <span class="n">rewards</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">RewardType</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">reward_space</span> <span class="ow">in</span> <span class="n">reward_spaces</span><span class="p">:</span>
-            <span class="n">reward_observations</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">computed_observations</span><span class="p">[</span>
-                    <span class="n">observation_space_index_map</span><span class="p">[</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="n">observation_space</span><span class="p">]</span>
-                    <span class="p">]</span>
-                <span class="p">]</span>
-                <span class="k">for</span> <span class="n">observation_space</span> <span class="ow">in</span> <span class="n">reward_space</span><span class="o">.</span><span class="n">observation_spaces</span>
-            <span class="p">]</span>
-            <span class="n">rewards</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="nb">float</span><span class="p">(</span>
-                    <span class="n">reward_space</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">actions</span><span class="p">,</span> <span class="n">reward_observations</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="p">)</span>
-                <span class="p">)</span>
-            <span class="p">)</span>
-
-        <span class="n">info</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;action_had_no_effect&quot;</span><span class="p">:</span> <span class="n">reply</span><span class="o">.</span><span class="n">action_had_no_effect</span><span class="p">,</span>
-            <span class="s2">&quot;new_action_space&quot;</span><span class="p">:</span> <span class="n">reply</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;new_action_space&quot;</span><span class="p">),</span>
-        <span class="p">}</span>
-
-        <span class="k">return</span> <span class="n">observations</span><span class="p">,</span> <span class="n">rewards</span><span class="p">,</span> <span class="n">reply</span><span class="o">.</span><span class="n">end_of_session</span><span class="p">,</span> <span class="n">info</span></div>
-
-<div class="viewcode-block" id="CompilerEnv.step"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.step">[docs]</a>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span>  <span class="c1"># pylint: disable=arguments-differ</span>
+<div class="viewcode-block" id="CompilerEnv.step"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.step">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">action</span><span class="p">:</span> <span class="n">ActionType</span><span class="p">,</span>
         <span class="n">observation_spaces</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ObservationSpaceSpec</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1251,40 +618,11 @@
 
 <span class="sd">        :return: A tuple of observation, reward, done, and info. Observation and</span>
 <span class="sd">            reward are None if default observation/reward is not set.</span>
-
-<span class="sd">        :raises SessionNotFound: If :meth:`reset()</span>
-<span class="sd">            &lt;compiler_gym.envs.CompilerEnv.reset&gt;` has not been called.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">IterableType</span><span class="p">):</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s2">&quot;Argument `action` of CompilerEnv.step no longer accepts a list &quot;</span>
-                <span class="s2">&quot; of actions. Please use CompilerEnv.multistep instead&quot;</span><span class="p">,</span>
-                <span class="n">category</span><span class="o">=</span><span class="ne">DeprecationWarning</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">multistep</span><span class="p">(</span>
-                <span class="n">action</span><span class="p">,</span>
-                <span class="n">observation_spaces</span><span class="o">=</span><span class="n">observation_spaces</span><span class="p">,</span>
-                <span class="n">reward_spaces</span><span class="o">=</span><span class="n">reward_spaces</span><span class="p">,</span>
-                <span class="n">observations</span><span class="o">=</span><span class="n">observations</span><span class="p">,</span>
-                <span class="n">rewards</span><span class="o">=</span><span class="n">rewards</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="k">if</span> <span class="n">observations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s2">&quot;Argument `observations` of CompilerEnv.step has been &quot;</span>
-                <span class="s2">&quot;renamed `observation_spaces`. Please update your code&quot;</span><span class="p">,</span>
-                <span class="n">category</span><span class="o">=</span><span class="ne">DeprecationWarning</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="n">observation_spaces</span> <span class="o">=</span> <span class="n">observations</span>
-        <span class="k">if</span> <span class="n">rewards</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s2">&quot;Argument `rewards` of CompilerEnv.step has been renamed &quot;</span>
-                <span class="s2">&quot;`reward_spaces`. Please update your code&quot;</span><span class="p">,</span>
-                <span class="n">category</span><span class="o">=</span><span class="ne">DeprecationWarning</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="n">reward_spaces</span> <span class="o">=</span> <span class="n">rewards</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">multistep</span><span class="p">([</span><span class="n">action</span><span class="p">],</span> <span class="n">observation_spaces</span><span class="p">,</span> <span class="n">reward_spaces</span><span class="p">)</span></div>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="CompilerEnv.multistep"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.multistep">[docs]</a>    <span class="k">def</span> <span class="nf">multistep</span><span class="p">(</span>
+<div class="viewcode-block" id="CompilerEnv.multistep"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.multistep">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">multistep</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">actions</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ActionType</span><span class="p">],</span>
         <span class="n">observation_spaces</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ObservationSpaceSpec</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1309,149 +647,61 @@
 
 <span class="sd">        :return: A tuple of observation, reward, done, and info. Observation and</span>
 <span class="sd">            reward are None if default observation/reward is not set.</span>
-
-<span class="sd">        :raises SessionNotFound: If :meth:`reset()</span>
-<span class="sd">            &lt;compiler_gym.envs.CompilerEnv.reset&gt;` has not been called.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">observations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s2">&quot;Argument `observations` of CompilerEnv.multistep has been &quot;</span>
-                <span class="s2">&quot;renamed `observation_spaces`. Please update your code&quot;</span><span class="p">,</span>
-                <span class="n">category</span><span class="o">=</span><span class="ne">DeprecationWarning</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="n">observation_spaces</span> <span class="o">=</span> <span class="n">observations</span>
-        <span class="k">if</span> <span class="n">rewards</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s2">&quot;Argument `rewards` of CompilerEnv.multistep has been renamed &quot;</span>
-                <span class="s2">&quot;`reward_spaces`. Please update your code&quot;</span><span class="p">,</span>
-                <span class="n">category</span><span class="o">=</span><span class="ne">DeprecationWarning</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="n">reward_spaces</span> <span class="o">=</span> <span class="n">rewards</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span></div>
 
-        <span class="c1"># Coerce observation spaces into a list of ObservationSpaceSpec instances.</span>
-        <span class="k">if</span> <span class="n">observation_spaces</span><span class="p">:</span>
-            <span class="n">observation_spaces_to_compute</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ObservationSpaceSpec</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">obs</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">ObservationSpaceSpec</span><span class="p">)</span>
-                <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="n">obs</span><span class="p">]</span>
-                <span class="k">for</span> <span class="n">obs</span> <span class="ow">in</span> <span class="n">observation_spaces</span>
-            <span class="p">]</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_space_spec</span><span class="p">:</span>
-            <span class="n">observation_spaces_to_compute</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ObservationSpaceSpec</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">observation_space_spec</span>
-            <span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">observation_spaces_to_compute</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ObservationSpaceSpec</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-
-        <span class="c1"># Coerce reward spaces into a list of Reward instances.</span>
-        <span class="k">if</span> <span class="n">reward_spaces</span><span class="p">:</span>
-            <span class="n">reward_spaces_to_compute</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Reward</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">rew</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rew</span><span class="p">,</span> <span class="n">Reward</span><span class="p">)</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="n">rew</span><span class="p">]</span>
-                <span class="k">for</span> <span class="n">rew</span> <span class="ow">in</span> <span class="n">reward_spaces</span>
-            <span class="p">]</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_space</span><span class="p">:</span>
-            <span class="n">reward_spaces_to_compute</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Reward</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">reward_space</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">reward_spaces_to_compute</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Reward</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-
-        <span class="c1"># Perform the underlying environment step.</span>
-        <span class="n">observation_values</span><span class="p">,</span> <span class="n">reward_values</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_step</span><span class="p">(</span>
-            <span class="n">actions</span><span class="p">,</span> <span class="n">observation_spaces_to_compute</span><span class="p">,</span> <span class="n">reward_spaces_to_compute</span>
-        <span class="p">)</span>
-
-        <span class="c1"># Translate observations lists back to the appropriate types.</span>
-        <span class="k">if</span> <span class="n">observation_spaces</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_space_spec</span><span class="p">:</span>
-            <span class="n">observation_values</span> <span class="o">=</span> <span class="n">observation_values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">elif</span> <span class="ow">not</span> <span class="n">observation_spaces_to_compute</span><span class="p">:</span>
-            <span class="n">observation_values</span> <span class="o">=</span> <span class="kc">None</span>
-
-        <span class="c1"># Translate reward lists back to the appropriate types.</span>
-        <span class="k">if</span> <span class="n">reward_spaces</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_space</span><span class="p">:</span>
-            <span class="n">reward_values</span> <span class="o">=</span> <span class="n">reward_values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="c1"># Update the cumulative episode reward</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">episode_reward</span> <span class="o">+=</span> <span class="n">reward_values</span>
-        <span class="k">elif</span> <span class="ow">not</span> <span class="n">reward_spaces_to_compute</span><span class="p">:</span>
-            <span class="n">reward_values</span> <span class="o">=</span> <span class="kc">None</span>
-
-        <span class="k">return</span> <span class="n">observation_values</span><span class="p">,</span> <span class="n">reward_values</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">info</span></div>
-
-<div class="viewcode-block" id="CompilerEnv.render"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.render">[docs]</a>    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span>
+<div class="viewcode-block" id="CompilerEnv.render"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.render">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;human&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Render the environment.</span>
 
-<span class="sd">        CompilerEnv instances support two render modes: &quot;human&quot;, which prints</span>
-<span class="sd">        the current environment state to the terminal and return nothing; and</span>
-<span class="sd">        &quot;ansi&quot;, which returns a string representation of the current environment</span>
-<span class="sd">        state.</span>
-
 <span class="sd">        :param mode: The render mode to use.</span>
 <span class="sd">        :raises TypeError: If a default observation space is not set, or if the</span>
 <span class="sd">            requested render mode does not exist.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot call render() when no observation space is used&quot;</span><span class="p">)</span>
-        <span class="n">observation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">observation_space_spec</span><span class="o">.</span><span class="n">id</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;human&quot;</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">observation</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;ansi&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">observation</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid mode: </span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span></div>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">_observation_view_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the type for observation views.</span>
+<div class="viewcode-block" id="CompilerEnv.commandline"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.commandline">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">commandline</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Interface for :class:`CompilerEnv &lt;compiler_gym.envs.CompilerEnv&gt;`</span>
+<span class="sd">        subclasses to provide an equivalent commandline invocation to the</span>
+<span class="sd">        current environment state.</span>
 
-<span class="sd">        Subclasses may override this to extend the default observation view.</span>
+<span class="sd">        See also :meth:`commandline_to_actions()</span>
+<span class="sd">        &lt;compiler_gym.envs.CompilerEnv.commandline_to_actions&gt;`.</span>
+
+<span class="sd">        :return: A string commandline invocation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">ObservationView</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span></div>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">_reward_view_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the type for reward views.</span>
+<div class="viewcode-block" id="CompilerEnv.commandline_to_actions"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.commandline_to_actions">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">commandline_to_actions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">commandline</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ActionType</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Interface for :class:`CompilerEnv &lt;compiler_gym.envs.CompilerEnv&gt;`</span>
+<span class="sd">        subclasses to convert from a commandline invocation to a sequence of</span>
+<span class="sd">        actions.</span>
 
-<span class="sd">        Subclasses may override this to extend the default reward view.</span>
+<span class="sd">        See also :meth:`commandline()</span>
+<span class="sd">        &lt;compiler_gym.envs.CompilerEnv.commandline&gt;`.</span>
+
+<span class="sd">        :return: A list of actions.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">RewardView</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="CompilerEnv.apply"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.apply">[docs]</a>    <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">CompilerEnvState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># noqa</span>
-        <span class="sd">&quot;&quot;&quot;Replay this state on the given an environment.</span>
+<div class="viewcode-block" id="CompilerEnv.apply"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.apply">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">CompilerEnvState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># noqa</span>
+        <span class="sd">&quot;&quot;&quot;Replay this state on the given environment.</span>
 
-<span class="sd">        :param env: A :class:`CompilerEnv &lt;compiler_gym.envs.CompilerEnv&gt;`</span>
+<span class="sd">        :param state: A :class:`CompilerEnvState &lt;compiler_gym.CompilerEnvState&gt;`</span>
 <span class="sd">            instance.</span>
 
 <span class="sd">        :raises ValueError: If this state cannot be applied.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_episode</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">benchmark</span><span class="o">=</span><span class="n">state</span><span class="o">.</span><span class="n">benchmark</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span></div>
 
-        <span class="c1"># TODO(cummins): Does this behavior make sense? Take, for example:</span>
-        <span class="c1">#</span>
-        <span class="c1">#     &gt;&gt;&gt; env.apply(state)</span>
-        <span class="c1">#     &gt;&gt;&gt; env.benchmark == state.benchmark</span>
-        <span class="c1">#     False</span>
-        <span class="c1">#</span>
-        <span class="c1"># I think most users would reasonable expect `env.apply(state)` to fully</span>
-        <span class="c1"># apply the state, not just the sequence of actions. And what about the</span>
-        <span class="c1"># choice of observation space, reward space, etc?</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">benchmark</span> <span class="o">!=</span> <span class="n">state</span><span class="o">.</span><span class="n">benchmark</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Applying state from environment for benchmark &#39;</span><span class="si">{</span><span class="n">state</span><span class="o">.</span><span class="n">benchmark</span><span class="si">}</span><span class="s2">&#39; &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;to environment for benchmark &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">benchmark</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
-            <span class="p">)</span>
-
-        <span class="n">actions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">commandline_to_actions</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">commandline</span><span class="p">)</span>
-        <span class="n">done</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">actions</span><span class="p">:</span>
-            <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">done</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Environment terminated with error: `</span><span class="si">{</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;error_details&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">`&quot;</span>
-            <span class="p">)</span></div>
-
-<div class="viewcode-block" id="CompilerEnv.validate"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">CompilerEnvState</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ValidationResult</span><span class="p">:</span>
+<div class="viewcode-block" id="CompilerEnv.validate"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.validate">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">CompilerEnvState</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ValidationResult</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Validate an environment&#39;s state.</span>
 
 <span class="sd">        :param state: A state to environment. If not provided, the current state</span>
@@ -1459,166 +709,7 @@
 
 <span class="sd">        :returns: A :class:`ValidationResult &lt;compiler_gym.ValidationResult&gt;`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">state</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">benchmark</span><span class="o">=</span><span class="n">state</span><span class="o">.</span><span class="n">benchmark</span><span class="p">)</span>
-            <span class="n">in_place</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span>
-            <span class="n">in_place</span> <span class="o">=</span> <span class="kc">True</span>
-
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_episode</span>
-
-        <span class="n">errors</span><span class="p">:</span> <span class="n">ValidationError</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">validation</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="n">state</span><span class="p">,</span>
-            <span class="s2">&quot;actions_replay_failed&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-            <span class="s2">&quot;reward_validated&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-            <span class="s2">&quot;reward_validation_failed&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-            <span class="s2">&quot;benchmark_semantics_validated&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-            <span class="s2">&quot;benchmark_semantics_validation_failed&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="p">}</span>
-
-        <span class="n">fkd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fork</span><span class="p">()</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">with</span> <span class="n">Timer</span><span class="p">()</span> <span class="k">as</span> <span class="n">walltime</span><span class="p">:</span>
-                <span class="n">replay_target</span> <span class="o">=</span> <span class="bp">self</span> <span class="k">if</span> <span class="n">in_place</span> <span class="k">else</span> <span class="n">fkd</span>
-                <span class="n">replay_target</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">benchmark</span><span class="o">=</span><span class="n">state</span><span class="o">.</span><span class="n">benchmark</span><span class="p">)</span>
-                <span class="c1"># Use a while loop here so that we can `break` early out of the</span>
-                <span class="c1"># validation process in case a step fails.</span>
-                <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-                    <span class="k">try</span><span class="p">:</span>
-                        <span class="n">replay_target</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
-                    <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">OSError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                        <span class="n">validation</span><span class="p">[</span><span class="s2">&quot;actions_replay_failed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-                        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                            <span class="n">ValidationError</span><span class="p">(</span>
-                                <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;Action replay failed&quot;</span><span class="p">,</span>
-                                <span class="n">data</span><span class="o">=</span><span class="p">{</span>
-                                    <span class="s2">&quot;exception&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span>
-                                    <span class="s2">&quot;exception_type&quot;</span><span class="p">:</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
-                                <span class="p">},</span>
-                            <span class="p">)</span>
-                        <span class="p">)</span>
-                        <span class="k">break</span>
-
-                    <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">reward</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_space</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                            <span class="s2">&quot;Validating state with reward, but &quot;</span>
-                            <span class="s2">&quot;environment has no reward space set&quot;</span>
-                        <span class="p">)</span>
-                    <span class="k">elif</span> <span class="p">(</span>
-                        <span class="n">state</span><span class="o">.</span><span class="n">reward</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-                        <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_space</span>
-                        <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_space</span><span class="o">.</span><span class="n">deterministic</span>
-                    <span class="p">):</span>
-                        <span class="n">validation</span><span class="p">[</span><span class="s2">&quot;reward_validated&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-                        <span class="c1"># If reward deviates from the expected amount record the</span>
-                        <span class="c1"># error but continue with the remainder of the validation.</span>
-                        <span class="k">if</span> <span class="ow">not</span> <span class="n">isclose</span><span class="p">(</span>
-                            <span class="n">state</span><span class="o">.</span><span class="n">reward</span><span class="p">,</span>
-                            <span class="n">replay_target</span><span class="o">.</span><span class="n">episode_reward</span><span class="p">,</span>
-                            <span class="n">rel_tol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span>
-                            <span class="n">abs_tol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span>
-                        <span class="p">):</span>
-                            <span class="n">validation</span><span class="p">[</span><span class="s2">&quot;reward_validation_failed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-                            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                                <span class="n">ValidationError</span><span class="p">(</span>
-                                    <span class="nb">type</span><span class="o">=</span><span class="p">(</span>
-                                        <span class="sa">f</span><span class="s2">&quot;Expected reward </span><span class="si">{</span><span class="n">state</span><span class="o">.</span><span class="n">reward</span><span class="si">}</span><span class="s2"> but &quot;</span>
-                                        <span class="sa">f</span><span class="s2">&quot;received reward </span><span class="si">{</span><span class="n">replay_target</span><span class="o">.</span><span class="n">episode_reward</span><span class="si">}</span><span class="s2">&quot;</span>
-                                    <span class="p">),</span>
-                                    <span class="n">data</span><span class="o">=</span><span class="p">{</span>
-                                        <span class="s2">&quot;expected_reward&quot;</span><span class="p">:</span> <span class="n">state</span><span class="o">.</span><span class="n">reward</span><span class="p">,</span>
-                                        <span class="s2">&quot;actual_reward&quot;</span><span class="p">:</span> <span class="n">replay_target</span><span class="o">.</span><span class="n">episode_reward</span><span class="p">,</span>
-                                    <span class="p">},</span>
-                                <span class="p">)</span>
-                            <span class="p">)</span>
-
-                    <span class="n">benchmark</span> <span class="o">=</span> <span class="n">replay_target</span><span class="o">.</span><span class="n">benchmark</span>
-                    <span class="k">if</span> <span class="n">benchmark</span><span class="o">.</span><span class="n">is_validatable</span><span class="p">():</span>
-                        <span class="n">validation</span><span class="p">[</span><span class="s2">&quot;benchmark_semantics_validated&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-                        <span class="n">semantics_errors</span> <span class="o">=</span> <span class="n">benchmark</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">replay_target</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="n">semantics_errors</span><span class="p">:</span>
-                            <span class="n">validation</span><span class="p">[</span><span class="s2">&quot;benchmark_semantics_validation_failed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-                            <span class="n">errors</span> <span class="o">+=</span> <span class="n">semantics_errors</span>
-
-                    <span class="c1"># Finished all checks, break the loop.</span>
-                    <span class="k">break</span>
-        <span class="k">finally</span><span class="p">:</span>
-            <span class="n">fkd</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-
-        <span class="k">return</span> <span class="n">ValidationResult</span><span class="o">.</span><span class="n">construct</span><span class="p">(</span>
-            <span class="n">walltime</span><span class="o">=</span><span class="n">walltime</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
-            <span class="n">errors</span><span class="o">=</span><span class="n">errors</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">validation</span><span class="p">,</span>
-        <span class="p">)</span></div>
-
-<div class="viewcode-block" id="CompilerEnv.send_param"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.send_param">[docs]</a>    <span class="k">def</span> <span class="nf">send_param</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Send a single &lt;key, value&gt; parameter to the compiler service.</span>
-
-<span class="sd">        See :meth:`send_params() &lt;compiler_gym.envs.CompilerEnv.send_params&gt;`</span>
-<span class="sd">        for more information.</span>
-
-<span class="sd">        :param key: The parameter key.</span>
-
-<span class="sd">        :param value: The parameter value.</span>
-
-<span class="sd">        :return: The response from the compiler service.</span>
-
-<span class="sd">        :raises SessionNotFound: If called before :meth:`reset()</span>
-<span class="sd">            &lt;compiler_gym.envs.CompilerEnv.reset&gt;`.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_params</span><span class="p">((</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span></div>
-
-<div class="viewcode-block" id="CompilerEnv.send_params"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.send_params">[docs]</a>    <span class="k">def</span> <span class="nf">send_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Send a list of &lt;key, value&gt; parameters to the compiler service.</span>
-
-<span class="sd">        This provides a mechanism to send messages to the backend compilation</span>
-<span class="sd">        session in a way that doesn&#39;t conform to the normal communication</span>
-<span class="sd">        pattern. This can be useful for things like configuring runtime</span>
-<span class="sd">        debugging settings, or applying &quot;meta actions&quot; to the compiler that are</span>
-<span class="sd">        not exposed in the compiler&#39;s action space. Consult the documentation</span>
-<span class="sd">        for a specific compiler service to see what parameters, if any, are</span>
-<span class="sd">        supported.</span>
-
-<span class="sd">        Must have called :meth:`reset() &lt;compiler_gym.envs.CompilerEnv.reset&gt;`</span>
-<span class="sd">        first.</span>
-
-<span class="sd">        :param params: A list of parameters, where each parameter is a</span>
-<span class="sd">            :code:`(key, value)` tuple.</span>
-
-<span class="sd">        :return: A list of string responses, one per parameter.</span>
-
-<span class="sd">        :raises SessionNotFound: If called before :meth:`reset()</span>
-<span class="sd">            &lt;compiler_gym.envs.CompilerEnv.reset&gt;`.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_episode</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">SessionNotFound</span><span class="p">(</span><span class="s2">&quot;Must call reset() before send_params()&quot;</span><span class="p">)</span>
-
-        <span class="n">request</span> <span class="o">=</span> <span class="n">SendSessionParameterRequest</span><span class="p">(</span>
-            <span class="n">session_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span><span class="p">,</span>
-            <span class="n">parameter</span><span class="o">=</span><span class="p">[</span><span class="n">SessionParameter</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">params</span><span class="p">],</span>
-        <span class="p">)</span>
-        <span class="n">reply</span><span class="p">:</span> <span class="n">SendSessionParameterReply</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">SendSessionParameter</span><span class="p">,</span> <span class="n">request</span>
-        <span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">reply</span><span class="o">.</span><span class="n">reply</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Sent </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">plural</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">),</span> <span class="s1">&#39;parameter&#39;</span><span class="p">,</span> <span class="s1">&#39;parameters&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> but received &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">reply</span><span class="o">.</span><span class="n">reply</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">plural</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">reply</span><span class="o">.</span><span class="n">reply</span><span class="p">),</span> <span class="s1">&#39;response&#39;</span><span class="p">,</span> <span class="s1">&#39;responses&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> from the &quot;</span>
-                <span class="s2">&quot;service&quot;</span>
-            <span class="p">)</span>
-
-        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">reply</span><span class="o">.</span><span class="n">reply</span><span class="p">)</span></div>
-
-    <span class="k">def</span> <span class="nf">__copy__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;CompilerEnv&quot;</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;CompilerEnv instances do not support shallow copies. Use deepcopy()&quot;</span>
-        <span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">__deepcopy__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">memo</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;CompilerEnv&quot;</span><span class="p">:</span>
-        <span class="k">del</span> <span class="n">memo</span>  <span class="c1"># unused</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fork</span><span class="p">()</span></div>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

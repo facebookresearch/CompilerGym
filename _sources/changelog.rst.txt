@@ -4,6 +4,127 @@
 Changelog
 =========
 
+Release 0.2.4 (2022-05-24)
+--------------------------
+
+This release adds a new compiler environment, new APIs, and a suite of
+backend improvements to improve the flexibility of CompilerGym
+environments. Many thanks to code contributors: @sogartar, @KyleHerndon,
+@SoumyajitKarmakar, @uduse, and @anthony0727!
+
+Highlights of this release include:
+
+-  [mlir] Began work on a new environment for matrix multiplication
+   using MLIR
+   (`#652 <https://github.com/facebookresearch/CompilerGym/pull/652>`__,
+   thanks @KyleHerndon and @sogartar!). Note this environment is not yet
+   included in the pypi package and must be `compiled from
+   source <https://github.com/facebookresearch/CompilerGym/blob/development/INSTALL.md#building-from-source-with-cmake>`__.
+-  [llvm] Added a new ``env.benchmark_from_clang_invocation()`` method
+   (`#577 <https://github.com/facebookresearch/CompilerGym/pull/577>`__)
+   that can be used for constructing LLVM environment automatically from
+   C/C++ compiler invocations. This makes it much easier to integrate
+   CompilerGym with your existing build scripts.
+-  Added three new wrapper classes: ``Counter``, that provides op counts
+   for analysis
+   (`#683 <https://github.com/facebookresearch/CompilerGym/pull/683>`__);
+   ``SynchronousSqliteLogger``, that provides logging of environment
+   interactions to a relational database
+   (`#679 <https://github.com/facebookresearch/CompilerGym/pull/679>`__),
+   and ``ForkOnStep`` that provides an ``undo()`` operation
+   (`#682 <https://github.com/facebookresearch/CompilerGym/pull/682>`__).
+-  Added ``reward_space`` and ``observation_space`` parameters to
+   ``env.reset()``
+   (`#659 <https://github.com/facebookresearch/CompilerGym/pull/659>`__,
+   thanks @SoumyajitKarmakar!)
+
+This release includes a number of improvements to the backend APIs that
+make it easier to write new CompilerGym environments:
+
+-  Refactored the backend to make ``CompilerEnv`` an abstract interface,
+   and ``ClientServiceCompilerEnv`` the concrete implementation of this
+   interface. This enables new environments to be implemented without
+   using gRPC
+   (`#633 <https://github.com/facebookresearch/CompilerGym/pull/633>`__,
+   thanks @sogartar!).
+-  Extended the support for different types of action and observation
+   spaces
+   (`#641 <https://github.com/facebookresearch/CompilerGym/pull/641>`__,
+   `#643 <https://github.com/facebookresearch/CompilerGym/pull/643>`__,
+   thanks @sogartar!), including new ``Permutation`` and
+   ``SpaceSequence`` spaces
+   (`#645 <https://github.com/facebookresearch/CompilerGym/pull/645>`__,
+   thanks @sogartar!)..
+-  Added a new ``disk/`` subdirectory to compiler service’s working
+   directories, which is symlinked to an on-disk location for devices
+   which support in-memory working directories. This fixes a bug with
+   leftover temporary directories from LLVM
+   (`#672 <https://github.com/facebookresearch/CompilerGym/pull/672>`__).
+
+This release also includes numerous bug fixes and improvements, many of
+which were reported or fixed by the community. For example, fixing a bug
+in cache file locations
+(`#656 <https://github.com/facebookresearch/CompilerGym/pull/656>`__,
+thanks @uduse!), and a missing flag definition in example code
+(`#684 <https://github.com/facebookresearch/CompilerGym/pull/684>`__,
+thanks @anthony0727!).
+
+**Full Changelog**:
+https://github.com/facebookresearch/CompilerGym/compare/v0.2.3…v0.2.4
+
+Release 0.2.3 (2022-03-18)
+--------------------------
+
+This release brings in deprecating changes to the core ``env.step()``
+routine, and lays the groundwork for enabling new types of compiler
+optimizations to be exposed through CompilerGym. Many thanks to code
+contributors: @mostafaelhoushi, @sogartar, @KyleHerndon, @uduse,
+@parthchadha, and @xtremey!
+
+Highlights of this release include:
+
+-  Added a new ``TextSizeInBytes`` observation space for LLVM
+   (`#575 <https://github.com/facebookresearch/CompilerGym/pull/575>`__).
+-  Added a new PPO leaderboard entry
+   (`#580 <https://github.com/facebookresearch/CompilerGym/pull/580>`__.
+   Thanks @xtremey!
+-  Fixed a bug in which temporary directories created by the LLVM
+   environment were not cleaned up
+   (`#592 <https://github.com/facebookresearch/CompilerGym/pull/592>`__).
+-  **[Backend]** The function ``createAndRunCompilerGymService`` now
+   returns an int, which is the exit return code
+   (`#592 <https://github.com/facebookresearch/CompilerGym/pull/592>`__).
+-  Improvements to the examples documentation
+   (`#548 <https://github.com/facebookresearch/CompilerGym/pull/548>`__)
+   and FAQ
+   (`#586 <https://github.com/facebookresearch/CompilerGym/pull/586>`__)
+
+Deprecations and breaking changes:
+
+-  ``CompilerEnv.step`` no longer accepts a list of actions
+   (`#627 <https://github.com/facebookresearch/CompilerGym/pull/627>`__).
+   A new method, ``CompilerEnv.multistep`` provides this functionality.
+   This is to provide compatibility with environments whose action
+   spaces are lists. To update your code, replace any calls to
+   ``env.step()`` which take a list of actions to use
+   ``env.multistep()``. Thanks @sogartar!
+-  The arguments ``observations`` and ``rewards`` to ``step()`` have
+   been renamed ``observation_spaces`` and ``reward_spaces``,
+   respectively
+   (`#627 <https://github.com/facebookresearch/CompilerGym/pull/627>`__).
+-  ``Reward.id`` has been renamed ``Reward.name``
+   (`#565 <https://github.com/facebookresearch/CompilerGym/pull/565>`__,
+   `#612 <https://github.com/facebookresearch/CompilerGym/pull/612>`__).
+   Thanks @parthchadha!
+-  The backend protocol buffer schema has been updated to natively
+   support more types of observation and action, and to support nested
+   spaces
+   (`#531 <https://github.com/facebookresearch/CompilerGym/pull/531>`__).
+   Thanks @sogartar!
+
+**Full Changelog**:
+https://github.com/facebookresearch/CompilerGym/compare/v0.2.2…v0.2.3
+
 Release 0.2.2 (2022-01-19)
 --------------------------
 

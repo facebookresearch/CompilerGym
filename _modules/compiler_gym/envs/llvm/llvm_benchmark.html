@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.envs.llvm.llvm_benchmark &mdash; CompilerGym 0.2.2 documentation</title>
+  <title>compiler_gym.envs.llvm.llvm_benchmark &mdash; CompilerGym 0.2.4 documentation</title>
   
 
   
@@ -71,7 +71,7 @@
             
             
               <div class="version">
-                0.2.2
+                0.2.4
               </div>
             
           
@@ -111,6 +111,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../envs/gcc.html">GCC Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../envs/loop_tool.html">loop_tool Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../envs/mlir.html">MLIR Environment Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul>
@@ -215,10 +216,12 @@
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">from</span> <span class="nn">compiler_gym.datasets</span> <span class="kn">import</span> <span class="n">Benchmark</span><span class="p">,</span> <span class="n">BenchmarkInitError</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.datasets</span> <span class="kn">import</span> <span class="n">Benchmark</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.errors</span> <span class="kn">import</span> <span class="n">BenchmarkInitError</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.third_party</span> <span class="kn">import</span> <span class="n">llvm</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.util.commands</span> <span class="kn">import</span> <span class="n">Popen</span><span class="p">,</span> <span class="n">run_command</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.commands</span> <span class="kn">import</span> <span class="n">Popen</span><span class="p">,</span> <span class="n">communicate</span><span class="p">,</span> <span class="n">run_command</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.runfiles_path</span> <span class="kn">import</span> <span class="n">transient_cache_path</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.shell_format</span> <span class="kn">import</span> <span class="n">join_cmd</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.thread_pool</span> <span class="kn">import</span> <span class="n">get_thread_pool_executor</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -235,38 +238,50 @@
 
 <span class="k">def</span> <span class="nf">_get_system_library_flags</span><span class="p">(</span><span class="n">compiler</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;Private implementation function.&quot;&quot;&quot;</span>
-    <span class="c1"># Create a temporary directory to write the compiled binary to, since GNU</span>
+    <span class="c1"># Create a temporary file to write the compiled binary to, since GNU</span>
     <span class="c1"># assembler does not support piping to stdout.</span>
     <span class="n">transient_cache</span> <span class="o">=</span> <span class="n">transient_cache_path</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
     <span class="n">transient_cache</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="nb">dir</span><span class="o">=</span><span class="n">transient_cache</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">compiler</span><span class="p">,</span> <span class="s2">&quot;-xc++&quot;</span><span class="p">,</span> <span class="s2">&quot;-v&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
-            <span class="c1"># On macOS we need to compile a binary to invoke the linker.</span>
-            <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">!=</span> <span class="s2">&quot;darwin&quot;</span><span class="p">:</span>
-                <span class="n">cmd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;-c&quot;</span><span class="p">)</span>
-            <span class="k">with</span> <span class="n">Popen</span><span class="p">(</span>
-                <span class="n">cmd</span><span class="p">,</span>
-                <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">DEVNULL</span><span class="p">,</span>
-                <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-                <span class="n">stdin</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-                <span class="n">universal_newlines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="p">)</span> <span class="k">as</span> <span class="n">process</span><span class="p">:</span>
-                <span class="n">_</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span>
-                    <span class="nb">input</span><span class="o">=</span><span class="s2">&quot;int main(){return 0;}&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span>
-                <span class="p">)</span>
-                <span class="k">if</span> <span class="n">process</span><span class="o">.</span><span class="n">returncode</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="n">HostCompilerFailure</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;Failed to invoke &#39;</span><span class="si">{</span><span class="n">compiler</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
-                        <span class="sa">f</span><span class="s2">&quot;Is there a working system compiler?</span><span class="se">\n</span><span class="s2">&quot;</span>
-                        <span class="sa">f</span><span class="s2">&quot;Error: </span><span class="si">{</span><span class="n">stderr</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">compiler</span><span class="p">,</span> <span class="s2">&quot;-xc++&quot;</span><span class="p">,</span> <span class="s2">&quot;-v&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+        <span class="c1"># On macOS we need to compile a binary to invoke the linker.</span>
+        <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">!=</span> <span class="s2">&quot;darwin&quot;</span><span class="p">:</span>
+            <span class="n">cmd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;-c&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Retry loop to permit timeouts, though unlikely, in case of a</span>
+        <span class="c1"># heavily overloaded system (I have observed CI failures because</span>
+        <span class="c1"># of this).</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">with</span> <span class="n">Popen</span><span class="p">(</span>
+                    <span class="n">cmd</span><span class="p">,</span>
+                    <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">DEVNULL</span><span class="p">,</span>
+                    <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                    <span class="n">stdin</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                    <span class="n">universal_newlines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="p">)</span> <span class="k">as</span> <span class="n">process</span><span class="p">:</span>
+                    <span class="n">_</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">communicate</span><span class="p">(</span>
+                        <span class="n">process</span><span class="o">=</span><span class="n">process</span><span class="p">,</span> <span class="nb">input</span><span class="o">=</span><span class="s2">&quot;int main(){return 0;}&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span>
                     <span class="p">)</span>
-        <span class="k">except</span> <span class="ne">FileNotFoundError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">process</span><span class="o">.</span><span class="n">returncode</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">HostCompilerFailure</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Failed to invoke &#39;</span><span class="si">{</span><span class="n">compiler</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;Is there a working system compiler?</span><span class="se">\n</span><span class="s2">&quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;Error: </span><span class="si">{</span><span class="n">stderr</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="p">)</span>
+                    <span class="k">break</span>
+            <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">TimeoutExpired</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">except</span> <span class="ne">FileNotFoundError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">HostCompilerFailure</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Failed to invoke &#39;</span><span class="si">{</span><span class="n">compiler</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Is there a working system compiler?</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+        <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">HostCompilerFailure</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Failed to invoke &#39;</span><span class="si">{</span><span class="n">compiler</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;Is there a working system compiler?</span><span class="se">\n</span><span class="s2">&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+                <span class="sa">f</span><span class="s2">&quot;Compiler invocation &#39;</span><span class="si">{</span><span class="n">join_cmd</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span><span class="si">}</span><span class="s2">&#39; timed out after 3 attempts.&quot;</span>
+            <span class="p">)</span>
 
     <span class="c1"># Parse the compiler output that matches the conventional output format</span>
     <span class="c1"># used by clang and GCC:</span>
@@ -310,7 +325,7 @@
     <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">_get_system_library_flags</span><span class="p">(</span><span class="n">compiler</span><span class="p">))</span>
 
 
-<span class="k">def</span> <span class="nf">get_system_library_flags</span><span class="p">(</span><span class="n">compiler</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="get_system_library_flags"><a class="viewcode-back" href="../../../../llvm/api.html#compiler_gym.envs.llvm.get_system_library_flags">[docs]</a><span class="k">def</span> <span class="nf">get_system_library_flags</span><span class="p">(</span><span class="n">compiler</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;Determine the set of compilation flags needed to use the host system</span>
 <span class="sd">    libraries.</span>
 
@@ -331,7 +346,7 @@
     <span class="c1"># We want to cache the results of this expensive query after resolving the</span>
     <span class="c1"># default value for the compiler argument, as it can changed based on</span>
     <span class="c1"># environment variables.</span>
-    <span class="k">return</span> <span class="n">_get_cached_system_library_flags</span><span class="p">(</span><span class="n">compiler</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_get_cached_system_library_flags</span><span class="p">(</span><span class="n">compiler</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ClangInvocation"><a class="viewcode-back" href="../../../../llvm/api.html#compiler_gym.envs.llvm.ClangInvocation">[docs]</a><span class="k">class</span> <span class="nc">ClangInvocation</span><span class="p">:</span>

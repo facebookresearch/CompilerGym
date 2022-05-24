@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.service &mdash; CompilerGym 0.2.2 documentation</title>
+  <title>compiler_gym.service &mdash; CompilerGym 0.2.4 documentation</title>
   
 
   
@@ -73,7 +73,7 @@
             
             
               <div class="version">
-                0.2.2
+                0.2.4
               </div>
             
           
@@ -113,6 +113,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../envs/gcc.html">GCC Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../envs/loop_tool.html">loop_tool Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../envs/mlir.html">MLIR Environment Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul class="current">
@@ -124,6 +125,7 @@
 <li class="toctree-l1"><a class="reference internal" href="leaderboard.html">compiler_gym.leaderboard</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">compiler_gym.service</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#the-compilationsession-interface">The CompilationSession Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#clientservicecompilerenv">ClientServiceCompilerEnv</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#the-connection-object">The connection object</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#configuring-the-connection">Configuring the connection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#exceptions">Exceptions</a></li>
@@ -209,22 +211,24 @@
             
   <div class="section" id="compiler-gym-service">
 <h1>compiler_gym.service<a class="headerlink" href="#compiler-gym-service" title="Permalink to this headline">¶</a></h1>
-<p>CompilerGym uses a client/server architecture. Services provide an interface for
-manipulating compiler behavior. Clients are Python frontend objects that provide
-a reinforcement learning abstraction on top of the service. Communication
-between the service and client is done <a class="reference internal" href="../rpc.html"><span class="doc">using RPC</span></a>. The connection between the
-client and service is managed by the <a class="reference internal" href="#compiler_gym.service.CompilerGymServiceConnection" title="compiler_gym.service.CompilerGymServiceConnection"><code class="xref py py-class docutils literal notranslate"><span class="pre">CompilerGymServiceConnection</span></code></a> object.</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">compiler_gym.service</span></code> module provides a client/service implementation
+of the <a class="reference internal" href="envs.html#compiler_gym.envs.CompilerEnv" title="compiler_gym.envs.CompilerEnv"><code class="xref py py-class docutils literal notranslate"><span class="pre">CompilerEnv</span></code></a> interface. Services
+provide an interface for manipulating compiler behavior. Clients are Python
+frontend objects that provide a reinforcement learning abstraction on top of the
+service. Communication between the service and client is done <a class="reference internal" href="../rpc.html"><span class="doc">using RPC</span></a>. The connection between the client and service is managed by the
+<a class="reference internal" href="#compiler_gym.service.CompilerGymServiceConnection" title="compiler_gym.service.CompilerGymServiceConnection"><code class="xref py py-class docutils literal notranslate"><span class="pre">CompilerGymServiceConnection</span></code></a> object.</p>
 <div class="contents local topic" id="document-contents">
 <p class="topic-title">Document contents:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#the-compilationsession-interface" id="id3">The CompilationSession Interface</a></p></li>
-<li><p><a class="reference internal" href="#the-connection-object" id="id4">The connection object</a></p></li>
-<li><p><a class="reference internal" href="#configuring-the-connection" id="id5">Configuring the connection</a></p></li>
-<li><p><a class="reference internal" href="#exceptions" id="id6">Exceptions</a></p></li>
+<li><p><a class="reference internal" href="#the-compilationsession-interface" id="id7">The CompilationSession Interface</a></p></li>
+<li><p><a class="reference internal" href="#clientservicecompilerenv" id="id8">ClientServiceCompilerEnv</a></p></li>
+<li><p><a class="reference internal" href="#the-connection-object" id="id9">The connection object</a></p></li>
+<li><p><a class="reference internal" href="#configuring-the-connection" id="id10">Configuring the connection</a></p></li>
+<li><p><a class="reference internal" href="#exceptions" id="id11">Exceptions</a></p></li>
 </ul>
 </div>
 <div class="section" id="the-compilationsession-interface">
-<h2><a class="toc-backref" href="#id3">The CompilationSession Interface</a><a class="headerlink" href="#the-compilationsession-interface" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id7">The CompilationSession Interface</a><a class="headerlink" href="#the-compilationsession-interface" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="compiler_gym.service.CompilationSession">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.service.</span></span><span class="sig-name descname"><span class="pre">CompilationSession</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">working_dir</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pathlib.Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_space</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">compiler_gym.service.proto.compiler_gym_service_pb2.ActionSpace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">benchmark</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">compiler_gym.service.proto.compiler_gym_service_pb2.Benchmark</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/service/compilation_session.html#CompilationSession"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.CompilationSession" title="Permalink to this definition">¶</a></dt>
@@ -345,8 +349,519 @@ decoding these parameters.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="clientservicecompilerenv">
+<h2><a class="toc-backref" href="#id8">ClientServiceCompilerEnv</a><a class="headerlink" href="#clientservicecompilerenv" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.service.client_service_compiler_env.</span></span><span class="sig-name descname"><span class="pre">ClientServiceCompilerEnv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="spaces.html#compiler_gym.spaces.Reward" title="compiler_gym.spaces.reward.Reward"><span class="pre">compiler_gym.spaces.reward.Reward</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datasets</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="datasets.html#compiler_gym.datasets.Dataset" title="compiler_gym.datasets.dataset.Dataset"><span class="pre">compiler_gym.datasets.dataset.Dataset</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">benchmark</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="datasets.html#compiler_gym.datasets.Benchmark" title="compiler_gym.datasets.benchmark.Benchmark"><span class="pre">compiler_gym.datasets.benchmark.Benchmark</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observation_space</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="views.html#compiler_gym.views.ObservationSpaceSpec" title="compiler_gym.views.observation_space_spec.ObservationSpaceSpec"><span class="pre">compiler_gym.views.observation_space_spec.ObservationSpaceSpec</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reward_space</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="spaces.html#compiler_gym.spaces.Reward" title="compiler_gym.spaces.reward.Reward"><span class="pre">compiler_gym.spaces.reward.Reward</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_space</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">derived_observation_spaces</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">service_message_converters</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#compiler_gym.service.client_service_compiler_env.ServiceMessageConverters" title="compiler_gym.service.client_service_compiler_env.ServiceMessageConverters"><span class="pre">compiler_gym.service.client_service_compiler_env.ServiceMessageConverters</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection_settings</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#compiler_gym.service.ConnectionOpts" title="compiler_gym.service.connection.ConnectionOpts"><span class="pre">compiler_gym.service.connection.ConnectionOpts</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">service_connection</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#compiler_gym.service.CompilerGymServiceConnection" title="compiler_gym.service.connection.CompilerGymServiceConnection"><span class="pre">compiler_gym.service.connection.CompilerGymServiceConnection</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">logging.Logger</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/service/client_service_compiler_env.html#ClientServiceCompilerEnv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implementation of <a class="reference internal" href="envs.html#compiler_gym.envs.CompilerEnv" title="compiler_gym.envs.CompilerEnv"><code class="xref py py-class docutils literal notranslate"><span class="pre">CompilerEnv</span></code></a>
+using gRPC for client-server communication.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables</dt>
+<dd class="field-odd"><p><strong>service</strong> (<a class="reference internal" href="#compiler_gym.service.CompilerGymServiceConnection" title="compiler_gym.service.CompilerGymServiceConnection"><em>compiler_gym.service.CompilerGymServiceConnection</em></a>) – A connection to the underlying compiler service.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="spaces.html#compiler_gym.spaces.Reward" title="compiler_gym.spaces.reward.Reward"><span class="pre">compiler_gym.spaces.reward.Reward</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datasets</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="datasets.html#compiler_gym.datasets.Dataset" title="compiler_gym.datasets.dataset.Dataset"><span class="pre">compiler_gym.datasets.dataset.Dataset</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">benchmark</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="datasets.html#compiler_gym.datasets.Benchmark" title="compiler_gym.datasets.benchmark.Benchmark"><span class="pre">compiler_gym.datasets.benchmark.Benchmark</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observation_space</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="views.html#compiler_gym.views.ObservationSpaceSpec" title="compiler_gym.views.observation_space_spec.ObservationSpaceSpec"><span class="pre">compiler_gym.views.observation_space_spec.ObservationSpaceSpec</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reward_space</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="spaces.html#compiler_gym.spaces.Reward" title="compiler_gym.spaces.reward.Reward"><span class="pre">compiler_gym.spaces.reward.Reward</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_space</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">derived_observation_spaces</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">service_message_converters</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#compiler_gym.service.client_service_compiler_env.ServiceMessageConverters" title="compiler_gym.service.client_service_compiler_env.ServiceMessageConverters"><span class="pre">compiler_gym.service.client_service_compiler_env.ServiceMessageConverters</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection_settings</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#compiler_gym.service.ConnectionOpts" title="compiler_gym.service.connection.ConnectionOpts"><span class="pre">compiler_gym.service.connection.ConnectionOpts</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">service_connection</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#compiler_gym.service.CompilerGymServiceConnection" title="compiler_gym.service.connection.CompilerGymServiceConnection"><span class="pre">compiler_gym.service.connection.CompilerGymServiceConnection</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">logging.Logger</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/service/client_service_compiler_env.html#ClientServiceCompilerEnv.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct and initialize a CompilerGym environment.</p>
+<p>In normal use you should use <code class="code docutils literal notranslate"><span class="pre">gym.make(...)</span></code> rather than calling
+the constructor directly.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>service</strong> – The hostname and port of a service that implements the
+CompilerGym service interface, or the path of a binary file which
+provides the CompilerGym service interface when executed. See
+<a class="reference internal" href="#"><span class="doc">compiler_gym.service</span></a> for details.</p></li>
+<li><p><strong>rewards</strong> – The reward spaces that this environment supports.
+Rewards are typically calculated based on observations generated by
+the service. See <a class="reference internal" href="spaces.html#compiler_gym.spaces.Reward" title="compiler_gym.spaces.Reward"><code class="xref py py-class docutils literal notranslate"><span class="pre">Reward</span></code></a> for
+details.</p></li>
+<li><p><strong>benchmark</strong> – The benchmark to use for this environment. Either a
+URI string, or a <a class="reference internal" href="datasets.html#compiler_gym.datasets.Benchmark" title="compiler_gym.datasets.Benchmark"><code class="xref py py-class docutils literal notranslate"><span class="pre">Benchmark</span></code></a> instance. If not provided, the
+first benchmark as returned by
+<code class="code docutils literal notranslate"><span class="pre">next(env.datasets.benchmarks())</span></code> will be used as the default.</p></li>
+<li><p><strong>observation_space</strong> – Compute and return observations at each
+<a class="reference internal" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.step" title="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.step"><code class="xref py py-func docutils literal notranslate"><span class="pre">step()</span></code></a> from this space. Accepts a string name or an
+<a class="reference internal" href="views.html#compiler_gym.views.ObservationSpaceSpec" title="compiler_gym.views.ObservationSpaceSpec"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObservationSpaceSpec</span></code></a>. If not provided,
+<a class="reference internal" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.step" title="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.step"><code class="xref py py-func docutils literal notranslate"><span class="pre">step()</span></code></a> returns <code class="code docutils literal notranslate"><span class="pre">None</span></code> for the observation value. Can
+be set later using <code class="xref py py-meth docutils literal notranslate"><span class="pre">env.observation_space</span></code>. For available
+spaces, see <a class="reference internal" href="views.html#compiler_gym.views.ObservationView" title="compiler_gym.views.ObservationView"><code class="xref py py-class docutils literal notranslate"><span class="pre">env.observation.spaces</span></code></a>.</p></li>
+<li><p><strong>reward_space</strong> – Compute and return reward at each <a class="reference internal" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.step" title="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.step"><code class="xref py py-func docutils literal notranslate"><span class="pre">step()</span></code></a>
+from this space. Accepts a string name or a <a class="reference internal" href="spaces.html#compiler_gym.spaces.Reward" title="compiler_gym.spaces.Reward"><code class="xref py py-class docutils literal notranslate"><span class="pre">Reward</span></code></a>. If not provided, <a class="reference internal" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.step" title="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.step"><code class="xref py py-func docutils literal notranslate"><span class="pre">step()</span></code></a>
+returns <code class="code docutils literal notranslate"><span class="pre">None</span></code> for the reward value. Can be set later using
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">env.reward_space</span></code>. For available spaces,
+see <a class="reference internal" href="views.html#compiler_gym.views.RewardView" title="compiler_gym.views.RewardView"><code class="xref py py-class docutils literal notranslate"><span class="pre">env.reward.spaces</span></code></a>.</p></li>
+<li><p><strong>action_space</strong> – The name of the action space to use. If not
+specified, the default action space for this compiler is used.</p></li>
+<li><p><strong>derived_observation_spaces</strong> – An optional list of arguments to be
+passed to <code class="xref py py-meth docutils literal notranslate"><span class="pre">env.observation.add_derived_space()</span></code>.</p></li>
+<li><p><strong>service_message_converters</strong> – Custom converters for action spaces and actions.</p></li>
+<li><p><strong>connection_settings</strong> – The settings used to establish a connection
+with the remote service.</p></li>
+<li><p><strong>service_connection</strong> – An existing compiler gym service connection
+to use.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>FileNotFoundError</strong> – If service is a path to a file that is not
+found.</p></li>
+<li><p><strong>TimeoutError</strong> – If the compiler service fails to initialize within
+the parameters provided in <code class="code docutils literal notranslate"><span class="pre">connection_settings</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.action_space">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">action_space</span></span><em class="property"><span class="pre">:</span> <span class="pre">gym.spaces.space.Space</span></em><a class="headerlink" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.action_space" title="Permalink to this definition">¶</a></dt>
+<dd><p>The current action space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Getter</dt>
+<dd class="field-odd"><p>Get the current action space.</p>
+</dd>
+<dt class="field-even">Setter</dt>
+<dd class="field-even"><p>Set the action space to use. Must be an entry in
+<code class="code docutils literal notranslate"><span class="pre">action_spaces</span></code>. If <code class="code docutils literal notranslate"><span class="pre">None</span></code>, the default action space is
+selected.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.action_spaces">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">action_spaces</span></span><em class="property"><span class="pre">:</span> <span class="pre">List[str]</span></em><a class="headerlink" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.action_spaces" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list of supported action space names.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.apply">
+<span class="sig-name descname"><span class="pre">apply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="compiler_gym.html#compiler_gym.CompilerEnvState" title="compiler_gym.compiler_env_state.CompilerEnvState"><span class="pre">compiler_gym.compiler_env_state.CompilerEnvState</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="reference internal" href="../_modules/compiler_gym/service/client_service_compiler_env.html#ClientServiceCompilerEnv.apply"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.apply" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replay this state on the given environment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>state</strong> – A <a class="reference internal" href="compiler_gym.html#compiler_gym.CompilerEnvState" title="compiler_gym.CompilerEnvState"><code class="xref py py-class docutils literal notranslate"><span class="pre">CompilerEnvState</span></code></a>
+instance.</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If this state cannot be applied.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.benchmark">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">benchmark</span></span><em class="property"><span class="pre">:</span> <span class="pre">compiler_gym.datasets.benchmark.Benchmark</span></em><a class="headerlink" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.benchmark" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get or set the benchmark to use.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Getter</dt>
+<dd class="field-odd"><p>Get <a class="reference internal" href="datasets.html#compiler_gym.datasets.Benchmark" title="compiler_gym.datasets.Benchmark"><code class="xref py py-class docutils literal notranslate"><span class="pre">Benchmark</span></code></a> that
+is currently in use.</p>
+</dd>
+<dt class="field-even">Setter</dt>
+<dd class="field-even"><p>Set the benchmark to use. Either a <a class="reference internal" href="datasets.html#compiler_gym.datasets.Benchmark" title="compiler_gym.datasets.Benchmark"><code class="xref py py-class docutils literal notranslate"><span class="pre">Benchmark</span></code></a> instance, or the URI of a
+benchmark as in <a class="reference internal" href="datasets.html#compiler_gym.datasets.Datasets.benchmark_uris" title="compiler_gym.datasets.Datasets.benchmark_uris"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.datasets.benchmark_uris()</span></code></a>.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Setting a new benchmark has no effect until
+<a class="reference internal" href="envs.html#compiler_gym.envs.CompilerEnv.reset" title="compiler_gym.envs.CompilerEnv.reset"><code class="xref py py-func docutils literal notranslate"><span class="pre">env.reset()</span></code></a> is called.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/service/client_service_compiler_env.html#ClientServiceCompilerEnv.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the environment.</p>
+<p>Once closed, <a class="reference internal" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.reset" title="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.reset"><code class="xref py py-func docutils literal notranslate"><span class="pre">reset()</span></code></a> must be called before the environment is used
+again.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You must make sure to call <code class="code docutils literal notranslate"><span class="pre">env.close()</span></code> on a CompilerGym
+environment when you are done with it. This is needed to perform
+manual tidying up of temporary files and processes. See <a class="reference internal" href="../faq.html#do-i-need-to-call-env-close"><span class="std std-ref">the
+FAQ</span></a> for more details.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.commandline">
+<span class="sig-name descname"><span class="pre">commandline</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">str</span><a class="reference internal" href="../_modules/compiler_gym/service/client_service_compiler_env.html#ClientServiceCompilerEnv.commandline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.commandline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calling this method on a <code class="xref py py-class docutils literal notranslate"><span class="pre">ClientServiceCompilerEnv</span></code> instance raises
+<code class="code docutils literal notranslate"><span class="pre">NotImplementedError</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.commandline_to_actions">
+<span class="sig-name descname"><span class="pre">commandline_to_actions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">commandline</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">compiler_gym.util.gym_type_hints.ActionType</span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/compiler_gym/service/client_service_compiler_env.html#ClientServiceCompilerEnv.commandline_to_actions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.commandline_to_actions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calling this method on a <code class="xref py py-class docutils literal notranslate"><span class="pre">ClientServiceCompilerEnv</span></code> instance raises
+<code class="code docutils literal notranslate"><span class="pre">NotImplementedError</span></code>.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.compiler_version">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">compiler_version</span></span><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><a class="headerlink" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.compiler_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>The version string of the underlying compiler that this service supports.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.episode_reward">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">episode_reward</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional[float]</span></em><a class="headerlink" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.episode_reward" title="Permalink to this definition">¶</a></dt>
+<dd><p><cite>CompilerEnv.reward_space
+&lt;compiler_gym.envs.CompilerGym.reward_space&gt;</cite> is set, this value is the
+sum of all rewards for the current episode.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>If</p>
+</dd>
+<dt class="field-even">Type</dt>
+<dd class="field-even"><p>func</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.episode_walltime">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">episode_walltime</span></span><em class="property"><span class="pre">:</span> <span class="pre">float</span></em><a class="headerlink" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.episode_walltime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the amount of time in seconds since the last call to
+<a class="reference internal" href="envs.html#compiler_gym.envs.CompilerEnv.reset" title="compiler_gym.envs.CompilerEnv.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reset()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.fork">
+<span class="sig-name descname"><span class="pre">fork</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv" title="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv"><span class="pre">compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv</span></a><a class="reference internal" href="../_modules/compiler_gym/service/client_service_compiler_env.html#ClientServiceCompilerEnv.fork"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.fork" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fork a new environment with exactly the same state.</p>
+<p>This creates a duplicate environment instance with the current state.
+The new environment is entirely independently of the source environment.
+The user must call <a class="reference internal" href="envs.html#compiler_gym.envs.CompilerEnv.close" title="compiler_gym.envs.CompilerEnv.close"><code class="xref py py-meth docutils literal notranslate"><span class="pre">close()</span></code></a>
+on the original and new environments.</p>
+<p>If not already in an episode, <a class="reference internal" href="envs.html#compiler_gym.envs.CompilerEnv.reset" title="compiler_gym.envs.CompilerEnv.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reset()</span></code></a> is called.</p>
+<p>Example usage:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;llvm-v0&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+<span class="go"># ... use env</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_env</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">fork</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_env</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="n">env</span><span class="o">.</span><span class="n">state</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A new environment instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.in_episode">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">in_episode</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.in_episode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether the service is ready for <a class="reference internal" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.step" title="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.step"><code class="xref py py-func docutils literal notranslate"><span class="pre">step()</span></code></a> to be called,
+i.e. <a class="reference internal" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.reset" title="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.reset"><code class="xref py py-func docutils literal notranslate"><span class="pre">reset()</span></code></a> has been called and <a class="reference internal" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.close" title="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.close"><code class="xref py py-func docutils literal notranslate"><span class="pre">close()</span></code></a> has not.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><code class="code docutils literal notranslate"><span class="pre">True</span></code> if in an episode, else <code class="code docutils literal notranslate"><span class="pre">False</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.logger">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.logger" title="Permalink to this definition">¶</a></dt>
+<dd><div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 0.2.1.</span></p>
+</div>
+<p>The <cite>ClientServiceCompilerEnv.logger</cite> attribute is deprecated.
+All ClientServiceCompilerEnv instances share a logger named
+compiler_gym.service.client_service_compiler_env</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.multistep">
+<span class="sig-name descname"><span class="pre">multistep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actions</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">compiler_gym.util.gym_type_hints.ActionType</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observation_spaces</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="views.html#compiler_gym.views.ObservationSpaceSpec" title="compiler_gym.views.observation_space_spec.ObservationSpaceSpec"><span class="pre">compiler_gym.views.observation_space_spec.ObservationSpaceSpec</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reward_spaces</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="spaces.html#compiler_gym.spaces.Reward" title="compiler_gym.spaces.reward.Reward"><span class="pre">compiler_gym.spaces.reward.Reward</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observations</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="views.html#compiler_gym.views.ObservationSpaceSpec" title="compiler_gym.views.observation_space_spec.ObservationSpaceSpec"><span class="pre">compiler_gym.views.observation_space_spec.ObservationSpaceSpec</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="spaces.html#compiler_gym.spaces.Reward" title="compiler_gym.spaces.reward.Reward"><span class="pre">compiler_gym.spaces.reward.Reward</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/service/client_service_compiler_env.html#ClientServiceCompilerEnv.multistep"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.multistep" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#compiler_gym.service.SessionNotFound" title="compiler_gym.service.SessionNotFound"><strong>SessionNotFound</strong></a> – If :meth:<a href="#id3"><span class="problematic" id="id4">`</span></a>reset()</p>
+</dd>
+</dl>
+<p>&lt;compiler_gym.envs.ClientServiceCompilerEnv.reset&gt;` has not been called.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.observation">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">observation</span></span><em class="property"><span class="pre">:</span> <span class="pre">compiler_gym.views.observation.ObservationView</span></em><a class="headerlink" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.observation" title="Permalink to this definition">¶</a></dt>
+<dd><p>A view of the available observation spaces that permits
+on-demand computation of observations.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.observation_space">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">observation_space</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional[gym.spaces.space.Space]</span></em><a class="headerlink" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.observation_space" title="Permalink to this definition">¶</a></dt>
+<dd><p>The observation space that is used to return an observation value in
+<a class="reference internal" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.step" title="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.step"><code class="xref py py-func docutils literal notranslate"><span class="pre">step()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Getter</dt>
+<dd class="field-odd"><p>Returns the underlying observation space, or <code class="code docutils literal notranslate"><span class="pre">None</span></code> if
+not set.</p>
+</dd>
+<dt class="field-even">Setter</dt>
+<dd class="field-even"><p>Set the default observation space.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.raw_step">
+<span class="sig-name descname"><span class="pre">raw_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actions</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">compiler_gym.util.gym_type_hints.ActionType</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observation_spaces</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="views.html#compiler_gym.views.ObservationSpaceSpec" title="compiler_gym.views.observation_space_spec.ObservationSpaceSpec"><span class="pre">compiler_gym.views.observation_space_spec.ObservationSpaceSpec</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reward_spaces</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="spaces.html#compiler_gym.spaces.Reward" title="compiler_gym.spaces.reward.Reward"><span class="pre">compiler_gym.spaces.reward.Reward</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">compiler_gym.util.gym_type_hints.ObservationType</span><span class="p"><span class="pre">,</span> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">compiler_gym.util.gym_type_hints.ObservationType</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><span class="pre">bool</span><span class="p"><span class="pre">,</span> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/compiler_gym/service/client_service_compiler_env.html#ClientServiceCompilerEnv.raw_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.raw_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Take a step.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>actions</strong> – A list of actions to be applied.</p></li>
+<li><p><strong>observations</strong> – A list of observations spaces to compute
+observations from. These are evaluated after the actions are
+applied.</p></li>
+<li><p><strong>rewards</strong> – A list of reward spaces to compute rewards from. These
+are evaluated after the actions are applied.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A tuple of observations, rewards, done, and info. Observations
+and rewards are lists.</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#compiler_gym.service.SessionNotFound" title="compiler_gym.service.SessionNotFound"><strong>SessionNotFound</strong></a> – If <code class="xref py py-meth docutils literal notranslate"><span class="pre">reset()</span></code> has not been called.</p>
+</dd>
+</dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Don’t call this method directly, use <code class="xref py py-meth docutils literal notranslate"><span class="pre">step()</span></code> or <code class="xref py py-meth docutils literal notranslate"><span class="pre">multistep()</span></code> instead. The
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">raw_step()</span></code> method is an
+implementation detail.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.render">
+<span class="sig-name descname"><span class="pre">render</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'human'</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/compiler_gym/service/client_service_compiler_env.html#ClientServiceCompilerEnv.render"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.render" title="Permalink to this definition">¶</a></dt>
+<dd><p>Render the environment.</p>
+<p>ClientServiceCompilerEnv instances support two render modes: “human”, which prints
+the current environment state to the terminal and return nothing; and
+“ansi”, which returns a string representation of the current environment
+state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>mode</strong> – The render mode to use.</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>TypeError</strong> – If a default observation space is not set, or if the
+requested render mode does not exist.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">benchmark:</span> <span class="pre">Optional[Union[str</span></em>, <em class="sig-param"><span class="pre">compiler_gym.datasets.benchmark.Benchmark]]</span> <span class="pre">=</span> <span class="pre">None</span></em>, <em class="sig-param"><span class="pre">action_space:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">None</span></em>, <em class="sig-param"><span class="pre">reward_space:</span> <span class="pre">Union[compiler_gym.util.gym_type_hints.OptionalArgumentValue</span></em>, <em class="sig-param"><span class="pre">str</span></em>, <em class="sig-param"><span class="pre">compiler_gym.spaces.reward.Reward]</span> <span class="pre">=</span> <span class="pre">&lt;OptionalArgumentValue.UNCHANGED:</span> <span class="pre">1&gt;</span></em>, <em class="sig-param"><span class="pre">observation_space:</span> <span class="pre">Union[compiler_gym.util.gym_type_hints.OptionalArgumentValue</span></em>, <em class="sig-param"><span class="pre">str</span></em>, <em class="sig-param"><span class="pre">compiler_gym.views.observation_space_spec.ObservationSpaceSpec]</span> <span class="pre">=</span> <span class="pre">&lt;OptionalArgumentValue.UNCHANGED:</span> <span class="pre">1&gt;</span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">compiler_gym.util.gym_type_hints.ObservationType</span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/compiler_gym/service/client_service_compiler_env.html#ClientServiceCompilerEnv.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset the environment state.</p>
+<p>This method must be called before <a class="reference internal" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.step" title="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.step"><code class="xref py py-func docutils literal notranslate"><span class="pre">step()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>benchmark</strong> – The name of the benchmark to use. If provided, it
+overrides any value that was set during <a class="reference internal" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.__init__" title="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.__init__"><code class="xref py py-func docutils literal notranslate"><span class="pre">__init__()</span></code></a>, and
+becomes subsequent calls to <code class="code docutils literal notranslate"><span class="pre">reset()</span></code> will use this benchmark.
+If no benchmark is provided, and no benchmark was provided to
+<code class="xref py py-func docutils literal notranslate"><span class="pre">__init___()</span></code>, the service will randomly select a benchmark to
+use.</p></li>
+<li><p><strong>action_space</strong> – The name of the action space to use. If provided,
+it overrides any value that set during <a class="reference internal" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.__init__" title="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.__init__"><code class="xref py py-func docutils literal notranslate"><span class="pre">__init__()</span></code></a>, and
+subsequent calls to <code class="code docutils literal notranslate"><span class="pre">reset()</span></code> will use this action space. If
+no action space is provided, the default action space is used.</p></li>
+<li><p><strong>observation_space</strong> – Compute and return observations at each
+<a class="reference internal" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.step" title="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.step"><code class="xref py py-func docutils literal notranslate"><span class="pre">step()</span></code></a> from this space. Accepts a string name or an
+<a class="reference internal" href="views.html#compiler_gym.views.ObservationSpaceSpec" title="compiler_gym.views.ObservationSpaceSpec"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObservationSpaceSpec</span></code></a>. If <code class="code docutils literal notranslate"><span class="pre">None</span></code>,
+<a class="reference internal" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.step" title="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.step"><code class="xref py py-func docutils literal notranslate"><span class="pre">step()</span></code></a> returns <code class="code docutils literal notranslate"><span class="pre">None</span></code> for the observation value. If
+<code class="code docutils literal notranslate"><span class="pre">OptionalArgumentValue.UNCHANGED</span></code> (the default value), the
+observation space remains unchanged from the previous episode. For
+available spaces, see <a class="reference internal" href="views.html#compiler_gym.views.ObservationView" title="compiler_gym.views.ObservationView"><code class="xref py py-class docutils literal notranslate"><span class="pre">env.observation.spaces</span></code></a>.</p></li>
+<li><p><strong>reward_space</strong> – Compute and return reward at each <a class="reference internal" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.step" title="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.step"><code class="xref py py-func docutils literal notranslate"><span class="pre">step()</span></code></a>
+from this space. Accepts a string name or a <a class="reference internal" href="spaces.html#compiler_gym.spaces.Reward" title="compiler_gym.spaces.Reward"><code class="xref py py-class docutils literal notranslate"><span class="pre">Reward</span></code></a>. If <code class="code docutils literal notranslate"><span class="pre">None</span></code>, <a class="reference internal" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.step" title="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.step"><code class="xref py py-func docutils literal notranslate"><span class="pre">step()</span></code></a>
+returns <code class="code docutils literal notranslate"><span class="pre">None</span></code> for the reward value.  If
+<code class="code docutils literal notranslate"><span class="pre">OptionalArgumentValue.UNCHANGED</span></code> (the default value), the
+observation space remains unchanged from the previous episode. For
+available spaces, see <a class="reference internal" href="views.html#compiler_gym.views.RewardView" title="compiler_gym.views.RewardView"><code class="xref py py-class docutils literal notranslate"><span class="pre">env.reward.spaces</span></code></a>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The initial observation.</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><a class="reference internal" href="datasets.html#compiler_gym.datasets.BenchmarkInitError" title="compiler_gym.datasets.BenchmarkInitError"><strong>BenchmarkInitError</strong></a> – If the benchmark is invalid. In this case,
+another benchmark must be used.</p></li>
+<li><p><strong>TypeError</strong> – If no benchmark has been set, and the environment
+does not have a default benchmark to select from.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.reward">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">reward</span></span><em class="property"><span class="pre">:</span> <span class="pre">compiler_gym.views.reward.RewardView</span></em><a class="headerlink" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.reward" title="Permalink to this definition">¶</a></dt>
+<dd><p>A view of the available reward spaces that permits on-demand
+computation of rewards.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.reward_range">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">reward_range</span></span><em class="property"><span class="pre">:</span> <span class="pre">Tuple[float,</span> <span class="pre">float]</span></em><a class="headerlink" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.reward_range" title="Permalink to this definition">¶</a></dt>
+<dd><p>A tuple indicating the range of reward values.</p>
+<p>Default range is (-inf, +inf).</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.reward_space">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">reward_space</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional[compiler_gym.spaces.reward.Reward]</span></em><a class="headerlink" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.reward_space" title="Permalink to this definition">¶</a></dt>
+<dd><p>The default reward space that is used to return a reward value from
+<a class="reference internal" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.step" title="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.step"><code class="xref py py-func docutils literal notranslate"><span class="pre">step()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Getter</dt>
+<dd class="field-odd"><p>Returns a <a class="reference internal" href="spaces.html#compiler_gym.spaces.Reward" title="compiler_gym.spaces.Reward"><code class="xref py py-class docutils literal notranslate"><span class="pre">Reward</span></code></a>,
+or <code class="code docutils literal notranslate"><span class="pre">None</span></code> if not set.</p>
+</dd>
+<dt class="field-even">Setter</dt>
+<dd class="field-even"><p>Set the default reward space.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.send_param">
+<span class="sig-name descname"><span class="pre">send_param</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">str</span><a class="reference internal" href="../_modules/compiler_gym/service/client_service_compiler_env.html#ClientServiceCompilerEnv.send_param"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.send_param" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send a single &lt;key, value&gt; parameter to the compiler service.</p>
+<p>See <code class="xref py py-meth docutils literal notranslate"><span class="pre">send_params()</span></code>
+for more information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> – The parameter key.</p></li>
+<li><p><strong>value</strong> – The parameter value.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The response from the compiler service.</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#compiler_gym.service.SessionNotFound" title="compiler_gym.service.SessionNotFound"><strong>SessionNotFound</strong></a> – If called before <code class="xref py py-meth docutils literal notranslate"><span class="pre">reset()</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.send_params">
+<span class="sig-name descname"><span class="pre">send_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/compiler_gym/service/client_service_compiler_env.html#ClientServiceCompilerEnv.send_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.send_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send a list of &lt;key, value&gt; parameters to the compiler service.</p>
+<p>This provides a mechanism to send messages to the backend compilation
+session in a way that doesn’t conform to the normal communication
+pattern. This can be useful for things like configuring runtime
+debugging settings, or applying “meta actions” to the compiler that are
+not exposed in the compiler’s action space. Consult the documentation
+for a specific compiler service to see what parameters, if any, are
+supported.</p>
+<p>Must have called <code class="xref py py-meth docutils literal notranslate"><span class="pre">reset()</span></code>
+first.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>params</strong> – A list of parameters, where each parameter is a
+<code class="code docutils literal notranslate"><span class="pre">(key,</span> <span class="pre">value)</span></code> tuple.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A list of string responses, one per parameter.</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#compiler_gym.service.SessionNotFound" title="compiler_gym.service.SessionNotFound"><strong>SessionNotFound</strong></a> – If called before <code class="xref py py-meth docutils literal notranslate"><span class="pre">reset()</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.state">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">state</span></span><em class="property"><span class="pre">:</span> <span class="pre">compiler_gym.compiler_env_state.CompilerEnvState</span></em><a class="headerlink" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.state" title="Permalink to this definition">¶</a></dt>
+<dd><p>The tuple representation of the current environment state.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.step">
+<span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">compiler_gym.util.gym_type_hints.ActionType</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observation_spaces</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="views.html#compiler_gym.views.ObservationSpaceSpec" title="compiler_gym.views.observation_space_spec.ObservationSpaceSpec"><span class="pre">compiler_gym.views.observation_space_spec.ObservationSpaceSpec</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reward_spaces</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="spaces.html#compiler_gym.spaces.Reward" title="compiler_gym.spaces.reward.Reward"><span class="pre">compiler_gym.spaces.reward.Reward</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observations</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="views.html#compiler_gym.views.ObservationSpaceSpec" title="compiler_gym.views.observation_space_spec.ObservationSpaceSpec"><span class="pre">compiler_gym.views.observation_space_spec.ObservationSpaceSpec</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="spaces.html#compiler_gym.spaces.Reward" title="compiler_gym.spaces.reward.Reward"><span class="pre">compiler_gym.spaces.reward.Reward</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">compiler_gym.util.gym_type_hints.ObservationType</span><span class="p"><span class="pre">,</span> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">compiler_gym.util.gym_type_hints.ObservationType</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><span class="pre">bool</span><span class="p"><span class="pre">,</span> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/compiler_gym/service/client_service_compiler_env.html#ClientServiceCompilerEnv.step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.step" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#compiler_gym.service.SessionNotFound" title="compiler_gym.service.SessionNotFound"><strong>SessionNotFound</strong></a> – If :meth:<a href="#id5"><span class="problematic" id="id6">`</span></a>reset()</p>
+</dd>
+</dl>
+<p>&lt;compiler_gym.envs.ClientServiceCompilerEnv.reset&gt;` has not been called.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.validate">
+<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="compiler_gym.html#compiler_gym.CompilerEnvState" title="compiler_gym.compiler_env_state.CompilerEnvState"><span class="pre">compiler_gym.compiler_env_state.CompilerEnvState</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="compiler_gym.html#compiler_gym.ValidationResult" title="compiler_gym.validation_result.ValidationResult"><span class="pre">compiler_gym.validation_result.ValidationResult</span></a><a class="reference internal" href="../_modules/compiler_gym/service/client_service_compiler_env.html#ClientServiceCompilerEnv.validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate an environment’s state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>state</strong> – A state to environment. If not provided, the current state
+is validated.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A <a class="reference internal" href="compiler_gym.html#compiler_gym.ValidationResult" title="compiler_gym.ValidationResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValidationResult</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.version">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">version</span></span><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><a class="headerlink" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.version" title="Permalink to this definition">¶</a></dt>
+<dd><p>The version string of the compiler service.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.versions">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">versions</span></span><em class="property"><span class="pre">:</span> <span class="pre">compiler_gym.service.proto.compiler_gym_service_pb2.GetVersionReply</span></em><a class="headerlink" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.versions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the version numbers from the compiler service.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="compiler_gym.service.client_service_compiler_env.ServiceMessageConverters">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.service.client_service_compiler_env.</span></span><span class="sig-name descname"><span class="pre">ServiceMessageConverters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action_space_converter</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">compiler_gym.service.proto.compiler_gym_service_pb2.ActionSpace</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><span class="pre">gym.spaces.space.Space</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_converter</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><span class="pre">compiler_gym.service.proto.compiler_gym_service_pb2.Event</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/service/client_service_compiler_env.html#ServiceMessageConverters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.client_service_compiler_env.ServiceMessageConverters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allows for customization of conversion to/from gRPC messages for the
+<a class="reference internal" href="#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv" title="compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClientServiceCompilerEnv</span></code></a>.</p>
+<p>Supports conversion customizations:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">compiler_gym.service.proto.ActionSpace</span></code> -&gt;
+<code class="code docutils literal notranslate"><span class="pre">gym.spaces.Space</span></code>.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">compiler_gym.util.gym_type_hints.ActionType</span></code> -&gt;
+<code class="code docutils literal notranslate"><span class="pre">compiler_gym.service.proto.Event</span></code>.</p></li>
+</ul>
+</div></blockquote>
+<dl class="py method">
+<dt class="sig sig-object py" id="compiler_gym.service.client_service_compiler_env.ServiceMessageConverters.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action_space_converter</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">compiler_gym.service.proto.compiler_gym_service_pb2.ActionSpace</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><span class="pre">gym.spaces.space.Space</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_converter</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><span class="pre">compiler_gym.service.proto.compiler_gym_service_pb2.Event</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/service/client_service_compiler_env.html#ServiceMessageConverters.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.client_service_compiler_env.ServiceMessageConverters.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructor.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="the-connection-object">
-<h2><a class="toc-backref" href="#id4">The connection object</a><a class="headerlink" href="#the-connection-object" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id9">The connection object</a><a class="headerlink" href="#the-connection-object" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="compiler_gym.service.CompilerGymServiceConnection">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.service.</span></span><span class="sig-name descname"><span class="pre">CompilerGymServiceConnection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">endpoint</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opts</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#compiler_gym.service.ConnectionOpts" title="compiler_gym.service.connection.ConnectionOpts"><span class="pre">compiler_gym.service.connection.ConnectionOpts</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/service/connection.html#CompilerGymServiceConnection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.CompilerGymServiceConnection" title="Permalink to this definition">¶</a></dt>
@@ -497,7 +1012,7 @@ service process is replaced.</p>
 
 </div>
 <div class="section" id="configuring-the-connection">
-<h2><a class="toc-backref" href="#id5">Configuring the connection</a><a class="headerlink" href="#configuring-the-connection" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id10">Configuring the connection</a><a class="headerlink" href="#configuring-the-connection" title="Permalink to this headline">¶</a></h2>
 <p>The <a class="reference internal" href="#compiler_gym.service.ConnectionOpts" title="compiler_gym.service.ConnectionOpts"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConnectionOpts</span></code></a> object is used
 to configure the options used for managing a service connection.</p>
 <dl class="py class">
@@ -593,7 +1108,7 @@ used on the command line. No effect when used for existing sockets.</p>
 
 </div>
 <div class="section" id="exceptions">
-<h2><a class="toc-backref" href="#id6">Exceptions</a><a class="headerlink" href="#exceptions" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id11">Exceptions</a><a class="headerlink" href="#exceptions" title="Permalink to this headline">¶</a></h2>
 <p>In general, errors raised by the service are converted to the equivalent builtin
 exception type, e.g., <cite>ValueError</cite> for invalid method arguments, and
 <cite>FileNotFound</cite> for resource errors. However, some error cases are not well
@@ -601,38 +1116,38 @@ covered by the builtin exception hierarchy. For those cases, we define custom
 exception types, all inheriting from a base <a class="reference internal" href="#compiler_gym.service.ServiceError" title="compiler_gym.service.ServiceError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceError</span></code></a> class:</p>
 <dl class="py exception">
 <dt class="sig sig-object py" id="compiler_gym.service.ServiceError">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.service.</span></span><span class="sig-name descname"><span class="pre">ServiceError</span></span><a class="reference internal" href="../_modules/compiler_gym/service/connection.html#ServiceError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.ServiceError" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.service.</span></span><span class="sig-name descname"><span class="pre">ServiceError</span></span><a class="reference internal" href="../_modules/compiler_gym/errors/service_errors.html#ServiceError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.ServiceError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Error raised from the service.</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="compiler_gym.service.EnvironmentNotSupported">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.service.</span></span><span class="sig-name descname"><span class="pre">EnvironmentNotSupported</span></span><a class="reference internal" href="../_modules/compiler_gym/service/connection.html#EnvironmentNotSupported"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.EnvironmentNotSupported" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.service.</span></span><span class="sig-name descname"><span class="pre">EnvironmentNotSupported</span></span><a class="reference internal" href="../_modules/compiler_gym/errors/service_errors.html#EnvironmentNotSupported"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.EnvironmentNotSupported" title="Permalink to this definition">¶</a></dt>
 <dd><p>Error raised if the runtime requirements for an environment are not
 met on the current system.</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="compiler_gym.service.ServiceInitError">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.service.</span></span><span class="sig-name descname"><span class="pre">ServiceInitError</span></span><a class="reference internal" href="../_modules/compiler_gym/service/connection.html#ServiceInitError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.ServiceInitError" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.service.</span></span><span class="sig-name descname"><span class="pre">ServiceInitError</span></span><a class="reference internal" href="../_modules/compiler_gym/errors/service_errors.html#ServiceInitError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.ServiceInitError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Error raised if the service fails to initialize.</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="compiler_gym.service.ServiceTransportError">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.service.</span></span><span class="sig-name descname"><span class="pre">ServiceTransportError</span></span><a class="reference internal" href="../_modules/compiler_gym/service/connection.html#ServiceTransportError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.ServiceTransportError" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.service.</span></span><span class="sig-name descname"><span class="pre">ServiceTransportError</span></span><a class="reference internal" href="../_modules/compiler_gym/errors/service_errors.html#ServiceTransportError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.ServiceTransportError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Error that is raised if communication with the service fails.</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="compiler_gym.service.ServiceIsClosed">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.service.</span></span><span class="sig-name descname"><span class="pre">ServiceIsClosed</span></span><a class="reference internal" href="../_modules/compiler_gym/service/connection.html#ServiceIsClosed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.ServiceIsClosed" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.service.</span></span><span class="sig-name descname"><span class="pre">ServiceIsClosed</span></span><a class="reference internal" href="../_modules/compiler_gym/errors/service_errors.html#ServiceIsClosed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.ServiceIsClosed" title="Permalink to this definition">¶</a></dt>
 <dd><p>Error that is raised if trying to interact with a closed service.</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="compiler_gym.service.SessionNotFound">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.service.</span></span><span class="sig-name descname"><span class="pre">SessionNotFound</span></span><a class="reference internal" href="../_modules/compiler_gym/service/connection.html#SessionNotFound"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.SessionNotFound" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.service.</span></span><span class="sig-name descname"><span class="pre">SessionNotFound</span></span><a class="reference internal" href="../_modules/compiler_gym/errors/service_errors.html#SessionNotFound"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.SessionNotFound" title="Permalink to this definition">¶</a></dt>
 <dd><p>Requested session ID not found in service.</p>
 </dd></dl>
 

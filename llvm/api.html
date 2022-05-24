@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.envs.llvm &mdash; CompilerGym 0.2.2 documentation</title>
+  <title>compiler_gym.envs.llvm &mdash; CompilerGym 0.2.4 documentation</title>
   
 
   
@@ -73,7 +73,7 @@
             
             
               <div class="version">
-                0.2.2
+                0.2.4
               </div>
             
           
@@ -113,6 +113,7 @@
 <li class="toctree-l1"><a class="reference internal" href="index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../envs/gcc.html">GCC Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../envs/loop_tool.html">loop_tool Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../envs/mlir.html">MLIR Environment Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul class="current">
@@ -303,7 +304,7 @@ separately and then linked to a single module:</p>
 source files.</p></li>
 <li><p><strong>system_includes</strong> – Whether to include the system standard libraries
 during compilation jobs. This requires a system toolchain. See
-<code class="xref py py-func docutils literal notranslate"><span class="pre">get_system_library_flags()</span></code>.</p></li>
+<a class="reference internal" href="#compiler_gym.envs.llvm.get_system_library_flags" title="compiler_gym.envs.llvm.get_system_library_flags"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_system_library_flags()</span></code></a>.</p></li>
 <li><p><strong>timeout</strong> – The maximum number of seconds to allow clang to run before
 terminating.</p></li>
 </ul>
@@ -325,6 +326,20 @@ seconds.</p></li>
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="compiler_gym.envs.llvm.BenchmarkFromCommandLine">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.envs.llvm.</span></span><span class="sig-name descname"><span class="pre">BenchmarkFromCommandLine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">invocation</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">compiler_gym.third_party.gccinvocation.gccinvocation.GccInvocation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bitcode</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/envs/llvm/benchmark_from_command_line.html#BenchmarkFromCommandLine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.llvm.BenchmarkFromCommandLine" title="Permalink to this definition">¶</a></dt>
+<dd><p>A benchmark that has been constructed from a command line invocation.</p>
+<p>See <a class="reference internal" href="../compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.make_benchmark_from_command_line" title="compiler_gym.envs.LlvmEnv.make_benchmark_from_command_line"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.make_benchmark_from_command_line()</span></code></a>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="compiler_gym.envs.llvm.BenchmarkFromCommandLine.compile">
+<span class="sig-name descname"><span class="pre">compile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">60</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="reference internal" href="../_modules/compiler_gym/envs/llvm/benchmark_from_command_line.html#BenchmarkFromCommandLine.compile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.llvm.BenchmarkFromCommandLine.compile" title="Permalink to this definition">¶</a></dt>
+<dd><p>This completes the compilation and linking of the final executable
+specified by the original command line.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="compiler_gym.envs.llvm.ClangInvocation">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.envs.llvm.</span></span><span class="sig-name descname"><span class="pre">ClangInvocation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system_includes</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">600</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/envs/llvm/llvm_benchmark.html#ClangInvocation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.llvm.ClangInvocation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class to represent a single invocation of the clang compiler.</p>
@@ -338,7 +353,7 @@ seconds.</p></li>
 <li><p><strong>args</strong> – The list of arguments to pass to clang.</p></li>
 <li><p><strong>system_includes</strong> – Whether to include the system standard libraries
 during compilation jobs. This requires a system toolchain. See
-<code class="xref py py-func docutils literal notranslate"><span class="pre">get_system_library_flags()</span></code>.</p></li>
+<a class="reference internal" href="#compiler_gym.envs.llvm.get_system_library_flags" title="compiler_gym.envs.llvm.get_system_library_flags"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_system_library_flags()</span></code></a>.</p></li>
 <li><p><strong>timeout</strong> – The maximum number of seconds to allow clang to run
 before terminating.</p></li>
 </ul>
@@ -346,6 +361,30 @@ before terminating.</p></li>
 </dl>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="compiler_gym.envs.llvm.get_system_library_flags">
+<span class="sig-prename descclassname"><span class="pre">compiler_gym.envs.llvm.</span></span><span class="sig-name descname"><span class="pre">get_system_library_flags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">compiler</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/compiler_gym/envs/llvm/llvm_benchmark.html#get_system_library_flags"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.llvm.get_system_library_flags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine the set of compilation flags needed to use the host system
+libraries.</p>
+<p>This uses the system compiler to determine the search paths for C/C++ system
+headers, and on macOS, the location of libclang_rt.osx.a. By default,
+<code class="code docutils literal notranslate"><span class="pre">c++</span></code> is invoked. This can be overridden by setting
+<code class="code docutils literal notranslate"><span class="pre">os.environ[&quot;CXX&quot;]</span></code> prior to calling this function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A list of command line flags for a compiler.</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>HostCompilerFailure</strong> – If the host compiler cannot be determined, or
+fails to compile a trivial piece of code.</p></li>
+<li><p><strong>UnableToParseHostCompilerOutput</strong> – If the output of the compiler
+cannot be understood.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

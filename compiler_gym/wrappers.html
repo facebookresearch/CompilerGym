@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.wrappers &mdash; CompilerGym 0.2.2 documentation</title>
+  <title>compiler_gym.wrappers &mdash; CompilerGym 0.2.4 documentation</title>
   
 
   
@@ -73,7 +73,7 @@
             
             
               <div class="version">
-                0.2.2
+                0.2.4
               </div>
             
           
@@ -113,6 +113,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../envs/gcc.html">GCC Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../envs/loop_tool.html">loop_tool Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../envs/mlir.html">MLIR Environment Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul class="current">
@@ -293,8 +294,9 @@ to allow an action space transformation.</p>
 to allow an observation space transformation.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="compiler_gym.wrappers.ObservationWrapper.observation">
-<span class="sig-name descname"><span class="pre">observation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">observation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/wrappers/core.html#ObservationWrapper.observation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.wrappers.ObservationWrapper.observation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Translate an observation to the new space.</p>
+<span class="sig-name descname"><span class="pre">observation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#compiler_gym.wrappers.ObservationWrapper.observation" title="Permalink to this definition">¶</a></dt>
+<dd><p>A view of the available observation spaces that permits
+on-demand computation of observations.</p>
 </dd></dl>
 
 </dd></dl>
@@ -306,8 +308,9 @@ to allow an observation space transformation.</p>
 to allow an reward space transformation.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="compiler_gym.wrappers.RewardWrapper.reward">
-<span class="sig-name descname"><span class="pre">reward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reward</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/wrappers/core.html#RewardWrapper.reward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.wrappers.RewardWrapper.reward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Translate a reward to the new space.</p>
+<span class="sig-name descname"><span class="pre">reward</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#compiler_gym.wrappers.RewardWrapper.reward" title="Permalink to this definition">¶</a></dt>
+<dd><p>A view of the available reward spaces that permits on-demand
+computation of rewards.</p>
 </dd></dl>
 
 </dd></dl>
@@ -373,6 +376,69 @@ denoting flags that are available in this wrapped environment.</p></li>
 <span class="go">True</span>
 </pre></div>
 </div>
+<dl class="py method">
+<dt class="sig sig-object py" id="compiler_gym.wrappers.TimeLimit.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="envs.html#compiler_gym.envs.CompilerEnv" title="compiler_gym.envs.compiler_env.CompilerEnv"><span class="pre">compiler_gym.envs.compiler_env.CompilerEnv</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_episode_steps</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/wrappers/time_limit.html#TimeLimit.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.wrappers.TimeLimit.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>env</strong> – The environment to wrap.</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>TypeError</strong> – If <code class="code docutils literal notranslate"><span class="pre">env</span></code> is not a <a class="reference internal" href="envs.html#compiler_gym.envs.CompilerEnv" title="compiler_gym.envs.CompilerEnv"><code class="xref py py-class docutils literal notranslate"><span class="pre">CompilerEnv</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="compiler_gym.wrappers.ForkOnStep">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.wrappers.</span></span><span class="sig-name descname"><span class="pre">ForkOnStep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="envs.html#compiler_gym.envs.CompilerEnv" title="compiler_gym.envs.compiler_env.CompilerEnv"><span class="pre">compiler_gym.envs.compiler_env.CompilerEnv</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/wrappers/fork.html#ForkOnStep"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.wrappers.ForkOnStep" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper that creates a fork of the environment before every step.</p>
+<p>This wrapper creates a new fork of the environment before every call to
+<a class="reference internal" href="envs.html#compiler_gym.envs.CompilerEnv.reset" title="compiler_gym.envs.CompilerEnv.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.reset()</span></code></a>. Because of this,
+this environment supports an additional <a class="reference internal" href="#compiler_gym.wrappers.ForkOnStep.undo" title="compiler_gym.wrappers.ForkOnStep.undo"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.undo()</span></code></a> method that can be used to
+backtrack.</p>
+<p>Example usage:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span> <span class="o">=</span> <span class="n">ForkOnStep</span><span class="p">(</span><span class="n">compiler_gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;llvm-v0&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">actions</span>
+<span class="go">[0]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">undo</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">actions</span>
+<span class="go">[]</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Variables</dt>
+<dd class="field-odd"><p><strong>stack</strong> (<em>List</em><em>[</em><a class="reference internal" href="envs.html#compiler_gym.envs.CompilerEnv" title="compiler_gym.envs.CompilerEnv"><em>CompilerEnv</em></a><em>]</em>) – A fork of the environment before every previous call to
+<a class="reference internal" href="envs.html#compiler_gym.envs.CompilerEnv.reset" title="compiler_gym.envs.CompilerEnv.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.reset()</span></code></a>, ordered
+oldest to newest.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="compiler_gym.wrappers.ForkOnStep.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="envs.html#compiler_gym.envs.CompilerEnv" title="compiler_gym.envs.compiler_env.CompilerEnv"><span class="pre">compiler_gym.envs.compiler_env.CompilerEnv</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/wrappers/fork.html#ForkOnStep.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.wrappers.ForkOnStep.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>env</strong> – The environment to wrap.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="compiler_gym.wrappers.ForkOnStep.undo">
+<span class="sig-name descname"><span class="pre">undo</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="envs.html#compiler_gym.envs.CompilerEnv" title="compiler_gym.envs.compiler_env.CompilerEnv"><span class="pre">compiler_gym.envs.compiler_env.CompilerEnv</span></a><a class="reference internal" href="../_modules/compiler_gym/wrappers/fork.html#ForkOnStep.undo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.wrappers.ForkOnStep.undo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Undo the previous action.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Self.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -525,6 +591,81 @@ and produces a point estimate.</p></li>
 </ul>
 </dd>
 </dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="compiler_gym.wrappers.SynchronousSqliteLogger">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.wrappers.</span></span><span class="sig-name descname"><span class="pre">SynchronousSqliteLogger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="envs.html#compiler_gym.envs.LlvmEnv" title="compiler_gym.envs.llvm.llvm_env.LlvmEnv"><span class="pre">compiler_gym.envs.llvm.llvm_env.LlvmEnv</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_path</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pathlib.Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_frequency_in_seconds</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_step_buffer_length</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">5000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/wrappers/sqlite_logger.html#SynchronousSqliteLogger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.wrappers.SynchronousSqliteLogger" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for an LLVM environment that logs all transitions to an sqlite
+database.</p>
+<p>Wrap an existing LLVM environment and then use it as per normal:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span> <span class="o">=</span> <span class="n">SynchronousSqliteLogger</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">env</span><span class="o">=</span><span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;llvm-autophase-ic-v0&quot;</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="n">db_path</span><span class="o">=</span><span class="s2">&quot;example.db&quot;</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Connect to the database file you specified:</p>
+<p>There are two tables:</p>
+<ol class="arabic simple">
+<li><p>States: records every unique combination of benchmark + actions. For each
+entry, records an identifying state ID, the episode reward, and whether
+the episode is terminated:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sqlite</span><span class="o">&gt;</span> <span class="o">.</span><span class="n">mode</span> <span class="n">markdown</span>
+<span class="n">sqlite</span><span class="o">&gt;</span> <span class="o">.</span><span class="n">headers</span> <span class="n">on</span>
+<span class="n">sqlite</span><span class="o">&gt;</span> <span class="n">select</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">States</span> <span class="n">limit</span> <span class="mi">5</span><span class="p">;</span>
+<span class="o">|</span>      <span class="n">benchmark_uri</span>       <span class="o">|</span> <span class="n">done</span> <span class="o">|</span> <span class="n">ir_instruction_count_oz_reward</span> <span class="o">|</span>                                 <span class="n">state_id</span> <span class="o">|</span> <span class="n">actions</span> <span class="o">|</span>
+<span class="o">|--------------------------|------|--------------------------------|------------------------------------------|----------------|</span>
+<span class="o">|</span> <span class="n">generator</span><span class="p">:</span><span class="o">//</span><span class="n">csmith</span><span class="o">-</span><span class="n">v0</span><span class="o">/</span><span class="mi">99</span> <span class="o">|</span> <span class="mi">0</span>    <span class="o">|</span> <span class="mf">0.0</span>                            <span class="o">|</span> <span class="n">d625b874e58f6d357b816e21871297ac5c001cf0</span> <span class="o">|</span>                <span class="o">|</span>
+<span class="o">|</span> <span class="n">generator</span><span class="p">:</span><span class="o">//</span><span class="n">csmith</span><span class="o">-</span><span class="n">v0</span><span class="o">/</span><span class="mi">99</span> <span class="o">|</span> <span class="mi">0</span>    <span class="o">|</span> <span class="mf">0.0</span>                            <span class="o">|</span> <span class="n">d625b874e58f6d357b816e21871297ac5c001cf0</span> <span class="o">|</span> <span class="mi">31</span>             <span class="o">|</span>
+<span class="o">|</span> <span class="n">generator</span><span class="p">:</span><span class="o">//</span><span class="n">csmith</span><span class="o">-</span><span class="n">v0</span><span class="o">/</span><span class="mi">99</span> <span class="o">|</span> <span class="mi">0</span>    <span class="o">|</span> <span class="mf">0.0</span>                            <span class="o">|</span> <span class="mi">52</span><span class="n">f7142ef606d8b1dec2ff3371c7452c8d7b81ea</span> <span class="o">|</span> <span class="mi">31</span> <span class="mi">116</span>         <span class="o">|</span>
+<span class="o">|</span> <span class="n">generator</span><span class="p">:</span><span class="o">//</span><span class="n">csmith</span><span class="o">-</span><span class="n">v0</span><span class="o">/</span><span class="mi">99</span> <span class="o">|</span> <span class="mi">0</span>    <span class="o">|</span> <span class="mf">0.268005818128586</span>              <span class="o">|</span> <span class="n">d8c05bd41b7a6c6157b6a8f0f5093907c7cc7ecf</span> <span class="o">|</span> <span class="mi">31</span> <span class="mi">116</span> <span class="mi">103</span>     <span class="o">|</span>
+<span class="o">|</span> <span class="n">generator</span><span class="p">:</span><span class="o">//</span><span class="n">csmith</span><span class="o">-</span><span class="n">v0</span><span class="o">/</span><span class="mi">99</span> <span class="o">|</span> <span class="mi">0</span>    <span class="o">|</span> <span class="mf">0.288621664047241</span>              <span class="o">|</span> <span class="n">c4d7ecd3807793a0d8bc281104c7f5a8aa4670f9</span> <span class="o">|</span> <span class="mi">31</span> <span class="mi">116</span> <span class="mi">103</span> <span class="mi">109</span> <span class="o">|</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>Observations: records pickled, compressed, and text observation values
+for each unique state.</p></li>
+</ol>
+<p>Caveats of this implementation:</p>
+<ol class="arabic simple">
+<li><p>Only <a class="reference internal" href="envs.html#compiler_gym.envs.LlvmEnv" title="compiler_gym.envs.LlvmEnv"><code class="xref py py-class docutils literal notranslate"><span class="pre">LlvmEnv</span></code></a> environments may be
+wrapped.</p></li>
+<li><p>The wrapped environment must have an observation space and reward space
+set.</p></li>
+<li><p>The observation spaces and reward spaces that are logged to database
+are hardcoded. To change what is recorded, you must copy and modify this
+implementation.</p></li>
+<li><p>Writing to the database is synchronous and adds significant overhead to
+the compute cost of the environment.</p></li>
+</ol>
+<dl class="py method">
+<dt class="sig sig-object py" id="compiler_gym.wrappers.SynchronousSqliteLogger.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="envs.html#compiler_gym.envs.LlvmEnv" title="compiler_gym.envs.llvm.llvm_env.LlvmEnv"><span class="pre">compiler_gym.envs.llvm.llvm_env.LlvmEnv</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_path</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pathlib.Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_frequency_in_seconds</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_step_buffer_length</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">5000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/wrappers/sqlite_logger.html#SynchronousSqliteLogger.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.wrappers.SynchronousSqliteLogger.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>env</strong> – The environment to wrap.</p></li>
+<li><p><strong>db_path</strong> – The path of the database to log to. This file may
+already exist. If it does, new entries are appended. If the files
+does not exist, it is created.</p></li>
+<li><p><strong>commit_frequency_in_seconds</strong> – The maximum amount of time to elapse
+before writing pending logs to the database.</p></li>
+<li><p><strong>max_step_buffer_length</strong> – The maximum number of calls to
+<code class="code docutils literal notranslate"><span class="pre">step()</span></code> before writing pending logs to the database.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="compiler_gym.wrappers.SynchronousSqliteLogger.flush">
+<span class="sig-name descname"><span class="pre">flush</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="reference internal" href="../_modules/compiler_gym/wrappers/sqlite_logger.html#SynchronousSqliteLogger.flush"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.wrappers.SynchronousSqliteLogger.flush" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flush the buffered steps and observations to database.</p>
 </dd></dl>
 
 </dd></dl>

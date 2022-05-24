@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.util.runfiles_path &mdash; CompilerGym 0.2.3 documentation</title>
+  <title>compiler_gym.util.runfiles_path &mdash; CompilerGym 0.2.4 documentation</title>
   
 
   
@@ -71,7 +71,7 @@
             
             
               <div class="version">
-                0.2.3
+                0.2.4
               </div>
             
           
@@ -111,6 +111,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../envs/gcc.html">GCC Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../envs/loop_tool.html">loop_tool Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../envs/mlir.html">MLIR Environment Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul>
@@ -258,12 +259,17 @@
 <div class="viewcode-block" id="site_data_path"><a class="viewcode-back" href="../../../compiler_gym/compiler_gym.html#compiler_gym.site_data_path">[docs]</a><span class="k">def</span> <span class="nf">site_data_path</span><span class="p">(</span><span class="n">relpath</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Return a path within the site data directory.</span>
 
-<span class="sd">    CompilerGym uses a directory to store persistent site data files in, such as benchmark datasets.</span>
-<span class="sd">    The default location is :code:`~/.local/share/compiler_gym`. Set the environment variable</span>
+<span class="sd">    CompilerGym uses a directory to store persistent site data files in, such as</span>
+<span class="sd">    benchmark datasets. The default location is</span>
+<span class="sd">    :code:`~/.local/share/compiler_gym`. Set the environment variable</span>
 <span class="sd">    :code:`$COMPILER_GYM_SITE_DATA` to override this default location.</span>
 
 <span class="sd">    No checks are to made to ensure that the path, or the containing directory,</span>
 <span class="sd">    exist.</span>
+
+<span class="sd">    Files in this directory are intended to be long lived (this is not a cache),</span>
+<span class="sd">    but it is safe to delete this directory, so long as no CompilerGym</span>
+<span class="sd">    environments are running.</span>
 
 <span class="sd">    :param relpath: The relative path within the site data tree.</span>
 
@@ -285,9 +291,12 @@
     <span class="sd">&quot;&quot;&quot;Return a path within the cache directory.</span>
 
 <span class="sd">    CompilerGym uses a directory to cache files in, such as downloaded content.</span>
-<span class="sd">    The default location for this cache is :code:`~/.cache/compiler_gym`. Set</span>
-<span class="sd">    the environment variable :code:`$COMPILER_GYM_CACHE` to override this</span>
+<span class="sd">    The default location for this cache is :code:`~/.local/cache/compiler_gym`.</span>
+<span class="sd">    Set the environment variable :code:`$COMPILER_GYM_CACHE` to override this</span>
 <span class="sd">    default location.</span>
+
+<span class="sd">    It is safe to delete this directory, so long as no CompilerGym environments</span>
+<span class="sd">    are running.</span>
 
 <span class="sd">    No checks are to made to ensure that the path, or the containing directory,</span>
 <span class="sd">    exist.</span>
@@ -300,7 +309,7 @@
     <span class="k">if</span> <span class="n">forced</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">forced</span><span class="p">)</span> <span class="o">/</span> <span class="n">relpath</span>
     <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;HOME&quot;</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;~/.cache/compiler_gym&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span> <span class="o">/</span> <span class="n">relpath</span>
+        <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;~/.local/cache/compiler_gym&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span> <span class="o">/</span> <span class="n">relpath</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;/tmp/compiler_gym_</span><span class="si">{</span><span class="n">getuser</span><span class="p">()</span><span class="si">}</span><span class="s2">/cache&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="n">relpath</span></div>
 
@@ -314,6 +323,10 @@
 <span class="sd">    :meth:`cache_path() &lt;compiler_gym.cache_path&gt;` is used as a fallback. Set</span>
 <span class="sd">    the environment variable :code:`$COMPILER_GYM_TRANSIENT_CACHE` to override</span>
 <span class="sd">    the default location.</span>
+
+<span class="sd">    Files in this directory are not meant to outlive the lifespan of the</span>
+<span class="sd">    CompilerGym environment that creates them. It is safe to delete this</span>
+<span class="sd">    directory, so long as no CompilerGym environments are running.</span>
 
 <span class="sd">    No checks are to made to ensure that the path, or the containing directory,</span>
 <span class="sd">    exist.</span>

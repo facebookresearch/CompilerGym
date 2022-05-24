@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.service.connection &mdash; CompilerGym 0.2.2 documentation</title>
+  <title>compiler_gym.service.connection &mdash; CompilerGym 0.2.4 documentation</title>
   
 
   
@@ -71,7 +71,7 @@
             
             
               <div class="version">
-                0.2.2
+                0.2.4
               </div>
             
           
@@ -111,6 +111,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../envs/gcc.html">GCC Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../envs/loop_tool.html">loop_tool Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../envs/mlir.html">MLIR Environment Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul>
@@ -205,19 +206,18 @@
 <span class="sd">&quot;&quot;&quot;This module contains the logic for connecting to services.&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">random</span>
-<span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">subprocess</span>
 <span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">signal</span> <span class="kn">import</span> <span class="n">Signals</span>
 <span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span><span class="p">,</span> <span class="n">time</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">grpc</span>
+<span class="kn">from</span> <span class="nn">deprecated.sphinx</span> <span class="kn">import</span> <span class="n">deprecated</span>
 <span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span>
 
+<span class="kn">import</span> <span class="nn">compiler_gym.errors</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ActionSpace</span><span class="p">,</span>
     <span class="n">CompilerGymServiceStub</span><span class="p">,</span>
@@ -225,13 +225,10 @@
     <span class="n">GetSpacesRequest</span><span class="p">,</span>
     <span class="n">ObservationSpace</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.service.service_cache</span> <span class="kn">import</span> <span class="n">ServiceCache</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.debug_util</span> <span class="kn">import</span> <span class="n">get_debug_level</span><span class="p">,</span> <span class="n">logging_level_to_debug_level</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.util.runfiles_path</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">runfiles_path</span><span class="p">,</span>
-    <span class="n">site_data_path</span><span class="p">,</span>
-    <span class="n">transient_cache_path</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.util.shell_format</span> <span class="kn">import</span> <span class="n">plural</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.runfiles_path</span> <span class="kn">import</span> <span class="n">runfiles_path</span><span class="p">,</span> <span class="n">site_data_path</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.shell_format</span> <span class="kn">import</span> <span class="n">join_cmd</span><span class="p">,</span> <span class="n">plural</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.truncate</span> <span class="kn">import</span> <span class="n">truncate_lines</span>
 
 <span class="n">GRPC_CHANNEL_OPTIONS</span> <span class="o">=</span> <span class="p">[</span>
@@ -309,34 +306,40 @@
 <span class="sd">    used on the command line. No effect when used for existing sockets.&quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="ServiceError"><a class="viewcode-back" href="../../../compiler_gym/service.html#compiler_gym.service.ServiceError">[docs]</a><span class="k">class</span> <span class="nc">ServiceError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Error raised from the service.&quot;&quot;&quot;</span></div>
+<span class="c1"># Deprecated since v0.2.4.</span>
+<span class="c1"># This type is for backwards compatibility that will be removed in a future release.</span>
+<span class="c1"># Please, use errors from `compiler_gym.errors`.</span>
+<span class="n">ServiceError</span> <span class="o">=</span> <span class="n">compiler_gym</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">ServiceError</span>
 
+<span class="c1"># Deprecated since v0.2.4.</span>
+<span class="c1"># This type is for backwards compatibility that will be removed in a future release.</span>
+<span class="c1"># Please, use errors from `compiler_gym.errors`.</span>
+<span class="n">SessionNotFound</span> <span class="o">=</span> <span class="n">compiler_gym</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">SessionNotFound</span>
 
-<div class="viewcode-block" id="SessionNotFound"><a class="viewcode-back" href="../../../compiler_gym/service.html#compiler_gym.service.SessionNotFound">[docs]</a><span class="k">class</span> <span class="nc">SessionNotFound</span><span class="p">(</span><span class="n">ServiceError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Requested session ID not found in service.&quot;&quot;&quot;</span></div>
+<span class="c1"># Deprecated since v0.2.4.</span>
+<span class="c1"># This type is for backwards compatibility that will be removed in a future release.</span>
+<span class="c1"># Please, use errors from `compiler_gym.errors`.</span>
+<span class="n">ServiceOSError</span> <span class="o">=</span> <span class="n">compiler_gym</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">ServiceOSError</span>
 
+<span class="c1"># Deprecated since v0.2.4.</span>
+<span class="c1"># This type is for backwards compatibility that will be removed in a future release.</span>
+<span class="c1"># Please, use errors from `compiler_gym.errors`.</span>
+<span class="n">ServiceInitError</span> <span class="o">=</span> <span class="n">compiler_gym</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">ServiceInitError</span>
 
-<span class="k">class</span> <span class="nc">ServiceOSError</span><span class="p">(</span><span class="n">ServiceError</span><span class="p">,</span> <span class="ne">OSError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;System error raised from the service.&quot;&quot;&quot;</span>
+<span class="c1"># Deprecated since v0.2.4.</span>
+<span class="c1"># This type is for backwards compatibility that will be removed in a future release.</span>
+<span class="c1"># Please, use errors from `compiler_gym.errors`.</span>
+<span class="n">EnvironmentNotSupported</span> <span class="o">=</span> <span class="n">compiler_gym</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">EnvironmentNotSupported</span>
 
+<span class="c1"># Deprecated since v0.2.4.</span>
+<span class="c1"># This type is for backwards compatibility that will be removed in a future release.</span>
+<span class="c1"># Please, use errors from `compiler_gym.errors`.</span>
+<span class="n">ServiceTransportError</span> <span class="o">=</span> <span class="n">compiler_gym</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">ServiceTransportError</span>
 
-<div class="viewcode-block" id="ServiceInitError"><a class="viewcode-back" href="../../../compiler_gym/service.html#compiler_gym.service.ServiceInitError">[docs]</a><span class="k">class</span> <span class="nc">ServiceInitError</span><span class="p">(</span><span class="n">ServiceError</span><span class="p">,</span> <span class="ne">OSError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Error raised if the service fails to initialize.&quot;&quot;&quot;</span></div>
-
-
-<div class="viewcode-block" id="EnvironmentNotSupported"><a class="viewcode-back" href="../../../compiler_gym/service.html#compiler_gym.service.EnvironmentNotSupported">[docs]</a><span class="k">class</span> <span class="nc">EnvironmentNotSupported</span><span class="p">(</span><span class="n">ServiceInitError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Error raised if the runtime requirements for an environment are not</span>
-<span class="sd">    met on the current system.&quot;&quot;&quot;</span></div>
-
-
-<div class="viewcode-block" id="ServiceTransportError"><a class="viewcode-back" href="../../../compiler_gym/service.html#compiler_gym.service.ServiceTransportError">[docs]</a><span class="k">class</span> <span class="nc">ServiceTransportError</span><span class="p">(</span><span class="n">ServiceError</span><span class="p">,</span> <span class="ne">OSError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Error that is raised if communication with the service fails.&quot;&quot;&quot;</span></div>
-
-
-<div class="viewcode-block" id="ServiceIsClosed"><a class="viewcode-back" href="../../../compiler_gym/service.html#compiler_gym.service.ServiceIsClosed">[docs]</a><span class="k">class</span> <span class="nc">ServiceIsClosed</span><span class="p">(</span><span class="n">ServiceError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Error that is raised if trying to interact with a closed service.&quot;&quot;&quot;</span></div>
-
+<span class="c1"># Deprecated since v0.2.4.</span>
+<span class="c1"># This type is for backwards compatibility that will be removed in a future release.</span>
+<span class="c1"># Please, use errors from `compiler_gym.errors`.</span>
+<span class="n">ServiceIsClosed</span> <span class="o">=</span> <span class="n">compiler_gym</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">ServiceIsClosed</span>
 
 <span class="n">Request</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;Request&quot;</span><span class="p">)</span>
 <span class="n">Reply</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;Reply&quot;</span><span class="p">)</span>
@@ -356,7 +359,6 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span>
         <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Reply</span><span class="p">:</span>  <span class="c1"># pylint: disable=undefined-variable</span>
             <span class="o">...</span>
-
 
 <span class="k">else</span><span class="p">:</span>
     <span class="c1"># Legacy support for Python &lt; 3.8.</span>
@@ -491,25 +493,6 @@
         <span class="k">return</span> <span class="kc">False</span>
 
 
-<span class="k">def</span> <span class="nf">make_working_dir</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Make a working directory for a service. The calling code is responsible</span>
-<span class="sd">    for removing this directory when done.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-        <span class="n">random_hash</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">getrandbits</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span>
-        <span class="n">service_name</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;s/%m%dT%H%M%S-%f-</span><span class="si">{</span><span class="n">random_hash</span><span class="si">:</span><span class="s2">04x</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">working_dir</span> <span class="o">=</span> <span class="n">transient_cache_path</span><span class="p">(</span><span class="n">service_name</span><span class="p">)</span>
-        <span class="c1"># Guard against the unlike scenario that there is a collision between</span>
-        <span class="c1"># the randomly generated working directories of multiple</span>
-        <span class="c1"># make_working_dir() calls.</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="p">(</span><span class="n">working_dir</span> <span class="o">/</span> <span class="s2">&quot;logs&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-            <span class="k">break</span>
-        <span class="k">except</span> <span class="ne">FileExistsError</span><span class="p">:</span>
-            <span class="k">pass</span>
-    <span class="k">return</span> <span class="n">working_dir</span>
-
-
 <span class="k">class</span> <span class="nc">ManagedConnection</span><span class="p">(</span><span class="n">Connection</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A connection to a service using a managed subprocess.&quot;&quot;&quot;</span>
 
@@ -531,14 +514,14 @@
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">Path</span><span class="p">(</span><span class="n">local_service_binary</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File not found: </span><span class="si">{</span><span class="n">local_service_binary</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span> <span class="o">=</span> <span class="n">make_working_dir</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="n">ServiceCache</span><span class="p">()</span>
 
         <span class="c1"># The command that will be executed. The working directory of this</span>
         <span class="c1"># command will be set to the local_service_binary&#39;s parent, so we can</span>
         <span class="c1"># use the relpath for a neater `ps aux` view.</span>
         <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span>
             <span class="sa">f</span><span class="s2">&quot;./</span><span class="si">{</span><span class="n">local_service_binary</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s2">&quot;--working_dir=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;--working_dir=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="p">]</span>
         <span class="c1"># Add any custom arguments</span>
         <span class="n">cmd</span> <span class="o">+=</span> <span class="n">script_args</span>
@@ -549,7 +532,10 @@
         <span class="n">env</span><span class="p">[</span><span class="s2">&quot;COMPILER_GYM_SITE_DATA&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">site_data_path</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">))</span>
         <span class="c1"># Set the pythonpath so that executable python scripts can use absolute</span>
         <span class="c1"># import paths like `from compiler_gym.envs.foo import bar`.</span>
-        <span class="n">env</span><span class="p">[</span><span class="s2">&quot;PYTHONPATH&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">env</span><span class="p">[</span><span class="s2">&quot;COMPILER_GYM_RUNFILES&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">&quot;PYTHONPATH&quot;</span> <span class="ow">in</span> <span class="n">env</span><span class="p">:</span>
+            <span class="n">env</span><span class="p">[</span><span class="s2">&quot;PYTHONPATH&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">env</span><span class="p">[</span><span class="s2">&quot;PYTHONPATH&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">:</span><span class="si">{</span><span class="n">env</span><span class="p">[</span><span class="s2">&quot;COMPILER_GYM_RUNFILES&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">env</span><span class="p">[</span><span class="s2">&quot;PYTHONPATH&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">env</span><span class="p">[</span><span class="s2">&quot;COMPILER_GYM_RUNFILES&quot;</span><span class="p">]</span>
 
         <span class="c1"># Set the verbosity of the service. The logging level of the service is</span>
         <span class="c1"># the debug level - 1, so that COMPILER_GYM_DEBUG=3 will cause VLOG(2)</span>
@@ -581,7 +567,14 @@
         <span class="c1"># Add any custom environment variables</span>
         <span class="n">env</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">script_env</span><span class="p">)</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Exec </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">cmd</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="s2">&quot;Exec `</span><span class="si">%s%s</span><span class="s2">`&quot;</span><span class="p">,</span>
+            <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">script_env</span><span class="o">.</span><span class="n">items</span><span class="p">())</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span>
+            <span class="k">if</span> <span class="n">script_env</span>
+            <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">join_cmd</span><span class="p">(</span><span class="n">cmd</span><span class="p">),</span>
+        <span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
             <span class="n">cmd</span><span class="p">,</span>
             <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">,</span>
@@ -591,7 +584,7 @@
 
         <span class="c1"># Read the port from a file generated by the service.</span>
         <span class="n">wait_secs</span> <span class="o">=</span> <span class="mf">0.1</span>
-        <span class="n">port_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span> <span class="o">/</span> <span class="s2">&quot;port.txt&quot;</span>
+        <span class="n">port_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">/</span> <span class="s2">&quot;port.txt&quot;</span>
         <span class="n">end_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="n">port_init_max_seconds</span>
         <span class="k">while</span> <span class="n">time</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">end_time</span><span class="p">:</span>
             <span class="n">returncode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span>
@@ -609,7 +602,7 @@
                 <span class="p">)</span>
                 <span class="k">if</span> <span class="n">logs</span><span class="p">:</span>
                     <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="se">\n</span><span class="s2">Service logs:</span><span class="se">\n</span><span class="si">{</span><span class="n">logs</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
                 <span class="k">raise</span> <span class="n">ServiceError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">port_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
                 <span class="k">try</span><span class="p">:</span>
@@ -629,7 +622,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">rpc_init_max_seconds</span><span class="p">)</span>
-            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span>
                 <span class="s2">&quot;Service failed to produce port file after &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">port_init_max_seconds</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> seconds&quot;</span>
@@ -670,13 +663,18 @@
             <span class="p">)</span>
             <span class="n">logs_message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Service logs:</span><span class="se">\n</span><span class="si">{</span><span class="n">logs</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">logs</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
 
-            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span>
                 <span class="s2">&quot;Failed to connect to RPC service after &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rpc_init_max_seconds</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> seconds.</span><span class="si">{</span><span class="n">logs_message</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@deprecated</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.2.4&quot;</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Replace `working_directory` with `cache.path`&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">working_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">path</span>
 
     <span class="k">def</span> <span class="nf">service_is_down</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Return true if the service subprocess has terminated.&quot;&quot;&quot;</span>
@@ -689,9 +687,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Compiler services write log files in the logs directory. Iterate over</span>
         <span class="c1"># them and return their contents.</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span> <span class="o">/</span> <span class="s2">&quot;logs&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">/</span> <span class="s2">&quot;logs&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
             <span class="k">return</span> <span class="p">()</span>
-        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span> <span class="o">/</span> <span class="s2">&quot;logs&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()):</span>
+        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">/</span> <span class="s2">&quot;logs&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
                 <span class="k">continue</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -716,7 +714,7 @@
             <span class="c1"># The service has already been closed, nothing to do.</span>
             <span class="k">pass</span>
         <span class="k">except</span> <span class="ne">ProcessLookupError</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Service process not found at </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Service process not found at </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">TimeoutExpired</span><span class="p">:</span>
             <span class="c1"># Try and kill it and then walk away.</span>
             <span class="k">try</span><span class="p">:</span>
@@ -728,9 +726,9 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
             <span class="k">except</span><span class="p">:</span>  <span class="c1"># noqa</span>
                 <span class="k">pass</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Abandoning orphan service at </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Abandoning orphan service at </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">)</span>
         <span class="k">finally</span><span class="p">:</span>
-            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

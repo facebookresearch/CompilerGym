@@ -49,6 +49,15 @@ Action space wrappers
 
 .. autoclass:: TimeLimit
 
+    .. automethod:: __init__
+
+
+.. autoclass:: ForkOnStep
+
+    .. automethod:: __init__
+
+    .. automethod:: undo
+
 
 Datasets wrappers
 -----------------
@@ -79,3 +88,10 @@ LLVM Environment wrappers
 .. autoclass:: RuntimePointEstimateReward
 
     .. automethod:: __init__
+
+
+.. autoclass:: SynchronousSqliteLogger
+
+    .. automethod:: __init__
+
+    .. automethod:: flush
