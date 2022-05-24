@@ -2,8 +2,10 @@ Command Line Reference
 ======================
 
 Compiler Gym includes several command line tools in the :code:`compiler_gym.bin`
-module. This document provides an overview of each module. Run any of the
-commands with :code:`--helpfull` to examine the full usage options.
+module. This document provides an overview of each module.
+
+Run any of the commands with :code:`--helpfull` to examine the full usage
+options.
 
 .. contents:: Command line tools:
     :local:
