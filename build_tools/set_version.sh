@@ -9,7 +9,7 @@
 # string embedded in them. To set a new verison, call this script with the new
 # version number and todays date in yyyy-mm-dd format. For example:
 #
-#     bash packaging/set_version.sh 0.1.12 2021-09-20
+#     bash build_tools/set_version.sh 0.1.12 2021-09-20
 set -euo pipefail
 
 main() {
