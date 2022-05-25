@@ -23,7 +23,7 @@ Constructing Benchmarks
 
    .. automethod:: __init__
 
-.. autofunction:: get_system_includes
+.. autofunction:: get_system_library_flags
 
 
 Datasets

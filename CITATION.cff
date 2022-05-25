@@ -31,8 +31,8 @@ authors:
 - family-names: "Leather"
   given-names: "Hugh"
 title: "CompilerGym"
-version: 0.2.3
-date-released: 2022-03-18
+version: 0.2.4
+date-released: 2022-05-24
 url: "https://github.com/facebookresearch/CompilerGym"
 preferred-citation:
   type: conference-paper
