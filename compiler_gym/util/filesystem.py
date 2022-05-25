@@ -74,3 +74,16 @@ def atomic_file_write(
         finally:
             if tmp_path.is_file():
                 os.rename(tmp_path, path)
+
+
+def is_in_memory(path: Path) -> bool:
+    """Determine if a path's mountpoint is in-memory.
+
+    :param path: A filesystem path.
+
+    :returns: True if the path is in-memory.
+    """
+    # TODO(cummins): This is totally hacky and intended to work only for the
+    # transient_cache_path() case. There will be false negatives, though not
+    # likely false positives.
+    return str(path).startswith("/dev/shm")

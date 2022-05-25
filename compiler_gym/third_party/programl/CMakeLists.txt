@@ -5,6 +5,10 @@
 
 cg_add_all_subdirs()
 
+if(NOT COMPILER_GYM_ENABLE_LLVM_ENV)
+    return()
+endif()
+
 llvm_map_components_to_libnames(_LLVM_LIBS analysis core irreader support passes)
 cg_cc_binary(
   NAME

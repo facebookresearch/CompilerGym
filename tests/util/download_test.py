@@ -5,6 +5,7 @@
 """Unit tests for //compiler_gym/util:download."""
 import pytest
 
+from compiler_gym.errors import DownloadFailed, TooManyRequests
 from compiler_gym.util import download
 from compiler_gym.util.runfiles_path import cache_path
 from tests.test_main import main
@@ -15,13 +16,13 @@ def test_download_timeout_retry_loop(mocker, max_retries: int):
     """Check that download attempts are repeated with sleep() on error."""
 
     def patched_download(*args):
-        raise download.TooManyRequests
+        raise TooManyRequests
 
     mocker.patch.object(download, "sleep")
     mocker.patch.object(download, "_do_download_attempt", patched_download)
     mocker.spy(download, "_do_download_attempt")
 
-    with pytest.raises(download.TooManyRequests):
+    with pytest.raises(TooManyRequests):
         download.download(urls="example", max_retries=max_retries)
 
     assert download._do_download_attempt.call_count == max_retries
@@ -35,13 +36,13 @@ def test_download_failed_retry_loop(mocker, max_retries: int):
     """Check that download attempts are repeated without sleep() on error."""
 
     def patched_download(*args):
-        raise download.DownloadFailed
+        raise DownloadFailed
 
     mocker.patch.object(download, "sleep")
     mocker.patch.object(download, "_do_download_attempt", patched_download)
     mocker.spy(download, "_do_download_attempt")
 
-    with pytest.raises(download.DownloadFailed):
+    with pytest.raises(DownloadFailed):
         download.download(urls="example", max_retries=max_retries)
 
     assert download._do_download_attempt.call_count == max_retries
@@ -93,9 +94,7 @@ def test_download_mismatched_checksum(mocker):
 
     mocker.patch.object(download, "_get_url_data", patched_download)
 
-    with pytest.raises(
-        download.DownloadFailed, match="Checksum of download does not match"
-    ):
+    with pytest.raises(DownloadFailed, match="Checksum of download does not match"):
         download.download("example", sha256="123")
 
 

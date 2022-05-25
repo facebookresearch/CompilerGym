@@ -37,6 +37,7 @@ py_test(
     name = "download_test",
     srcs = ["download_test.py"],
     deps = [
+        "//compiler_gym/errors",
         "//compiler_gym/util",
         "//tests:test_main",
     ],
@@ -87,6 +88,16 @@ py_test(
     name = "parallelization_test",
     timeout = "short",
     srcs = ["parallelization_test.py"],
+    deps = [
+        "//compiler_gym/util",
+        "//tests:test_main",
+    ],
+)
+
+py_test(
+    name = "permutation_test",
+    timeout = "short",
+    srcs = ["permutation_test.py"],
     deps = [
         "//compiler_gym/util",
         "//tests:test_main",

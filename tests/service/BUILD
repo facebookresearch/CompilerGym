@@ -11,7 +11,18 @@ py_test(
     deps = [
         "//compiler_gym",
         "//compiler_gym/envs",
+        "//compiler_gym/errors",
         "//compiler_gym/service",
+        "//tests:test_main",
+    ],
+)
+
+py_test(
+    name = "service_cache_test",
+    timeout = "short",
+    srcs = ["service_cache_test.py"],
+    deps = [
+        "//compiler_gym/service:service_cache",
         "//tests:test_main",
     ],
 )

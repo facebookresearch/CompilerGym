@@ -7,8 +7,8 @@ import numpy as np
 import pytest
 from flaky import flaky
 
-from compiler_gym.datasets.benchmark import BenchmarkInitError
 from compiler_gym.envs.llvm import LlvmEnv
+from compiler_gym.errors import BenchmarkInitError
 from compiler_gym.wrappers import RuntimePointEstimateReward
 from tests.test_main import main
 
@@ -46,6 +46,7 @@ def test_reward_range_not_runnable_benchmark(env: LlvmEnv):
         env.reset(benchmark="benchmark://npb-v0/1")
 
 
+@flaky  # Runtime can fail
 def test_fork(env: LlvmEnv):
     env = RuntimePointEstimateReward(env)
     with env.fork() as fkd:

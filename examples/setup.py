@@ -30,6 +30,12 @@ setuptools.setup(
         "llvm_rl",
         "llvm_rl.model",
     ],
+    package_data={
+        "llvm_rl": [
+            "config/*.yaml",
+            "config/**/*.yaml",
+        ]
+    },
     python_requires=">=3.8",
     platforms=[distutils.util.get_platform()],
     zip_safe=False,

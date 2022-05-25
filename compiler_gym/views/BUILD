@@ -19,7 +19,7 @@ py_library(
     srcs = ["observation.py"],
     deps = [
         ":observation_space_spec",
-        "//compiler_gym/service",
+        "//compiler_gym/errors",
         "//compiler_gym/service/proto",
         "//compiler_gym/util",
     ],

@@ -12,9 +12,9 @@ externalproject_add(
     absl
     PREFIX "${CMAKE_CURRENT_BINARY_DIR}/absl"
     URL
-        "https://github.com/abseil/abseil-cpp/archive/ec33f404bb16564a9aea3044cd8504d6885165b0.tar.gz"
+        "https://github.com/abseil/abseil-cpp/archive/7c6608d0dbe43cf9bdf7f77787bc6bc89cc42f8b.tar.gz"
     URL_HASH
-        "SHA256=20a968fab8432661b5c6f3f951cd299fe6d7677541c7dfd62407475a046c91aa"
+        "SHA256=971a1838a68fd175a3ba61a1f3f54561b208c46f3f27899f710fe9a454424e6b"
     CMAKE_ARGS
         -C "${CMAKE_CURRENT_BINARY_DIR}/absl_initial_cache.cmake"
         "-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}"

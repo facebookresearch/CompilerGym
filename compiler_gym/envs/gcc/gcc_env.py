@@ -10,20 +10,22 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 from compiler_gym.datasets import Benchmark
-from compiler_gym.envs.compiler_env import CompilerEnv
 from compiler_gym.envs.gcc.datasets import get_gcc_datasets
 from compiler_gym.envs.gcc.gcc import Gcc, GccSpec
 from compiler_gym.envs.gcc.gcc_rewards import AsmSizeReward, ObjSizeReward
 from compiler_gym.service import ConnectionOpts
+from compiler_gym.service.client_service_compiler_env import ClientServiceCompilerEnv
+from compiler_gym.spaces import Reward
 from compiler_gym.util.decorators import memoized_property
-from compiler_gym.util.gym_type_hints import ObservationType
+from compiler_gym.util.gym_type_hints import ObservationType, OptionalArgumentValue
+from compiler_gym.views import ObservationSpaceSpec
 
 # The default gcc_bin argument.
 DEFAULT_GCC: str = "docker:gcc:11.2.0"
 
 
-class GccEnv(CompilerEnv):
-    """A specialized CompilerEnv for GCC.
+class GccEnv(ClientServiceCompilerEnv):
+    """A specialized ClientServiceCompilerEnv for GCC.
 
     This class exposes the optimization space of GCC's command line flags
     as an environment for reinforcement learning. For further details, see the
@@ -90,11 +92,19 @@ class GccEnv(CompilerEnv):
         self,
         benchmark: Optional[Union[str, Benchmark]] = None,
         action_space: Optional[str] = None,
-        retry_count: int = 0,
+        observation_space: Union[
+            OptionalArgumentValue, str, ObservationSpaceSpec
+        ] = OptionalArgumentValue.UNCHANGED,
+        reward_space: Union[
+            OptionalArgumentValue, str, Reward
+        ] = OptionalArgumentValue.UNCHANGED,
     ) -> Optional[ObservationType]:
-        """Reset the environment. This additionally sets the timeout to the
-        correct value."""
-        observation = super().reset(benchmark, action_space, retry_count)
+        observation = super().reset(
+            benchmark=benchmark,
+            action_space=action_space,
+            observation_space=observation_space,
+            reward_space=reward_space,
+        )
         if self._timeout:
             self.send_param("timeout", str(self._timeout))
         return observation

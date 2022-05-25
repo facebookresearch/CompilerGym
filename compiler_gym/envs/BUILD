@@ -10,6 +10,7 @@ py_library(
     visibility = ["//visibility:public"],
     deps = [
         ":compiler_env",
+        "//compiler_gym:config",
         "//compiler_gym/envs/gcc",
         "//compiler_gym/envs/llvm",
         "//compiler_gym/envs/loop_tool",
@@ -24,8 +25,6 @@ py_library(
         "//compiler_gym:compiler_env_state",
         "//compiler_gym:validation_result",
         "//compiler_gym/datasets",
-        "//compiler_gym/service",
-        "//compiler_gym/service/proto",
         "//compiler_gym/spaces",
         "//compiler_gym/util",
         "//compiler_gym/views",

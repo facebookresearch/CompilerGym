@@ -27,6 +27,7 @@ For example:
     equivalent to those in OpenAI Gym that you can use to write your own
     wrappers.
 """
+from compiler_gym import config
 from compiler_gym.wrappers.commandline import (
     CommandlineWithTerminalAction,
     ConstrainedCommandline,
@@ -37,13 +38,21 @@ from compiler_gym.wrappers.core import (
     ObservationWrapper,
     RewardWrapper,
 )
+from compiler_gym.wrappers.counter import Counter
 from compiler_gym.wrappers.datasets import (
     CycleOverBenchmarks,
     CycleOverBenchmarksIterator,
     IterateOverBenchmarks,
     RandomOrderBenchmarks,
 )
-from compiler_gym.wrappers.llvm import RuntimePointEstimateReward
+from compiler_gym.wrappers.fork import ForkOnStep
+
+if config.enable_llvm_env:
+    from compiler_gym.wrappers.llvm import RuntimePointEstimateReward  # noqa: F401
+    from compiler_gym.wrappers.sqlite_logger import (  # noqa: F401
+        SynchronousSqliteLogger,
+    )
+
 from compiler_gym.wrappers.time_limit import TimeLimit
 
 from .validation import ValidateBenchmarkAfterEveryStep
@@ -53,13 +62,18 @@ __all__ = [
     "CommandlineWithTerminalAction",
     "CompilerEnvWrapper",
     "ConstrainedCommandline",
+    "Counter",
     "CycleOverBenchmarks",
     "CycleOverBenchmarksIterator",
+    "ForkOnStep",
     "IterateOverBenchmarks",
     "ObservationWrapper",
     "RandomOrderBenchmarks",
     "RewardWrapper",
-    "RuntimePointEstimateReward",
     "TimeLimit",
     "ValidateBenchmarkAfterEveryStep",
 ]
+
+if config.enable_llvm_env:
+    __all__.append("RuntimePointEstimateReward")
+    __all__.append("SynchronousSqliteLogger")

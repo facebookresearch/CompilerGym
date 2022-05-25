@@ -35,7 +35,7 @@ endif()
 file(
     APPEND
     "${CMAKE_CURRENT_BINARY_DIR}/llvm_initial_cache.cmake"
-    "set(LLVM_ENABLE_PROJECTS \"clang\" CACHE STRING \"\")\n"
+    "set(LLVM_ENABLE_PROJECTS \"clang\" CACHE STRING \"\" FORCE)\n"
 )
 
 externalproject_add(

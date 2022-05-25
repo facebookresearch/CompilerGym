@@ -21,6 +21,7 @@ py_test(
     shard_count = 8,
     deps = [
         "//compiler_gym/envs",
+        "//compiler_gym/errors",
         "//compiler_gym/third_party/autophase",
         "//tests:test_main",
         "//tests/pytest_plugins:llvm",
@@ -57,6 +58,7 @@ py_test(
     ],
     deps = [
         "//compiler_gym/envs",
+        "//compiler_gym/errors",
         "//compiler_gym/service/proto",
         "//compiler_gym/util",
         "//tests:test_main",
@@ -163,6 +165,7 @@ py_test(
     srcs = ["invalid_ir_test.py"],
     data = ["invalid_ir.ll"],
     deps = [
+        "//compiler_gym/errors",
         "//compiler_gym/util",
         "//tests:test_main",
         "//tests/pytest_plugins:common",
@@ -199,6 +202,7 @@ py_test(
     srcs = ["llvm_session_parameters_test.py"],
     deps = [
         "//compiler_gym/envs",
+        "//compiler_gym/errors",
         "//tests:test_main",
         "//tests/pytest_plugins:llvm",
     ],
@@ -266,6 +270,7 @@ py_test(
     deps = [
         "//compiler_gym",
         "//compiler_gym/envs",
+        "//compiler_gym/errors",
         "//compiler_gym/third_party/autophase",
         "//compiler_gym/util",
         "//tests:test_main",

@@ -23,3 +23,10 @@ class Tuple(GymTuple):
         """
         super().__init__(spaces)
         self.name = name
+
+    def __eq__(self, other) -> bool:
+        return (
+            isinstance(self, other.__class__)
+            and self.name == other.name
+            and super().__eq__(other)
+        )

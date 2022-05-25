@@ -284,6 +284,7 @@ class Benchmark {
  *
  * @return fs::path A path.
  */
-boost::filesystem::path createBenchmarkScratchDirectoryOrDie();
+boost::filesystem::path createBenchmarkScratchDirectoryOrDie(
+    const boost::filesystem::path& workingDirectory);
 
 }  // namespace compiler_gym::llvm_service

@@ -4,23 +4,42 @@
 # LICENSE file in the root directory of this source tree.
 """Unit tests for //compiler_gym/wrappers."""
 import pytest
+from pytest import warns
 
 from compiler_gym.datasets import Datasets
 from compiler_gym.envs.llvm import LlvmEnv
-from compiler_gym.wrappers import (
-    ActionWrapper,
-    CompilerEnvWrapper,
-    ObservationWrapper,
-    RewardWrapper,
-)
+from compiler_gym.wrappers import ActionWrapper, CompilerEnvWrapper
+from compiler_gym.wrappers import ObservationWrapper as CoreObservationWrapper
+from compiler_gym.wrappers import RewardWrapper as CoreRewardWrapper
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 
+class ObservationWrapper(CoreObservationWrapper):
+    def __init__(self, env):
+        super().__init__(env)
+
+    def convert_observation(self, observation):
+        return observation
+
+
+class RewardWrapper(CoreRewardWrapper):
+    def __init__(self, env):
+        super().__init__(env)
+
+    def convert_reward(self, reward):
+        return reward
+
+
 @pytest.fixture(
     scope="module",
-    params=[ActionWrapper, CompilerEnvWrapper, ObservationWrapper, RewardWrapper],
+    params=[
+        ActionWrapper,
+        CompilerEnvWrapper,
+        ObservationWrapper,
+        RewardWrapper,
+    ],
 )
 def wrapper_type(request):
     """A test fixture that yields one of the CompilerGym wrapper types."""
@@ -101,13 +120,13 @@ def test_wrapped_step_custom_args(env: LlvmEnv, wrapper_type):
     """Test passing the custom CompilerGym step() keyword arguments."""
 
     class MyWrapper(wrapper_type):
-        def observation(self, observation):
+        def convert_observation(self, observation):
             return observation  # pass thru
 
         def action(self, action):
             return action  # pass thru
 
-        def reward(self, reward):
+        def convert_reward(self, reward):
             return reward
 
     env = MyWrapper(env)
@@ -130,7 +149,7 @@ def test_wrapped_benchmark(env: LlvmEnv, wrapper_type):
     """Test that benchmark property has expected values."""
 
     class MyWrapper(wrapper_type):
-        def observation(self, observation):
+        def convert_observation(self, observation):
             return observation  # pass thru
 
     env.observation_space = "Ir"
@@ -150,7 +169,7 @@ def test_wrapped_set_benchmark(env: LlvmEnv, wrapper_type):
     """Test that the benchmark attribute can be set on wrapped classes."""
 
     class MyWrapper(wrapper_type):
-        def observation(self, observation):
+        def convert_observation(self, observation):
             return observation  # pass thru
 
     env = MyWrapper(env)
@@ -161,14 +180,18 @@ def test_wrapped_set_benchmark(env: LlvmEnv, wrapper_type):
     assert env.benchmark == "benchmark://cbench-v1/dijkstra"
 
     # Repeat again for a different benchmark.
-    env.benchmark = "benchmark://cbench-v1/crc32"
+    with warns(
+        UserWarning,
+        match=r"Changing the benchmark has no effect until reset\(\) is called",
+    ):
+        env.benchmark = "benchmark://cbench-v1/crc32"
     env.reset()
     assert env.benchmark == "benchmark://cbench-v1/crc32"
 
 
 def test_wrapped_env_in_episode(env: LlvmEnv, wrapper_type):
     class MyWrapper(wrapper_type):
-        def observation(self, observation):
+        def convert_observation(self, observation):
             return observation
 
     env = MyWrapper(env)
@@ -187,7 +210,7 @@ def test_wrapped_env_changes_default_spaces(env: LlvmEnv, wrapper_type):
             self.env.observation_space = "Autophase"
             self.env.reward_space = "IrInstructionCount"
 
-        def observation(self, observation):
+        def convert_observation(self, observation):
             return observation  # pass thru
 
     env = MyWrapper(env)
@@ -203,8 +226,11 @@ def test_wrapped_env_change_spaces(env: LlvmEnv, wrapper_type):
     """Test changing the observation and reward spaces on a wrapped environment."""
 
     class MyWrapper(wrapper_type):
-        def observation(self, observation):
+        def convert_observation(self, observation):
             return observation  # pass thru
+
+        def convert_reward(self, reward):
+            return reward  # pass thru
 
     env = MyWrapper(env)
 
@@ -243,7 +269,7 @@ def test_wrapped_observation(mocker, env: LlvmEnv):
             super().__init__(env)
             self.observation_space = "Ir"
 
-        def observation(self, observation):
+        def convert_observation(self, observation):
             return len(observation)
 
     env = MyWrapper(env)
@@ -255,15 +281,13 @@ def test_wrapped_observation(mocker, env: LlvmEnv):
 
 
 def test_wrapped_observation_missing_definition(env: LlvmEnv):
-
-    env = ObservationWrapper(env)
-    with pytest.raises(NotImplementedError):
-        env.reset()
+    with pytest.raises(TypeError):
+        env = CoreObservationWrapper(env)
 
 
 def test_wrapped_reward(env: LlvmEnv):
     class MyWrapper(RewardWrapper):
-        def reward(self, reward):
+        def convert_reward(self, reward):
             return -5
 
     env.reward_space = "IrInstructionCount"
@@ -277,6 +301,33 @@ def test_wrapped_reward(env: LlvmEnv):
     _, reward, _, _ = env.step(0)
     assert reward == -5
     assert env.episode_reward == -10
+
+
+def test_wrapped_env_close(env: LlvmEnv):
+    wrapped = CompilerEnvWrapper(env)
+    wrapped.reset()
+    assert wrapped.service is not None
+    wrapped.close()
+    assert wrapped.service is None
+
+
+def test_wrapped_env_custom_close(env: LlvmEnv):
+    """Test that a custom close() method is called on wrapped environments."""
+
+    class MyWrapper(CompilerEnvWrapper):
+        def __init__(self, env: LlvmEnv):
+            super().__init__(env)
+            self.custom_close = False
+
+        def close(self):
+            self.custom_close = True
+            self.env.close()
+
+    env = MyWrapper(env)
+    assert not env.custom_close
+
+    env.close()
+    assert env.custom_close
 
 
 if __name__ == "__main__":

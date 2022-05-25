@@ -11,7 +11,7 @@ from absl import flags
 
 import compiler_gym
 from compiler_gym.bin.service import print_service_capabilities
-from compiler_gym.service import EnvironmentNotSupported
+from compiler_gym.errors import EnvironmentNotSupported
 from tests.test_main import main
 
 

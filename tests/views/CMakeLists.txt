@@ -11,6 +11,7 @@ cg_py_test(
   SRCS
     "observation_test.py"
   DEPS
+    compiler_gym::errors::errors
     compiler_gym::service::proto::proto
     compiler_gym::views::views
     tests::test_main

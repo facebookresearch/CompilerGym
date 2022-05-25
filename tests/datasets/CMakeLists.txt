@@ -12,6 +12,7 @@ cg_py_test(
     "benchmark_test.py"
   DEPS
     compiler_gym::datasets::datasets
+    compiler_gym::errors::errors
     tests::pytest_plugins::common
     tests::test_main
 )

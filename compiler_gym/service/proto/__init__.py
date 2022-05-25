@@ -52,6 +52,7 @@ from compiler_gym.service.proto.compiler_gym_service_pb2 import (
     SendSessionParameterRequest,
     SessionParameter,
     Space,
+    SpaceSequenceSpace,
     StartSessionReply,
     StartSessionRequest,
     StepReply,
@@ -64,7 +65,6 @@ from compiler_gym.service.proto.compiler_gym_service_pb2_grpc import (
     CompilerGymServiceServicer,
     CompilerGymServiceStub,
 )
-from compiler_gym.service.proto.py_converters import proto_to_action_space
 
 __all__ = [
     "ActionSpace",
@@ -120,12 +120,9 @@ __all__ = [
     "Opaque",
     "SendSessionParameterReply",
     "SendSessionParameterRequest",
-    "ServiceError",
-    "ServiceInitError",
-    "ServiceIsClosed",
-    "ServiceTransportError",
     "SessionParameter",
     "Space",
+    "SpaceSequenceSpace",
     "StartSessionReply",
     "StartSessionRequest",
     "StepReply",
@@ -133,5 +130,4 @@ __all__ = [
     "StringSequenceSpace",
     "StringSpace",
     "StringTensor",
-    "proto_to_action_space",
 ]

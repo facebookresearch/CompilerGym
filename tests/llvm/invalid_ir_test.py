@@ -5,9 +5,9 @@
 """Tests for LLVM benchmark handling."""
 import pytest
 
-from compiler_gym.datasets.benchmark import BenchmarkInitError
 from compiler_gym.envs import llvm
 from compiler_gym.envs.llvm import LlvmEnv
+from compiler_gym.errors import BenchmarkInitError
 from compiler_gym.util.runfiles_path import runfiles_path
 from tests.pytest_plugins.common import bazel_only
 from tests.test_main import main

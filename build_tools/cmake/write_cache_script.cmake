@@ -25,6 +25,7 @@ function(write_cache_script _DST_FILE)
         CMAKE_STATIC_LINKER_FLAGS
         CMAKE_SHARED_LINKER_FLAGS_INIT
         CMAKE_SHARED_LINKER_FLAGS
+        CMAKE_EXECUTE_PROCESS_COMMAND_ECHO
         CMAKE_EXE_LINKER_FLAGS_INIT
         CMAKE_EXE_LINKER_FLAGS
     )
@@ -33,7 +34,7 @@ function(write_cache_script _DST_FILE)
             file(
                 APPEND
                 "${_DST_FILE}"
-                "set(${_VAR} \"${${_VAR}}\" CACHE STRING \"\")\n"
+                "set(${_VAR} \"${${_VAR}}\" CACHE STRING \"\" FORCE)\n"
             )
         endif()
     endforeach()

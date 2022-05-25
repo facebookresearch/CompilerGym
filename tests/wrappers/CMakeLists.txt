@@ -5,6 +5,10 @@
 
 cg_add_all_subdirs()
 
+if(NOT COMPILER_GYM_ENABLE_LLVM_ENV)
+    return()
+endif()
+
 cg_py_test(
   NAME
     commandline_wrappers_test
@@ -28,6 +32,17 @@ cg_py_test(
 )
 
 cg_py_test(
+  NAME counter_test
+  SRCS "counter_test.py"
+  DEPS
+    compiler_gym::envs::llvm::llvm
+    compiler_gym::errors::errors
+    compiler_gym::wrappers::wrappers
+    tests::test_main
+    tests::pytest_plugins::llvm
+)
+
+cg_py_test(
   NAME
     datasets_wrappers_test
   SRCS
@@ -39,10 +54,33 @@ cg_py_test(
 )
 
 cg_py_test(
+  NAME fork_test
+  SRCS "fork_test.py"
+  DEPS
+    compiler_gym::envs::llvm::llvm
+    compiler_gym::errors::errors
+    compiler_gym::wrappers::wrappers
+    tests::test_main
+    tests::pytest_plugins::llvm
+)
+
+cg_py_test(
   NAME llvm_test
   SRCS "llvm_test.py"
   DEPS
     compiler_gym::envs::llvm::llvm
+    compiler_gym::errors::errors
+    compiler_gym::wrappers::wrappers
+    tests::test_main
+    tests::pytest_plugins::llvm
+)
+
+cg_py_test(
+  NAME sqlite_logger_test
+  SRCS "sqlite_logger_test.py"
+  DEPS
+    compiler_gym::envs::llvm::llvm
+    compiler_gym::errors::errors
     compiler_gym::wrappers::wrappers
     tests::test_main
     tests::pytest_plugins::llvm
@@ -57,4 +95,15 @@ cg_py_test(
     compiler_gym::wrappers::wrappers
     tests::pytest_plugins::llvm
     tests::test_main
+)
+
+cg_py_test(
+  NAME validation_test
+  SRCS "validation_test.py"
+  DEPS
+    compiler_gym::envs::llvm::llvm
+    compiler_gym::errors::errors
+    compiler_gym::wrappers::wrappers
+    tests::test_main
+    tests::pytest_plugins::llvm
 )

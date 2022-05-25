@@ -17,6 +17,7 @@ cg_py_library(
     "tar_dataset.py"
   DEPS
     ::uri
+    compiler_gym::errors::errors
     compiler_gym::service::proto::proto
     compiler_gym::util::util
     compiler_gym::validation_result

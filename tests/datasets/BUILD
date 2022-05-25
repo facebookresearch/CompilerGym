@@ -10,6 +10,7 @@ py_test(
     srcs = ["benchmark_test.py"],
     deps = [
         "//compiler_gym/datasets",
+        "//compiler_gym/errors",
         "//tests:test_main",
         "//tests/pytest_plugins:common",
     ],

@@ -6,7 +6,7 @@ from typing import Callable, Dict, List
 
 from deprecated.sphinx import deprecated
 
-from compiler_gym.service.connection import ServiceError
+from compiler_gym.errors import ServiceError
 from compiler_gym.service.proto import ObservationSpace
 from compiler_gym.util.gym_type_hints import (
     ActionType,

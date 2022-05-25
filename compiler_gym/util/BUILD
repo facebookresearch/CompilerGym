@@ -21,6 +21,7 @@ py_library(
         "logs.py",
         "minimize_trajectory.py",
         "parallelization.py",
+        "permutation.py",
         "registration.py",
         "runfiles_path.py",
         "shell_format.py",
@@ -34,6 +35,7 @@ py_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//compiler_gym/errors",
         "@rules_python//python/runfiles",
     ],
 )

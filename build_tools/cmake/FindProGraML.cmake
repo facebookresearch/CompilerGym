@@ -195,6 +195,9 @@ find_library(
 find_path(ProGraML_ir_llvm_llvm_10_INCLUDE_DIRS programl/ir/llvm/llvm.h)
 if(ProGraML_ir_llvm_llvm_10_LIBRARIES AND ProGraML_ir_llvm_llvm_10_INCLUDE_DIRS)
     add_library(ProGraML::ir::llvm::llvm-10 UNKNOWN IMPORTED)
+    llvm_map_components_to_libnames(_LLVM_LIBS
+      core support irreader
+    )
     set(_LINK_LIBS
         ProGraML::graph::features
         ProGraML::graph::program_graph_builder
@@ -204,6 +207,7 @@ if(ProGraML_ir_llvm_llvm_10_LIBRARIES AND ProGraML_ir_llvm_llvm_10_INCLUDE_DIRS)
         Labm8::cpp::status
         Labm8::cpp::statusor
         Labm8::cpp::string
+        ${_LLVM_LIBS}
     )
     set_target_properties(
         ProGraML::ir::llvm::llvm-10

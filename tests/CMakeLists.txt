@@ -5,17 +5,19 @@
 
 cg_add_all_subdirs()
 
-cg_py_test(
-  NAME
-    compiler_env_test
-  SRCS
-    "compiler_env_test.py"
-  DEPS
-    compiler_gym::datasets::datasets
-    compiler_gym::envs::envs
-    tests::pytest_plugins::llvm
-    tests::test_main
-)
+if(COMPILER_GYM_ENABLE_LLVM_ENV)
+    cg_py_test(
+      NAME
+        compiler_env_test
+      SRCS
+        "compiler_env_test.py"
+      DEPS
+        compiler_gym::datasets::datasets
+        compiler_gym::envs::envs
+        tests::pytest_plugins::llvm
+        tests::test_main
+    )
+endif()
 
 cg_py_test(
   NAME
@@ -28,39 +30,45 @@ cg_py_test(
     tests::test_main
 )
 
-cg_py_test(
-  NAME
-    env_copy_test
-  SRCS
-    "env_copy_test.py"
-  DEPS
-    compiler_gym::envs::envs
-    tests::pytest_plugins::llvm
-    tests::test_main
-)
+if(COMPILER_GYM_ENABLE_LLVM_ENV)
+    cg_py_test(
+      NAME
+        env_copy_test
+      SRCS
+        "env_copy_test.py"
+      DEPS
+        compiler_gym::envs::envs
+        tests::pytest_plugins::llvm
+        tests::test_main
+    )
+endif()
 
-cg_py_test(
-  NAME
-    make_test
-  SRCS
-    "make_test.py"
-  DEPS
-    compiler_gym::compiler_gym
-    tests::test_main
-)
+if(COMPILER_GYM_ENABLE_LLVM_ENV)
+    cg_py_test(
+      NAME
+        make_test
+      SRCS
+        "make_test.py"
+      DEPS
+        compiler_gym::compiler_gym
+        tests::test_main
+    )
+endif()
 
-cg_py_test(
-  NAME
-    random_search_test
-  SRCS
-    "random_search_test.py"
-  DEPS
-    compiler_gym::compiler_gym
-    compiler_gym::random_replay
-    compiler_gym::random_search
-    tests::pytest_plugins::common
-    tests::test_main
-)
+if(COMPILER_GYM_ENABLE_LLVM_ENV)
+    cg_py_test(
+      NAME
+        random_search_test
+      SRCS
+        "random_search_test.py"
+      DEPS
+        compiler_gym::compiler_gym
+        compiler_gym::random_replay
+        compiler_gym::random_search
+        tests::pytest_plugins::common
+        tests::test_main
+    )
+endif()
 
 cg_py_library(
   NAME
@@ -93,15 +101,17 @@ cg_cc_library(
   PUBLIC
 )
 
-cg_py_test(
-  NAME
-    validate_test
-  SRCS
-    "validate_test.py"
-  DEPS
-    ::test_main
-    compiler_gym::compiler_gym
-)
+if(COMPILER_GYM_ENABLE_LLVM_ENV)
+    cg_py_test(
+      NAME
+        validate_test
+      SRCS
+        "validate_test.py"
+      DEPS
+        ::test_main
+        compiler_gym::compiler_gym
+    )
+endif()
 
 cg_py_test(
   NAME

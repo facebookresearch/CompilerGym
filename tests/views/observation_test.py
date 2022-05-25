@@ -6,7 +6,7 @@
 import numpy as np
 import pytest
 
-from compiler_gym.service.connection import ServiceError
+from compiler_gym.errors import ServiceError
 from compiler_gym.service.proto import (
     DoubleBox,
     DoubleTensor,
@@ -156,7 +156,7 @@ def test_observation_when_raw_step_returns_incorrect_no_of_observations():
 
 
 def test_observation_when_raw_step_returns_done():
-    """Test that a SessionNotFoundError from the raw_step() callback propagates as a """
+    """Test that a SessionNotFoundError from the raw_step() callback propagates as a"""
 
     def make_failing_raw_step(error_msg=None):
         def failing_raw_step(*args, **kwargs):

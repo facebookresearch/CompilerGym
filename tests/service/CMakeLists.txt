@@ -5,14 +5,17 @@
 
 cg_add_all_subdirs()
 
-cg_py_test(
-  NAME
-    connection_test
-  SRCS
-    "connection_test.py"
-  DEPS
-    compiler_gym::compiler_gym
-    compiler_gym::envs::envs
-    compiler_gym::service::service
-    tests::test_main
-)
+if(COMPILER_GYM_ENABLE_LLVM_ENV)
+    cg_py_test(
+      NAME
+        connection_test
+      SRCS
+        "connection_test.py"
+      DEPS
+        compiler_gym::compiler_gym
+        compiler_gym::envs::envs
+        compiler_gym::errors::errors
+        compiler_gym::service::service_cache
+        tests::test_main
+    )
+endif()

@@ -13,7 +13,8 @@ import pytest
 import compiler_gym
 import examples.loop_optimizations_service as loop_optimizations_service
 from compiler_gym.envs import CompilerEnv
-from compiler_gym.service import SessionNotFound
+from compiler_gym.errors import SessionNotFound
+from compiler_gym.service.client_service_compiler_env import ClientServiceCompilerEnv
 from compiler_gym.spaces import Dict, NamedDiscrete, Scalar, Sequence
 from compiler_gym.third_party.autophase import AUTOPHASE_FEATURE_NAMES
 from tests.test_main import main
@@ -54,7 +55,7 @@ def test_invalid_arguments(bin: Path):
     assert returncode == 1
 
 
-def test_versions(env: CompilerEnv):
+def test_versions(env: ClientServiceCompilerEnv):
     """Tests the GetVersion() RPC endpoint."""
     assert env.version == compiler_gym.__version__
     assert env.compiler_version == "1.0.0"
@@ -101,17 +102,29 @@ def test_observation_spaces(env: CompilerEnv):
     assert env.observation.spaces["Inst2vec"].space == Sequence(
         name="Inst2vec",
         size_range=(0, np.iinfo(int).max),
+        scalar_range=Scalar(
+            name=None,
+            min=np.iinfo(np.int64).min,
+            max=np.iinfo(np.int64).max,
+            dtype=np.int64,
+        ),
         dtype=int,
     )
     assert env.observation.spaces["Autophase"].space == Sequence(
         name="Autophase",
         size_range=(len(AUTOPHASE_FEATURE_NAMES), len(AUTOPHASE_FEATURE_NAMES)),
+        scalar_range=Scalar(
+            name=None,
+            min=np.iinfo(np.int64).min,
+            max=np.iinfo(np.int64).max,
+            dtype=np.int64,
+        ),
         dtype=int,
     )
     assert env.observation.spaces["AutophaseDict"].space == Dict(
         name="AutophaseDict",
         spaces={
-            name: Scalar(name="", min=0, max=np.iinfo(np.int64).max, dtype=np.int64)
+            name: Scalar(name=None, min=0, max=np.iinfo(np.int64).max, dtype=np.int64)
             for name in AUTOPHASE_FEATURE_NAMES
         },
     )
@@ -224,7 +237,7 @@ def test_default_autophase_dict_observation(env: CompilerEnv):
     env.observation_space = "AutophaseDict"
     observation = env.reset()
     assert isinstance(observation, dict)
-    assert observation.keys() == AUTOPHASE_FEATURE_NAMES
+    assert sorted(observation.keys()) == sorted(AUTOPHASE_FEATURE_NAMES)
     assert len(observation.values()) == len(AUTOPHASE_FEATURE_NAMES)
     assert all(obs >= 0 for obs in observation.values())
 

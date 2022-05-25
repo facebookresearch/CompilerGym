@@ -5,6 +5,8 @@
 """Unit tests for //compiler_gym/util:filesystem."""
 from pathlib import Path
 
+import pytest
+
 from compiler_gym.util import filesystem
 from tests.test_main import main
 
@@ -47,6 +49,32 @@ def test_atomic_file_write_text_io(tmpwd: Path):
 
     with open(out) as f:
         assert f.read() == "Hello!"
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        "/",
+        "/dev/null",
+        Path("/"),
+        Path("/dev/null"),
+    ],
+)
+def test_not_is_in_memory(path):
+    assert not filesystem.is_in_memory(path)
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        "/dev/shm",
+        "/dev/shm/foo",
+        Path("/dev/shm"),
+        Path("/dev/shm/foo"),
+    ],
+)
+def test_is_in_memory(path):
+    assert filesystem.is_in_memory(path)
 
 
 if __name__ == "__main__":

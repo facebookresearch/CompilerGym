@@ -5,19 +5,18 @@
 """This module contains the logic for connecting to services."""
 import logging
 import os
-import random
-import shutil
 import subprocess
 import sys
-from datetime import datetime
 from pathlib import Path
 from signal import Signals
 from time import sleep, time
 from typing import Dict, Iterable, List, Optional, TypeVar, Union
 
 import grpc
+from deprecated.sphinx import deprecated
 from pydantic import BaseModel
 
+import compiler_gym.errors
 from compiler_gym.service.proto import (
     ActionSpace,
     CompilerGymServiceStub,
@@ -25,13 +24,10 @@ from compiler_gym.service.proto import (
     GetSpacesRequest,
     ObservationSpace,
 )
+from compiler_gym.service.service_cache import ServiceCache
 from compiler_gym.util.debug_util import get_debug_level, logging_level_to_debug_level
-from compiler_gym.util.runfiles_path import (
-    runfiles_path,
-    site_data_path,
-    transient_cache_path,
-)
-from compiler_gym.util.shell_format import plural
+from compiler_gym.util.runfiles_path import runfiles_path, site_data_path
+from compiler_gym.util.shell_format import join_cmd, plural
 from compiler_gym.util.truncate import truncate_lines
 
 GRPC_CHANNEL_OPTIONS = [
@@ -109,34 +105,40 @@ class ConnectionOpts(BaseModel):
     used on the command line. No effect when used for existing sockets."""
 
 
-class ServiceError(Exception):
-    """Error raised from the service."""
+# Deprecated since v0.2.4.
+# This type is for backwards compatibility that will be removed in a future release.
+# Please, use errors from `compiler_gym.errors`.
+ServiceError = compiler_gym.errors.ServiceError
 
+# Deprecated since v0.2.4.
+# This type is for backwards compatibility that will be removed in a future release.
+# Please, use errors from `compiler_gym.errors`.
+SessionNotFound = compiler_gym.errors.SessionNotFound
 
-class SessionNotFound(ServiceError):
-    """Requested session ID not found in service."""
+# Deprecated since v0.2.4.
+# This type is for backwards compatibility that will be removed in a future release.
+# Please, use errors from `compiler_gym.errors`.
+ServiceOSError = compiler_gym.errors.ServiceOSError
 
+# Deprecated since v0.2.4.
+# This type is for backwards compatibility that will be removed in a future release.
+# Please, use errors from `compiler_gym.errors`.
+ServiceInitError = compiler_gym.errors.ServiceInitError
 
-class ServiceOSError(ServiceError, OSError):
-    """System error raised from the service."""
+# Deprecated since v0.2.4.
+# This type is for backwards compatibility that will be removed in a future release.
+# Please, use errors from `compiler_gym.errors`.
+EnvironmentNotSupported = compiler_gym.errors.EnvironmentNotSupported
 
+# Deprecated since v0.2.4.
+# This type is for backwards compatibility that will be removed in a future release.
+# Please, use errors from `compiler_gym.errors`.
+ServiceTransportError = compiler_gym.errors.ServiceTransportError
 
-class ServiceInitError(ServiceError, OSError):
-    """Error raised if the service fails to initialize."""
-
-
-class EnvironmentNotSupported(ServiceInitError):
-    """Error raised if the runtime requirements for an environment are not
-    met on the current system."""
-
-
-class ServiceTransportError(ServiceError, OSError):
-    """Error that is raised if communication with the service fails."""
-
-
-class ServiceIsClosed(ServiceError, TypeError):
-    """Error that is raised if trying to interact with a closed service."""
-
+# Deprecated since v0.2.4.
+# This type is for backwards compatibility that will be removed in a future release.
+# Please, use errors from `compiler_gym.errors`.
+ServiceIsClosed = compiler_gym.errors.ServiceIsClosed
 
 Request = TypeVar("Request")
 Reply = TypeVar("Reply")
@@ -156,7 +158,6 @@ if sys.version_info > (3, 8, 0):
             self, a: Request, timeout: float
         ) -> Reply:  # pylint: disable=undefined-variable
             ...
-
 
 else:
     # Legacy support for Python < 3.8.
@@ -291,25 +292,6 @@ class Connection:
         return False
 
 
-def make_working_dir() -> Path:
-    """Make a working directory for a service. The calling code is responsible
-    for removing this directory when done.
-    """
-    while True:
-        random_hash = random.getrandbits(16)
-        service_name = datetime.now().strftime(f"s/%m%dT%H%M%S-%f-{random_hash:04x}")
-        working_dir = transient_cache_path(service_name)
-        # Guard against the unlike scenario that there is a collision between
-        # the randomly generated working directories of multiple
-        # make_working_dir() calls.
-        try:
-            (working_dir / "logs").mkdir(parents=True, exist_ok=False)
-            break
-        except FileExistsError:
-            pass
-    return working_dir
-
-
 class ManagedConnection(Connection):
     """A connection to a service using a managed subprocess."""
 
@@ -331,14 +313,14 @@ class ManagedConnection(Connection):
 
         if not Path(local_service_binary).is_file():
             raise FileNotFoundError(f"File not found: {local_service_binary}")
-        self.working_dir = make_working_dir()
+        self.cache = ServiceCache()
 
         # The command that will be executed. The working directory of this
         # command will be set to the local_service_binary's parent, so we can
         # use the relpath for a neater `ps aux` view.
         cmd = [
             f"./{local_service_binary.name}",
-            f"--working_dir={self.working_dir}",
+            f"--working_dir={self.cache.path}",
         ]
         # Add any custom arguments
         cmd += script_args
@@ -349,7 +331,10 @@ class ManagedConnection(Connection):
         env["COMPILER_GYM_SITE_DATA"] = str(site_data_path("."))
         # Set the pythonpath so that executable python scripts can use absolute
         # import paths like `from compiler_gym.envs.foo import bar`.
-        env["PYTHONPATH"] = env["COMPILER_GYM_RUNFILES"]
+        if "PYTHONPATH" in env:
+            env["PYTHONPATH"] = f'{env["PYTHONPATH"]}:{env["COMPILER_GYM_RUNFILES"]}'
+        else:
+            env["PYTHONPATH"] = env["COMPILER_GYM_RUNFILES"]
 
         # Set the verbosity of the service. The logging level of the service is
         # the debug level - 1, so that COMPILER_GYM_DEBUG=3 will cause VLOG(2)
@@ -381,7 +366,14 @@ class ManagedConnection(Connection):
         # Add any custom environment variables
         env.update(script_env)
 
-        logger.debug("Exec %s", cmd)
+        logger.debug(
+            "Exec `%s%s`",
+            " ".join(f"{k}={v}" for k, v in script_env.items()) + " "
+            if script_env
+            else "",
+            join_cmd(cmd),
+        )
+
         self.process = subprocess.Popen(
             cmd,
             env=env,
@@ -391,7 +383,7 @@ class ManagedConnection(Connection):
 
         # Read the port from a file generated by the service.
         wait_secs = 0.1
-        port_path = self.working_dir / "port.txt"
+        port_path = self.cache / "port.txt"
         end_time = time() + port_init_max_seconds
         while time() < end_time:
             returncode = self.process.poll()
@@ -409,7 +401,7 @@ class ManagedConnection(Connection):
                 )
                 if logs:
                     msg = f"{msg}\nService logs:\n{logs}"
-                shutil.rmtree(self.working_dir, ignore_errors=True)
+                self.cache.close()
                 raise ServiceError(msg)
             if port_path.is_file():
                 try:
@@ -429,7 +421,7 @@ class ManagedConnection(Connection):
             else:
                 self.process.terminate()
             self.process.communicate(timeout=rpc_init_max_seconds)
-            shutil.rmtree(self.working_dir)
+            self.cache.close()
             raise TimeoutError(
                 "Service failed to produce port file after "
                 f"{port_init_max_seconds:.1f} seconds"
@@ -470,13 +462,18 @@ class ManagedConnection(Connection):
             )
             logs_message = f" Service logs:\n{logs}" if logs else ""
 
-            shutil.rmtree(self.working_dir)
+            self.cache.close()
             raise TimeoutError(
                 "Failed to connect to RPC service after "
                 f"{rpc_init_max_seconds:.1f} seconds.{logs_message}"
             )
 
         super().__init__(channel, url)
+
+    @property
+    @deprecated(version="0.2.4", reason="Replace `working_directory` with `cache.path`")
+    def working_dir(self) -> Path:
+        return self.cache.path
 
     def service_is_down(self) -> bool:
         """Return true if the service subprocess has terminated."""
@@ -489,9 +486,9 @@ class ManagedConnection(Connection):
         """
         # Compiler services write log files in the logs directory. Iterate over
         # them and return their contents.
-        if not (self.working_dir / "logs").is_dir():
+        if not (self.cache / "logs").is_dir():
             return ()
-        for path in sorted((self.working_dir / "logs").iterdir()):
+        for path in sorted((self.cache / "logs").iterdir()):
             if not path.is_file():
                 continue
             with open(path) as f:
@@ -516,7 +513,7 @@ class ManagedConnection(Connection):
             # The service has already been closed, nothing to do.
             pass
         except ProcessLookupError:
-            logger.warning("Service process not found at %s", self.working_dir)
+            logger.warning("Service process not found at %s", self.cache)
         except subprocess.TimeoutExpired:
             # Try and kill it and then walk away.
             try:
@@ -528,9 +525,9 @@ class ManagedConnection(Connection):
                 self.process.communicate(timeout=60)
             except:  # noqa
                 pass
-            logger.warning("Abandoning orphan service at %s", self.working_dir)
+            logger.warning("Abandoning orphan service at %s", self.cache)
         finally:
-            shutil.rmtree(self.working_dir, ignore_errors=True)
+            self.cache.close()
             super().close()
 
     def __repr__(self):

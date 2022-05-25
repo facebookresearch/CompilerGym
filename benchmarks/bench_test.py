@@ -23,6 +23,7 @@ import pytest
 import examples.example_compiler_gym_service as dummy
 from compiler_gym.envs import CompilerEnv, LlvmEnv, llvm
 from compiler_gym.service import CompilerGymServiceConnection
+from compiler_gym.service.client_service_compiler_env import ClientServiceCompilerEnv
 from tests.pytest_plugins.llvm import OBSERVATION_SPACE_NAMES, REWARD_SPACE_NAMES
 from tests.test_main import main
 
@@ -56,8 +57,8 @@ def test_make_local(benchmark, env_id):
     "args",
     [
         (llvm.LLVM_SERVICE_BINARY, LlvmEnv),
-        (dummy.EXAMPLE_CC_SERVICE_BINARY, CompilerEnv),
-        (dummy.EXAMPLE_PY_SERVICE_BINARY, CompilerEnv),
+        (dummy.EXAMPLE_CC_SERVICE_BINARY, ClientServiceCompilerEnv),
+        (dummy.EXAMPLE_PY_SERVICE_BINARY, ClientServiceCompilerEnv),
     ],
     ids=["llvm", "dummy-cc", "dummy-py"],
 )

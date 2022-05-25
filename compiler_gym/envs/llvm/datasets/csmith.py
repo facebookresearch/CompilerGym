@@ -10,10 +10,11 @@ from typing import Iterable, List, Optional
 import numpy as np
 
 from compiler_gym.datasets import Benchmark, BenchmarkSource, Dataset
-from compiler_gym.datasets.benchmark import BenchmarkInitError, BenchmarkWithSource
+from compiler_gym.datasets.benchmark import BenchmarkWithSource
 from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.envs.llvm import llvm_benchmark
 from compiler_gym.envs.llvm.llvm_benchmark import ClangInvocation
+from compiler_gym.errors import BenchmarkInitError
 from compiler_gym.service.proto import BenchmarkDynamicConfig, Command
 from compiler_gym.util.commands import Popen, communicate
 from compiler_gym.util.decorators import memoized_property
@@ -24,7 +25,7 @@ from compiler_gym.util.truncate import truncate
 logger = logging.getLogger(__name__)
 
 # The maximum value for the --seed argument to csmith.
-UINT_MAX = (2 ** 32) - 1
+UINT_MAX = (2**32) - 1
 
 _CSMITH_BIN = runfiles_path("compiler_gym/third_party/csmith/csmith/bin/csmith")
 _CSMITH_INCLUDES = runfiles_path(

@@ -10,7 +10,7 @@ Ubuntu 18.04, Fedora 28, Debian 10 or newer equivalents).
 # Building from Source
 
 If you prefer, you may build from source. This requires a modern C++ toolchain
-and bazel.
+Bazel and CMake.
 
 ## macOS
 
@@ -31,14 +31,14 @@ Now proceed to [All platforms](#all-platforms) below.
 On debian-based linux systems, install the required toolchain using:
 
 ```sh
-sudo apt install -y clang-9 clang++-9 clang-format golang libjpeg-dev \
+sudo apt install -y clang-9 clang-format golang libjpeg-dev \
   libtinfo5 m4 make patch zlib1g-dev tar bzip2 wget
 mkdir -pv ~/.local/bin
 wget https://github.com/bazelbuild/bazelisk/releases/download/v1.7.5/bazelisk-linux-amd64 -O ~/.local/bin/bazel
 wget https://github.com/hadolint/hadolint/releases/download/v1.19.0/hadolint-Linux-x86_64 -O ~/.local/bin/hadolint
 chmod +x ~/.local/bin/bazel ~/.local/bin/hadolint
-go get github.com/bazelbuild/buildtools/buildifier
-GO111MODULE=on go get github.com/uber/prototool/cmd/prototool@dev
+go install github.com/bazelbuild/buildtools/buildifier@latest
+GO111MODULE=on go install github.com/uber/prototool/cmd/prototool@dev
 export PATH="$HOME/.local/bin:$PATH"
 export CC=clang
 export CXX=clang++
@@ -73,6 +73,8 @@ remote changes to the CompilerGym repository.
 
 ## Building from source with Bazel
 
+It is recomended to build with Bazel.
+
 Run the test suite to confirm that everything is working:
 
     make test
@@ -93,12 +95,12 @@ environment using:
 
 ## Building from source with CMake
 
-Darwin is not supported with CMake.
+Building with CMake is still experimental. Darwin is not supported with CMake.
 
 ### Dependency instructions for Ubuntu
 
 ```bash
-sudo apt-get install g++ lld-9 \
+sudo apt-get install g++ lld \
   autoconf libtool ninja-build ccache git \
 ```
 
@@ -108,6 +110,7 @@ Requires CMake (>=3.20).
 wget https://github.com/Kitware/CMake/releases/download/v3.20.5/cmake-3.20.5-linux-x86_64.sh -O cmake.sh
 bash cmake.sh --prefix=$HOME/.local --exclude-subdir --skip-license
 rm cmake.sh
+export PATH=$HOME/.local/bin:$PATH
 ```
 
 ### Dependency Arguments
@@ -130,8 +133,6 @@ By default most dependencies are built together with Compiler Gym. To search for
 cmake \
   -DCMAKE_C_COMPILER=clang-9 \
   -DCMAKE_CXX_COMPILER=clang++-9 \
-  -DPython3_FIND_VIRTUALENV=FIRST \
-  -DCMAKE_BUILD_WITH_INSTALL_RPATH=true \
   -S "<path to source directory>" \
   -B "<path to build directory>"
 
@@ -154,19 +155,19 @@ Additional optional configuration arguments:
     -DCOMPILER_GYM_BUILD_EXAMPLES=ON
     ```
 
+* For faster rebuilds.
+
+    ```bash
+    -DCMAKE_C_COMPILER_LAUNCHER=ccache
+    -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+    ```
+
 * For faster linking.
 
     ```bash
     -DCMAKE_EXE_LINKER_FLAGS_INIT="-fuse-ld=lld-9"
     -DCMAKE_MODULE_LINKER_FLAGS_INIT="-fuse-ld=lld-9"
     -DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=lld-9"
-    ```
-
-* For faster rebuilds.
-
-    ```bash
-    -DCMAKE_C_COMPILER_LAUNCHER=ccache
-    -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
     ```
 
 By default, CompilerGym builds LLVM from source. This takes a long time and a

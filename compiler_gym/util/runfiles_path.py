@@ -58,12 +58,17 @@ def runfiles_path(relpath: str) -> Path:
 def site_data_path(relpath: str) -> Path:
     """Return a path within the site data directory.
 
-    CompilerGym uses a directory to store persistent site data files in, such as benchmark datasets.
-    The default location is :code:`~/.local/share/compiler_gym`. Set the environment variable
+    CompilerGym uses a directory to store persistent site data files in, such as
+    benchmark datasets. The default location is
+    :code:`~/.local/share/compiler_gym`. Set the environment variable
     :code:`$COMPILER_GYM_SITE_DATA` to override this default location.
 
     No checks are to made to ensure that the path, or the containing directory,
     exist.
+
+    Files in this directory are intended to be long lived (this is not a cache),
+    but it is safe to delete this directory, so long as no CompilerGym
+    environments are running.
 
     :param relpath: The relative path within the site data tree.
 
@@ -85,9 +90,12 @@ def cache_path(relpath: str) -> Path:
     """Return a path within the cache directory.
 
     CompilerGym uses a directory to cache files in, such as downloaded content.
-    The default location for this cache is :code:`~/.cache/compiler_gym`. Set
-    the environment variable :code:`$COMPILER_GYM_CACHE` to override this
+    The default location for this cache is :code:`~/.local/cache/compiler_gym`.
+    Set the environment variable :code:`$COMPILER_GYM_CACHE` to override this
     default location.
+
+    It is safe to delete this directory, so long as no CompilerGym environments
+    are running.
 
     No checks are to made to ensure that the path, or the containing directory,
     exist.
@@ -100,7 +108,7 @@ def cache_path(relpath: str) -> Path:
     if forced:
         return Path(forced) / relpath
     elif os.environ.get("HOME"):
-        return Path("~/.cache/compiler_gym").expanduser() / relpath
+        return Path("~/.local/cache/compiler_gym").expanduser() / relpath
     else:
         return Path(f"/tmp/compiler_gym_{getuser()}/cache") / relpath
 
@@ -114,6 +122,10 @@ def transient_cache_path(relpath: str) -> Path:
     :meth:`cache_path() <compiler_gym.cache_path>` is used as a fallback. Set
     the environment variable :code:`$COMPILER_GYM_TRANSIENT_CACHE` to override
     the default location.
+
+    Files in this directory are not meant to outlive the lifespan of the
+    CompilerGym environment that creates them. It is safe to delete this
+    directory, so long as no CompilerGym environments are running.
 
     No checks are to made to ensure that the path, or the containing directory,
     exist.

@@ -17,9 +17,12 @@ cg_py_library(
     ::dict
     ::discrete
     ::named_discrete
+    ::permutation
     ::reward
+    ::runtime_reward
     ::scalar
     ::sequence
+    ::space_sequence
     ::tuple
   PUBLIC
 )
@@ -71,7 +74,18 @@ cg_py_library(
     "reward.py"
   DEPS
     ::scalar
-    compiler_gym::service::service
+    compiler_gym::util::util
+  PUBLIC
+)
+
+cg_py_library(
+  NAME
+    runtime_reward
+  SRCS
+    "runtime_reward.py"
+  DEPS
+    ::reward
+    compiler_gym::errors::errors
     compiler_gym::util::util
   PUBLIC
 )
@@ -98,6 +112,25 @@ cg_py_library(
 )
 
 cg_py_library(
+  NAME
+    space_sequence
+  SRCS
+    "space_sequence.py"
+  PUBLIC
+)
+
+cg_py_library(
   NAME tuple
   SRCS "tuple.py"
+)
+
+cg_py_library(
+  NAME
+    permutation
+  SRCS
+    "permutation.py"
+  DEPS
+    ::scalar
+    ::sequence
+  PUBLIC
 )

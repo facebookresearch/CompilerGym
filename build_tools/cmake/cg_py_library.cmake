@@ -42,6 +42,7 @@ function(cg_py_library)
 
     # TODO(boian): remove this renaming when call sites do not include ":" in target dependency names
     rename_bazel_targets(_RULE_DEPS "${_RULE_DEPS}")
+    cg_target_outputs(TARGETS ${_RULE_DEPS} RESULT _DEPS_OUTPUTS)
 
     # Prefix the library with the package name, so we get: cg_package_name.
     rename_bazel_targets(_NAME "${_RULE_NAME}")
@@ -64,18 +65,23 @@ function(cg_py_library)
             COMMAND
                 ${CMAKE_COMMAND} -E create_symlink
                 "${CMAKE_CURRENT_SOURCE_DIR}/${_SRC_FILE}" "${_SRC_BIN_PATH}"
-            DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${_SRC_FILE}"
+            DEPENDS
+                "${CMAKE_CURRENT_SOURCE_DIR}/${_SRC_FILE}"
+                ${_RULE_DEPS}
+                ${_DEPS_OUTPUTS}
+                ${_RULE_GENERATED_SRCS}
             VERBATIM
         )
         list(APPEND _BIN_PATHS "${_SRC_BIN_PATH}")
     endforeach()
 
     list(APPEND _BIN_PATHS ${_RULE_GENERATED_SRCS})
-
     set(_DEPS ${_RULE_DEPS} ${_BIN_PATHS})
     add_custom_target(${_NAME} ALL DEPENDS ${_DEPS})
 
     cg_add_data_dependencies(NAME ${_RULE_NAME} DATA ${_RULE_DATA})
+
+    set_property(TARGET ${_NAME} PROPERTY OUTPUTS ${_BIN_PATHS})
 
     # If only one src file set the LOCATION target property to point to it.
     list(LENGTH _BIN_PATHS _BIN_PATHS_LENGTH)

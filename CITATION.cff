@@ -31,11 +31,15 @@ authors:
 - family-names: "Leather"
   given-names: "Hugh"
 title: "CompilerGym"
-version: 0.2.3
-date-released: 2022-03-18
+version: 0.2.4
+date-released: 2022-05-24
 url: "https://github.com/facebookresearch/CompilerGym"
 preferred-citation:
-  type: article
+  type: conference-paper
+  conference: "CGO"
+  title: "CompilerGym: Robust, Performant Compiler Optimization Environments for AI Research"
+  url: "https://arxiv.org/pdf/2109.08267.pdf"
+  year: 2022
   authors:
   - family-names: "Cummins"
     given-names: "Chris"
@@ -62,6 +66,3 @@ preferred-citation:
     given-names: "Yuandong"
   - family-names: "Leather"
     given-names: "Hugh"
-  journal: "arXiv:2109.08267"
-  title: "CompilerGym: Robust, Performant Compiler Optimization Environments for AI Research"
-  year: 2021

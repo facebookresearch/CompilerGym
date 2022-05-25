@@ -52,5 +52,20 @@ def test_lower_bound_inequality():
     assert space_a != space_b
 
 
+def test_equal():
+    assert Scalar(name="test_scalar", min=-10, max=10, dtype=int) == Scalar(
+        name="test_scalar", min=-10, max=10, dtype=int
+    )
+
+
+def test_not_equal():
+    scalar = Scalar(name="test_scalar", min=-10, max=10, dtype=int)
+    assert scalar != Scalar(name="test_scalar_2", min=-10, max=10, dtype=int)
+    assert scalar != Scalar(name="test_scalar", min=-5, max=10, dtype=int)
+    assert scalar != Scalar(name="test_scalar", min=-10, max=5, dtype=int)
+    assert scalar != Scalar(name="test_scalar", min=-10, max=10, dtype=float)
+    assert scalar != "not_as_scalar"
+
+
 if __name__ == "__main__":
     main()

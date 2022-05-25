@@ -15,12 +15,15 @@ Constructing Benchmarks
 
 .. autofunction:: make_benchmark
 
+.. autoclass:: BenchmarkFromCommandLine
+   :members:
+
 .. autoclass:: ClangInvocation
    :members:
 
    .. automethod:: __init__
 
-.. autofunction:: get_system_includes
+.. autofunction:: get_system_library_flags
 
 
 Datasets

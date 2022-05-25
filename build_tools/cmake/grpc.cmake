@@ -10,6 +10,7 @@ include_guard(GLOBAL)
 include(CMakeParseArguments)
 include(cg_macros)
 include(cg_py_library)
+include(cg_target_outputs)
 include(protobuf)
 
 function(get_cc_grpc_proto_out_files _PROTO_FILENAME _RESULT)
@@ -43,6 +44,7 @@ function(cc_grpc_library)
     endif()
 
     rename_bazel_targets(_DEPS "${_RULE_DEPS}")
+    cg_target_outputs(TARGETS ${_DEPS} RESULT _DEPS_OUTPUTS)
     rename_bazel_targets(_NAME "${_RULE_NAME}")
     rename_bazel_targets(_SRCS "${_RULE_SRCS}")
 
@@ -84,6 +86,7 @@ function(cc_grpc_library)
             "${_DESCRIPTOR_SET_FILE}"
             "${_PROTO_FILE}"
             ${_DEPS}
+            ${_DEPS_OUTPUTS}
         VERBATIM
     )
 
@@ -119,6 +122,7 @@ function(py_grpc_library)
     cmake_parse_arguments(_RULE "" "NAME;SRCS" "DEPS" ${ARGN})
 
     rename_bazel_targets(_DEPS "${_RULE_DEPS}")
+    cg_target_outputs(TARGETS ${_DEPS} RESULT _DEPS_OUTPUTS)
     rename_bazel_targets(_SRCS "${_RULE_SRCS}")
 
     get_target_property(_DESCRIPTOR_SET_FILE ${_SRCS} PROTO_DESCRIPTOR_SETS)
@@ -150,6 +154,7 @@ function(py_grpc_library)
             "${_DESCRIPTOR_SET_FILE}"
             "${_PROTO_FILE}"
             ${_DEPS}
+            ${_DEPS_OUTPUTS}
         VERBATIM
     )
 

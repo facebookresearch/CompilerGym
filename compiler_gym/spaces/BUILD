@@ -17,9 +17,12 @@ py_library(
         ":dict",
         ":discrete",
         ":named_discrete",
+        ":permutation",
         ":reward",
+        ":runtime_reward",
         ":scalar",
         ":sequence",
+        ":space_sequence",
         ":tuple",
     ],
 )
@@ -69,7 +72,16 @@ py_library(
     srcs = ["reward.py"],
     deps = [
         ":scalar",
-        "//compiler_gym/service",
+        "//compiler_gym/util",
+    ],
+)
+
+py_library(
+    name = "runtime_reward",
+    srcs = ["runtime_reward.py"],
+    deps = [
+        ":reward",
+        "//compiler_gym/errors",
         "//compiler_gym/util",
     ],
 )
@@ -92,7 +104,23 @@ py_library(
 )
 
 py_library(
+    name = "space_sequence",
+    srcs = ["space_sequence.py"],
+    visibility = ["//compiler_gym:__subpackages__"],
+)
+
+py_library(
     name = "tuple",
     srcs = ["tuple.py"],
     visibility = ["//compiler_gym:__subpackages__"],
+)
+
+py_library(
+    name = "permutation",
+    srcs = ["permutation.py"],
+    visibility = ["//compiler_gym:__subpackages__"],
+    deps = [
+        ":scalar",
+        ":sequence",
+    ],
 )

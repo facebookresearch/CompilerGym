@@ -67,6 +67,24 @@ For a glimpse of what's to come, check out [our
 roadmap](https://github.com/facebookresearch/CompilerGym/projects/1).
 
 
+## News & Events
+
+- April 2022: 🏆 We are running the first **code optimization competition** at
+  [MLArchSys'22](https://sites.google.com/view/mlarchsys/isca-2022/compiler-optimization-competition)!
+  All are welcome to participate. Details
+  [here](https://sites.google.com/view/mlarchsys/isca-2022/compiler-optimization-competition).
+- April 2022: ⭐️ CompilerGym wins the **distinguished paper award** at
+  [CGO'22](https://conf.researchr.org/home/cgo-2022)! You can read our work
+  [here](https://arxiv.org/pdf/2109.08267.pdf).
+- April 2022: 📖 Our **tutorial** at
+  [CGO'22](https://conf.researchr.org/home/cgo-2022) was well attended. If you
+  missed the event, you can work through the materials
+  [here](https://chriscummins.cc/2022/cgo22-tutorial/).
+- September 2021: 📄 CompilerGym was featured on the **Meta AI research blog**.
+  You can read the post
+  [here](https://ai.facebook.com/blog/compilergym-making-compiler-optimizations-accessible-to-all/).
+
+
 ## Installation
 
 Install the latest CompilerGym release using:
@@ -152,10 +170,10 @@ If you use CompilerGym in any of your work, please cite [our
 paper](https://arxiv.org/pdf/2109.08267.pdf):
 
 ```
-@article{CompilerGym,
+@inproceedings{CompilerGym,
       title={{CompilerGym: Robust, Performant Compiler Optimization Environments for AI Research}},
       author={Chris Cummins and Bram Wasti and Jiadong Guo and Brandon Cui and Jason Ansel and Sahir Gomez and Somya Jain and Jia Liu and Olivier Teytaud and Benoit Steiner and Yuandong Tian and Hugh Leather},
-      journal={arXiv:2109.08267},
-      year={2021},
+      booktitle={CGO},
+      year={2022},
 }
 ```

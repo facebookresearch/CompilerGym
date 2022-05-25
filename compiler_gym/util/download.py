@@ -10,6 +10,7 @@ from typing import List, Optional, Union
 import fasteners
 import requests
 
+import compiler_gym.errors
 from compiler_gym.util.filesystem import atomic_file_write
 from compiler_gym.util.runfiles_path import cache_path
 from compiler_gym.util.truncate import truncate
@@ -17,12 +18,15 @@ from compiler_gym.util.truncate import truncate
 logger = logging.getLogger(__name__)
 
 
-class DownloadFailed(IOError):
-    """Error thrown if a download fails."""
+# Deprecated since v0.2.4.
+# This type is for backwards compatibility that will be removed in a future release.
+# Please, use errors from `compiler_gym.errors`.
+DownloadFailed = compiler_gym.errors.DownloadFailed
 
-
-class TooManyRequests(DownloadFailed):
-    """Error thrown by HTTP 429 response."""
+# Deprecated since v0.2.4.
+# This type is for backwards compatibility that will be removed in a future release.
+# Please, use errors from `compiler_gym.errors`.
+TooManyRequests = compiler_gym.errors.TooManyRequests
 
 
 def _get_url_data(url: str) -> bytes:

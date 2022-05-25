@@ -38,3 +38,10 @@ class Box(GymBox):
         """
         super().__init__(low=low, high=high, shape=shape, dtype=dtype)
         self.name = name
+
+    def __eq__(self, other) -> bool:
+        return (
+            isinstance(self, other.__class__)
+            and self.name == other.name
+            and super().__eq__(other)
+        )

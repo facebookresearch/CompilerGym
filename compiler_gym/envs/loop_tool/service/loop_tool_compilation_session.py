@@ -13,7 +13,8 @@ import loop_tool_py as lt
 import numpy as np
 import pkg_resources
 
-from compiler_gym.service import CompilationSession, EnvironmentNotSupported
+from compiler_gym.errors import EnvironmentNotSupported
+from compiler_gym.service import CompilationSession
 from compiler_gym.service.proto import (
     ActionSpace,
     Benchmark,
@@ -84,7 +85,7 @@ class LoopToolCompilationSession(CompilationSession):
             space=Space(
                 int64_box=Int64Box(
                     low=Int64Tensor(shape=[1], value=[0]),
-                    high=Int64Tensor(shape=[1], value=[2 ** 36]),
+                    high=Int64Tensor(shape=[1], value=[2**36]),
                 ),
             ),
             deterministic=True,

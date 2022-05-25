@@ -13,5 +13,9 @@ def test_indent():
     assert fmt.indent("abc\ndef") == "    abc\n    def"
 
 
+def test_join_cmd():
+    assert fmt.join_cmd(["a", "b", "c"]) == "a b c"
+
+
 if __name__ == "__main__":
     main()
