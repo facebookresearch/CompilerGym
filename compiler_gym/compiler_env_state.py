@@ -4,9 +4,12 @@
 # LICENSE file in the root directory of this source tree.
 """This module defines a class to represent a compiler environment state."""
 import csv
+import re
 import sys
+from io import StringIO
 from typing import Iterable, List, Optional, TextIO
 
+import requests
 from pydantic import BaseModel, Field, validator
 
 from compiler_gym.datasets.uri import BenchmarkUri
@@ -23,10 +26,7 @@ class CompilerEnvState(BaseModel):
 
     benchmark: str = Field(
         allow_mutation=False,
-        examples=[
-            "benchmark://cbench-v1/crc32",
-            "generator://csmith-v0/0",
-        ],
+        examples=["benchmark://cbench-v1/crc32", "generator://csmith-v0/0",],
     )
     """The URI of the benchmark used for this episode."""
 
@@ -37,9 +37,7 @@ class CompilerEnvState(BaseModel):
     """The walltime of the episode in seconds. Must be non-negative."""
 
     reward: Optional[float] = Field(
-        required=False,
-        default=None,
-        allow_mutation=True,
+        required=False, default=None, allow_mutation=True,
     )
     """The cumulative reward for this episode. Optional."""
 
@@ -229,6 +227,16 @@ class CompilerEnvStateReader:
         for path in paths:
             if path == "-":
                 yield from iter(CompilerEnvStateReader(sys.stdin))
+            elif (
+                re.match(r"^(http|https)://[a-zA-Z0-9.-_/]+(\.csv)$", path) is not None
+            ):
+                response: requests.Response = requests.get(path)
+                if response.status_code == 200:
+                    yield from iter(CompilerEnvStateReader(StringIO(response.text)))
+                else:
+                    raise requests.exceptions.InvalidURL(
+                        f"Url {path} content could not be obtained"
+                    )
             else:
                 with open(path) as f:
                     yield from iter(CompilerEnvStateReader(f))
