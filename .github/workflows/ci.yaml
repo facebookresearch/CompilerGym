@@ -88,6 +88,14 @@ jobs:
                   path: ~/cmake_build/py_pkg/dist/*.whl
                   if-no-files-found: error
                   retention-days: 7
+                  
+            - name: Run Examples
+              run: |
+                  cd examples
+                  python example_compiler_gym_service/demo_without_bazel.py
+                  python example_unrolling_service/examples_without_bazel.py
+                  python loop_optimizations_service/examples_without_bazel.py
+              shell: bash
 
     build-mlir-env-linux-cmake:
         runs-on: ubuntu-latest
