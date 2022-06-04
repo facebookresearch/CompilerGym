@@ -20,6 +20,19 @@ cg_py_test(
 
 cg_py_test(
   NAME
+    jotaibench_test
+  SRCS
+    "jotaibench_test.py"
+  DEPS
+    compiler_gym::envs::llvm::llvm
+    compiler_gym::envs::llvm::datasets::datasets
+    tests::pytest_plugins::common
+    tests::pytest_plugins::llvm
+    tests::test_main
+)
+
+cg_py_test(
+  NAME
     cbench_test
   SRCS
     "cbench_test.py"
