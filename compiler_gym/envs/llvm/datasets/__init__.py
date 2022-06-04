@@ -8,6 +8,7 @@ from typing import Iterable, Optional
 
 from compiler_gym.datasets import Dataset, TarDatasetWithManifest
 from compiler_gym.envs.llvm.datasets.anghabench import AnghaBenchDataset
+from compiler_gym.envs.llvm.datasets.jotaibench import JotaiBenchDataset
 from compiler_gym.envs.llvm.datasets.cbench import (
     CBenchDataset,
     CBenchLegacyDataset,
@@ -261,6 +262,22 @@ def get_llvm_datasets(site_data_base: Optional[Path] = None) -> Iterable[Dataset
         manifest_sha256=anghabench_v0_manifest_sha256,
         deprecated="Please use anghabench-v1",
     )
+    yield JotaiBenchDataset(site_data_base=site_data_base, sort_order=0)
+    # Add legacy version of Jotaibench using an old manifest.
+    jotaibench_v0_manifest_url, jotaibench_v0_manifest_sha256 = {
+        "linux": (
+            "https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-anghabench-v0-linux-manifest.bz2",
+            "a038d25d39ee9472662a9704dfff19c9e3512ff6a70f1067af85c5cb3784b477",
+        ),
+    }[sys.platform]
+    yield JotaiBenchDataset(
+        name="benchmark://jotaibench-v0",
+        site_data_base=site_data_base,
+        sort_order=0,
+        manifest_url=jotaibench_v0_manifest_url,
+        manifest_sha256=jotaibench_v0_manifest_sha256,
+        deprecated="Please use jotaibench-v1",
+    )
     yield BlasDataset(site_data_base=site_data_base, sort_order=0)
     yield CLgenDataset(site_data_base=site_data_base, sort_order=0)
     yield CBenchDataset(site_data_base=site_data_base)
@@ -294,6 +311,7 @@ def get_llvm_datasets(site_data_base: Optional[Path] = None) -> Iterable[Dataset
 
 __all__ = [
     "AnghaBenchDataset",
+    "JotaiBenchDataset"
     "BlasDataset",
     "CBenchDataset",
     "CBenchLegacyDataset",

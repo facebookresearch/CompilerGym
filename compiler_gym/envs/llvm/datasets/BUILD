@@ -9,6 +9,7 @@ py_library(
     srcs = [
         "__init__.py",
         "anghabench.py",
+        "jotaibench.py",
         "cbench.py",
         "chstone.py",
         "clgen.py",
