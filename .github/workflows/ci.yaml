@@ -94,8 +94,8 @@ jobs:
                   pip install ~/cmake_build/py_pkg/dist/*.whl
                   cd examples
                   python example_compiler_gym_service/demo_without_bazel.py
-                  python example_unrolling_service/examples_without_bazel.py
-                  python loop_optimizations_service/examples_without_bazel.py
+                  python example_unrolling_service/example_without_bazel.py
+                  python loop_optimizations_service/example_without_bazel.py
               shell: bash
 
     build-mlir-env-linux-cmake:
