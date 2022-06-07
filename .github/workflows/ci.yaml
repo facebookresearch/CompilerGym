@@ -85,7 +85,10 @@ jobs:
               uses: actions/upload-artifact@v2
               with:
                   name: linux-wheel-cmake
-                  path: ~/cmake_build/py_pkg/dist/*.whl
+                  path: |
+                    ~/cmake_build/py_pkg/dist/*.whl
+                    ~/example_unrolling_service/loop_unroller/loop_unroller
+                    ~/loop_optimizations_service/opt_loops/opt_loops
                   if-no-files-found: error
                   retention-days: 7
 
@@ -233,6 +236,12 @@ jobs:
               uses: actions/download-artifact@v2
               with:
                   name: linux-wheel-cmake
+                  
+            - name: Move examples binaries
+              run: |
+                  mv loop_unroller ~/example_unrolling_service/loop_unroller/loop_unroller
+                  mv opt_loops ~/loop_optimizations_service/opt_loops/opt_loops
+              shell: bash
 
             - name: Install wheel
               run: python -m pip install *.whl
@@ -245,6 +254,15 @@ jobs:
 
             - name: Run the test suite
               run: make install-test PYTEST_ARGS="--ignore tests/mlir"
+  
+            - name: Run environment examples
+              run: |
+                  cd examples
+                  python example_compiler_gym_service/demo_without_bazel.py
+                  python example_unrolling_service/example_without_bazel.py
+                  python loop_optimizations_service/example_without_bazel.py
+                  cd -
+              shell: bash
 
     test-mlir-env-linux-cmake:
         needs: build-mlir-env-linux-cmake
