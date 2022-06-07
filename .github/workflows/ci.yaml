@@ -86,9 +86,9 @@ jobs:
               with:
                   name: linux-wheel-cmake
                   path: |
-                    ~/cmake_build/py_pkg/dist/*.whl
-                    ~/example_unrolling_service/loop_unroller/loop_unroller
-                    ~/loop_optimizations_service/opt_loops/opt_loops
+                      ~/cmake_build/py_pkg/dist/*.whl
+                      ~/example_unrolling_service/loop_unroller/loop_unroller
+                      ~/loop_optimizations_service/opt_loops/opt_loops
                   if-no-files-found: error
                   retention-days: 7
 
@@ -236,7 +236,7 @@ jobs:
               uses: actions/download-artifact@v2
               with:
                   name: linux-wheel-cmake
-                  
+
             - name: Move examples binaries
               run: |
                   mv loop_unroller ~/example_unrolling_service/loop_unroller/loop_unroller
@@ -254,7 +254,7 @@ jobs:
 
             - name: Run the test suite
               run: make install-test PYTEST_ARGS="--ignore tests/mlir"
-  
+
             - name: Run environment examples
               run: |
                   cd examples
