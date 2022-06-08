@@ -237,12 +237,6 @@ jobs:
               with:
                   name: linux-wheel-cmake
 
-            - name: Move examples binaries
-              run: |
-                  mv loop_unroller ~/example_unrolling_service/loop_unroller/loop_unroller
-                  mv opt_loops ~/loop_optimizations_service/opt_loops/opt_loops
-              shell: bash
-
             - name: Install wheel
               run: python -m pip install *.whl
 
