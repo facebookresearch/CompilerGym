@@ -92,8 +92,8 @@ jobs:
             - name: Upload loop_unroller binary
               uses: actions/upload-artifact@v2
               with:
-                  name: linux-loop-unrollee-cmake
-                  path: ~/example_unrolling_service/loop_unroller/loop_unroller
+                  name: linux-loop-unroller-cmake
+                  path: examples/example_unrolling_service/loop_unroller/loop_unroller
                   if-no-files-found: error
                   retention-days: 7
 
@@ -101,7 +101,7 @@ jobs:
               uses: actions/upload-artifact@v2
               with:
                   name: linux-opt-loops-cmake
-                  path: ~/loop_optimizations_service/opt_loops/opt_loops
+                  path: examples/loop_optimizations_service/opt_loops/opt_loops
                   if-no-files-found: error
                   retention-days: 7
 
@@ -112,6 +112,7 @@ jobs:
                   python example_compiler_gym_service/demo_without_bazel.py
                   python example_unrolling_service/example_without_bazel.py
                   python loop_optimizations_service/example_without_bazel.py
+                  cd -
               shell: bash
 
     build-mlir-env-linux-cmake:
@@ -274,8 +275,8 @@ jobs:
 
             - name: Move examples binaries
               run: |
-                  mv loop_unroller ~/example_unrolling_service/loop_unroller/loop_unroller
-                  mv opt_loops ~/loop_optimizations_service/opt_loops/opt_loops
+                  mv loop_unroller examples/example_unrolling_service/loop_unroller/loop_unroller
+                  mv opt_loops examples/loop_optimizations_service/opt_loops/opt_loops
               shell: bash
 
             - name: Run environment examples
