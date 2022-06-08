@@ -85,10 +85,23 @@ jobs:
               uses: actions/upload-artifact@v2
               with:
                   name: linux-wheel-cmake
-                  path: |
-                      ~/cmake_build/py_pkg/dist/*.whl
-                      ~/example_unrolling_service/loop_unroller/loop_unroller
-                      ~/loop_optimizations_service/opt_loops/opt_loops
+                  path: ~/cmake_build/py_pkg/dist/*.whl
+                  if-no-files-found: error
+                  retention-days: 7
+
+            - name: Upload loop_unroller binary
+              uses: actions/upload-artifact@v2
+              with:
+                  name: linux-loop-unrollee-cmake
+                  path: ~/example_unrolling_service/loop_unroller/loop_unroller
+                  if-no-files-found: error
+                  retention-days: 7
+
+            - name: Upload opt_loops binary
+              uses: actions/upload-artifact@v2
+              with:
+                  name: linux-opt-loops-cmake
+                  path: ~/loop_optimizations_service/opt_loops/opt_loops
                   if-no-files-found: error
                   retention-days: 7
 
@@ -248,6 +261,16 @@ jobs:
 
             - name: Run the test suite
               run: make install-test PYTEST_ARGS="--ignore tests/mlir"
+
+            - name: Download loop_unroller
+              uses: actions/download-artifact@v2
+              with:
+                  name: linux-loop-unroller-cmake
+
+            - name: Download opt_loops
+              uses: actions/download-artifact@v2
+              with:
+                  name: linux-opt-loops-cmake
 
             - name: Run environment examples
               run: |
