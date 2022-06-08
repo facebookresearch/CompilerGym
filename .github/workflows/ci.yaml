@@ -59,8 +59,7 @@ jobs:
                   else
                     wget --quiet https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz -O ~/llvm.tar.xz
                   fi
-                  # TODO(cummins): Remove 'v' debugging flag:
-                  mkdir ~/llvm && tar xvf ~/llvm.tar.xz --strip-components 1 -C ~/llvm
+                  mkdir ~/llvm && tar xf ~/llvm.tar.xz --strip-components 1 -C ~/llvm
                   rm ~/llvm.tar.xz
                   echo "Unpacked, testing for expected file:"
                   test -d ~/llvm/lib/cmake/llvm
@@ -108,7 +107,7 @@ jobs:
                   else
                     wget --quiet https://github.com/llvm/llvm-project/releases/download/llvmorg-14.0.0/clang+llvm-14.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz -O ~/llvm.tar.xz
                   fi
-                  mkdir ~/llvm && tar xvf ~/llvm.tar.xz --strip-components 1 -C ~/llvm
+                  mkdir ~/llvm && tar xf ~/llvm.tar.xz --strip-components 1 -C ~/llvm
                   rm ~/llvm.tar.xz
                   echo "Unpacked, testing for expected file:"
                   test -d ~/llvm/lib/cmake/llvm
