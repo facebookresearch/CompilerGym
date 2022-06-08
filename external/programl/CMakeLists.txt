@@ -33,7 +33,7 @@ externalproject_add_step(
     build_programl
     ALWAYS TRUE
     COMMAND
-        "${CMAKE_COMMAND}" -E env "CC=${CMAKE_C_COMPILER}"
+        timeout 10m "${CMAKE_COMMAND}" -E env "CC=${CMAKE_C_COMPILER}"
         "CXX=${CMAKE_CXX_COMPILER}" "${Bazel_EXECUTABLE}" build
         --verbose_failures "--cxxopt=-std=c++${CMAKE_CXX_STANDARD}" --
         //programl/graph:features //programl/graph:program_graph_builder
