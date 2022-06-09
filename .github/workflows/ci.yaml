@@ -275,9 +275,10 @@ jobs:
                   mv loop_unroller ./examples/example_unrolling_service/loop_unroller/loop_unroller
                   mv opt_loops ./examples/loop_optimizations_service/opt_loops/opt_loops
                   echo "pwd: "
-                  echo pwd
-                  touch -d examples/example_unrolling_service/loop_unroller/
-                  touch ./examples/example_unrolling_service/loop_unroller/loop_unroller
+                  pwd
+                  ls -R | grep loop_unroller
+                  test -d examples/example_unrolling_service/loop_unroller/
+                  test ./examples/example_unrolling_service/loop_unroller/loop_unroller
               shell: bash
 
             - name: Run environment examples
