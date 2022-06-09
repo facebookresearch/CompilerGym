@@ -278,7 +278,7 @@ jobs:
                   mv opt_loops ./examples/loop_optimizations_service/opt_loops/opt_loops
                   echo "pwd: "
                   pwd
-                  ls -R | grep loop_unroller
+                  ls -alR | grep loop_unroller
                   test -d examples/example_unrolling_service/loop_unroller/
                   test ./examples/example_unrolling_service/loop_unroller/loop_unroller
               shell: bash
