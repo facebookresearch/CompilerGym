@@ -44,5 +44,4 @@ externalproject_add_step(
         @labm8//labm8/cpp:string @labm8//labm8/cpp:stringpiece
     DEPENDEES update
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/programl/src/programl"
-    USES_TERMINAL TRUE
 )
