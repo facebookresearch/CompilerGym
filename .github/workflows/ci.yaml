@@ -276,7 +276,7 @@ jobs:
                   chmod +x opt_loops
                   mv loop_unroller ./examples/example_unrolling_service/loop_unroller/loop_unroller
                   mv opt_loops ./examples/loop_optimizations_service/opt_loops/opt_loops
-                  echo "pwd: "
+                  echo "pwd:  "
                   pwd
                   ls -alR | grep loop_unroller
                   test -d examples/example_unrolling_service/loop_unroller/
