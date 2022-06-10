@@ -26,7 +26,10 @@ class CompilerEnvState(BaseModel):
 
     benchmark: str = Field(
         allow_mutation=False,
-        examples=["benchmark://cbench-v1/crc32", "generator://csmith-v0/0",],
+        examples=[
+            "benchmark://cbench-v1/crc32",
+            "generator://csmith-v0/0",
+        ],
     )
     """The URI of the benchmark used for this episode."""
 
@@ -37,7 +40,9 @@ class CompilerEnvState(BaseModel):
     """The walltime of the episode in seconds. Must be non-negative."""
 
     reward: Optional[float] = Field(
-        required=False, default=None, allow_mutation=True,
+        required=False,
+        default=None,
+        allow_mutation=True,
     )
     """The cumulative reward for this episode. Optional."""
 

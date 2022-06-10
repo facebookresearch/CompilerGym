@@ -34,7 +34,7 @@ externalproject_add_step(
     ALWAYS TRUE
     COMMAND
         "${CMAKE_COMMAND}" -E env "CC=${CMAKE_C_COMPILER}"
-        "CXX=${CMAKE_CXX_COMPILER}" "${Bazel_EXECUTABLE}" build
+        "CXX=${CMAKE_CXX_COMPILER}" "${Bazel_EXECUTABLE}" --batch build
         --verbose_failures "--cxxopt=-std=c++${CMAKE_CXX_STANDARD}" --
         //programl/graph:features //programl/graph:program_graph_builder
         //programl/graph/format:node_link_graph //programl/ir/llvm:llvm-10

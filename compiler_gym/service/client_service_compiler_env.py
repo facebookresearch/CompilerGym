@@ -814,7 +814,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
 
         # If the action space has changed, update it.
         if reply.HasField("new_action_space"):
-            self.action_space = self.service_message_converters.action_space_converter(
+            self._action_space = self.service_message_converters.action_space_converter(
                 reply.new_action_space
             )
 
@@ -931,7 +931,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
 
         # If the action space has changed, update it.
         if reply.HasField("new_action_space"):
-            self.action_space = self.service_message_converters.action_space_converter(
+            self._action_space = self.service_message_converters.action_space_converter(
                 reply.new_action_space
             )
 
