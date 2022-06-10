@@ -8,6 +8,7 @@ from io import StringIO
 from pathlib import Path
 
 import pytest
+import requests
 from pydantic import ValidationError as PydanticValidationError
 
 from compiler_gym import CompilerEnvState, CompilerEnvStateWriter
@@ -319,6 +320,93 @@ def test_state_serialize_deserialize_equality_no_reward():
     assert state_from_csv.walltime == 100
     assert state_from_csv.reward is None
     assert state_from_csv.commandline == "-a -b -c"
+
+
+def test_read_paths_stdin(monkeypatch):
+    monkeypatch.setattr(
+        "sys.stdin",
+        StringIO(
+            "benchmark,reward,walltime,commandline\n"
+            "benchmark://cbench-v0/foo,2.0,5.0,-a -b -c\n"
+        ),
+    )
+    reader = CompilerEnvStateReader.read_paths(["-"])
+    assert list(reader) == [
+        CompilerEnvState(
+            benchmark="benchmark://cbench-v0/foo",
+            walltime=5,
+            commandline="-a -b -c",
+            reward=2,
+        )
+    ]
+
+
+def test_read_paths_file(tmp_path):
+    file_dir = f"{tmp_path}/test.csv"
+    with open(file_dir, "w") as csv_file:
+        csv_file.write(
+            "benchmark,reward,walltime,commandline\n"
+            "benchmark://cbench-v0/foo,2.0,5.0,-a -b -c\n"
+        )
+    reader = CompilerEnvStateReader.read_paths([file_dir])
+    assert list(reader) == [
+        CompilerEnvState(
+            benchmark="benchmark://cbench-v0/foo",
+            walltime=5,
+            commandline="-a -b -c",
+            reward=2,
+        )
+    ]
+
+
+def test_read_paths_url(monkeypatch):
+    urls = ["https://compilergym.ai/benchmarktest.csv"]
+
+    class MockResponse:
+        def __init__(self, text, status_code):
+            self.text = text
+            self.status_code = status_code
+
+    def ok_mock_response(*args, **kwargs):
+        return MockResponse(
+            (
+                "benchmark,reward,walltime,commandline\n"
+                "benchmark://cbench-v0/foo,2.0,5.0,-a -b -c\n"
+            ),
+            200,
+        )
+
+    monkeypatch.setattr(requests, "get", ok_mock_response)
+    reader = CompilerEnvStateReader.read_paths(urls)
+    assert list(reader) == [
+        CompilerEnvState(
+            benchmark="benchmark://cbench-v0/foo",
+            walltime=5,
+            commandline="-a -b -c",
+            reward=2,
+        )
+    ]
+
+    def bad_mock_response(*args, **kwargs):
+        return MockResponse("", 404)
+
+    monkeypatch.setattr(requests, "get", bad_mock_response)
+    with pytest.raises(requests.exceptions.InvalidURL):
+        reader = CompilerEnvStateReader.read_paths(urls)
+        list(reader)
+
+
+def test_read_paths_bad_inputs():
+    bad_dirs = [
+        "/fake/directory/file.csv",
+        "fake/directory/file.csv",
+        "https://www.compilergym.ai/benchmark",
+        "htts://www.compilergym.ai/benchmark.csv",
+        "htts://www.compilergym.ai/benchmark",
+    ]
+    with pytest.raises(FileNotFoundError):
+        reader = CompilerEnvStateReader.read_paths(bad_dirs)
+        list(reader)
 
 
 if __name__ == "__main__":
