@@ -93,7 +93,7 @@ def non_validatable_cbench_uri(request) -> str:
 
 @pytest.fixture(scope="function")
 def env() -> LlvmEnv:
-    """Create an LLVM environment."""
+    """Test fixture that yields an environment."""
     with gym.make("llvm-v0") as env_:
         yield env_
 

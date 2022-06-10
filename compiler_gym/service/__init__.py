@@ -14,12 +14,14 @@ from compiler_gym.service.connection import (
     ServiceTransportError,
     SessionNotFound,
 )
+from compiler_gym.service.connection_pool import ServiceConnectionPool
 
 __all__ = [
-    "CompilerGymServiceConnection",
     "CompilationSession",
+    "CompilerGymServiceConnection",
     "ConnectionOpts",
     "EnvironmentNotSupported",
+    "ServiceConnectionPool",
     "ServiceError",
     "ServiceInitError",
     "ServiceIsClosed",

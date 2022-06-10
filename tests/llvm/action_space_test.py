@@ -17,12 +17,12 @@ def test_commandline_no_actions(env: LlvmEnv):
 
 def test_commandline(env: LlvmEnv):
     env.reset(benchmark="cbench-v1/crc32")
-    env.step(env.action_space.flags.index("-mem2reg"))
-    env.step(env.action_space.flags.index("-reg2mem"))
+    env.step(env.action_space["-mem2reg"])
+    env.step(env.action_space["-reg2mem"])
     assert env.commandline() == "opt -mem2reg -reg2mem input.bc -o output.bc"
     assert env.commandline_to_actions(env.commandline()) == [
-        env.action_space.flags.index("-mem2reg"),
-        env.action_space.flags.index("-reg2mem"),
+        env.action_space["-mem2reg"],
+        env.action_space["-reg2mem"],
     ]
 
 

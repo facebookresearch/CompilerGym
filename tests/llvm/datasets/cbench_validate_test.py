@@ -12,14 +12,14 @@ from tests.test_main import main
 pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 
-@pytest.mark.timeout(600)
+@pytest.mark.timeout(900)  # Validation can take a long time!
 def test_validate_benchmark_semantics(env: LlvmEnv, validatable_cbench_uri: str):
     """Run the validation routine on all benchmarks."""
     env.reward_space = "IrInstructionCount"
     env.reset(benchmark=validatable_cbench_uri)
 
     # Run a single step.
-    env.step(env.action_space.flags.index("-mem2reg"))
+    env.step(env.action_space["-mem2reg"])
 
     # Validate the environment state.
     result: ValidationResult = env.validate()
@@ -41,7 +41,7 @@ def test_non_validatable_benchmark_validate(
     env.reset(benchmark=non_validatable_cbench_uri)
 
     # Run a single step.
-    env.step(env.action_space.flags.index("-mem2reg"))
+    env.step(env.action_space["-mem2reg"])
 
     # Validate the environment state.
     result: ValidationResult = env.validate()

@@ -18,11 +18,22 @@ py_test(
 )
 
 py_test(
+    name = "connection_pool_test",
+    srcs = ["connection_pool_test.py"],
+    deps = [
+        "//compiler_gym",
+        "//compiler_gym/service",
+        "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
+    ],
+)
+
+py_test(
     name = "service_cache_test",
     timeout = "short",
     srcs = ["service_cache_test.py"],
     deps = [
-        "//compiler_gym/service:service_cache",
+        "//compiler_gym/service",
         "//tests:test_main",
     ],
 )

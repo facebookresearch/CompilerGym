@@ -16,7 +16,7 @@ GCC_SERVICE_BINARY: Path = runfiles_path(
 
 register(
     id="gcc-v0",
-    entry_point="compiler_gym.envs.gcc:GccEnv",
+    entry_point="compiler_gym.envs.gcc.gcc_env:make",
     kwargs={"service": GCC_SERVICE_BINARY},
 )
 

@@ -110,7 +110,7 @@ py_test(
         "//compiler_gym/third_party/cbench:crc32",
     ],
     deps = [
-        "//compiler_gym/envs",
+        "//compiler_gym",
         "//tests:test_main",
         "//tests/pytest_plugins:llvm",
     ],

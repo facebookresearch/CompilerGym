@@ -10,11 +10,12 @@ import sys
 from pathlib import Path
 from signal import Signals
 from time import sleep, time
-from typing import Dict, Iterable, List, Optional, TypeVar, Union
+from typing import Dict, FrozenSet, Iterable, List, Optional, TypeVar, Union
 
 import grpc
 from deprecated.sphinx import deprecated
-from pydantic import BaseModel
+from frozendict import frozendict
+from pydantic import BaseModel, root_validator
 
 import compiler_gym.errors
 from compiler_gym.service.proto import (
@@ -40,8 +41,8 @@ GRPC_CHANNEL_OPTIONS = [
     # Spurious error UNAVAILABLE "Trying to connect an http1.x server".
     # https://putridparrot.com/blog/the-unavailable-trying-to-connect-an-http1-x-server-grpc-error/
     ("grpc.enable_http_proxy", 0),
-    # Disable TCP port re-use to mitigate port conflict errors when starting
-    # many services in parallel. Context:
+    # Disable TCP port reuse to mitigate port conflict errors when starting many
+    # services in parallel. Context:
     # https://github.com/facebookresearch/CompilerGym/issues/572
     ("grpc.so_reuseport", 0),
 ]
@@ -49,7 +50,14 @@ GRPC_CHANNEL_OPTIONS = [
 logger = logging.getLogger(__name__)
 
 
-class ConnectionOpts(BaseModel):
+class HashableBaseModel(BaseModel):
+    """A pydantic model that is hashable. Requires that all fields are hashable."""
+
+    def __hash__(self):
+        return hash((type(self),) + tuple(self.__dict__.values()))
+
+
+class ConnectionOpts(HashableBaseModel):
     """The options used to configure a connection to a service."""
 
     rpc_call_max_seconds: float = 300
@@ -91,18 +99,24 @@ class ConnectionOpts(BaseModel):
     always_send_benchmark_on_reset: bool = False
     """Send the full benchmark program data to the compiler service on ever call
     to :meth:`env.reset() <compiler_gym.envs.CompilerEnv.reset>`. This is more
-    efficient in cases where the majority of calls to
-    :meth:`env.reset() <compiler_gym.envs.CompilerEnv.reset>` uses a different
-    benchmark. In case of benchmark re-use, leave this :code:`False`.
+    efficient in cases where the majority of calls to :meth:`env.reset()
+    <compiler_gym.envs.CompilerEnv.reset>` uses a different benchmark. In case
+    of benchmark reuse, leave this :code:`False`.
     """
 
-    script_args: List[str] = []
+    script_args: FrozenSet[str] = frozenset([])
     """If the service is started from a local script, this set of args is used
     on the command line. No effect when used for existing sockets."""
 
-    script_env: Dict[str, str] = {}
+    script_env: Dict[str, str] = frozendict({})
     """If the service is started from a local script, this set of env vars is
     used on the command line. No effect when used for existing sockets."""
+
+    @root_validator
+    def freeze_types(cls, values):
+        values["script_args"] = frozenset(values["script_args"])
+        values["script_env"] = frozendict(values["script_env"])
+        return values
 
 
 # Deprecated since v0.2.4.
@@ -301,7 +315,7 @@ class ManagedConnection(Connection):
         port_init_max_seconds: float,
         rpc_init_max_seconds: float,
         process_exit_max_seconds: float,
-        script_args: List[str],
+        script_args: FrozenSet[str],
         script_env: Dict[str, str],
     ):
         """Constructor.
@@ -323,7 +337,7 @@ class ManagedConnection(Connection):
             f"--working_dir={self.cache.path}",
         ]
         # Add any custom arguments
-        cmd += script_args
+        cmd += list(script_args)
 
         # Set the root of the runfiles directory.
         env = os.environ.copy()
@@ -532,10 +546,8 @@ class ManagedConnection(Connection):
 
     def __repr__(self):
         if self.process.poll() is None:
-            return (
-                f"Connection to service at {self.url} running on PID {self.process.pid}"
-            )
-        return f"Connection to dead service at {self.url}"
+            return f"ManagedConnection({self.url}, pid={self.process.pid})"
+        return f"ManagedConnection({self.url}, not running)"
 
 
 class UnmanagedConnection(Connection):
@@ -575,25 +587,26 @@ class UnmanagedConnection(Connection):
         super().__init__(channel, url)
 
     def __repr__(self):
-        return f"Connection to unmanaged service {self.url}"
+        return f"UnmanagedConnection({self.url})"
 
 
 class CompilerGymServiceConnection:
     """A connection to a compiler gym service.
 
     There are two types of service connections: managed and unmanaged. The type
-    of connection is determined by the endpoint. If a "host:port" URL is provided,
-    an unmanaged connection is created. If the path of a file is provided, a
-    managed connection is used. The difference between a managed and unmanaged
-    connection is that with a managed connection, the lifecycle of the service
-    if controlled by the client connection. That is, when a managed connection
-    is created, a service subprocess is started by executing the specified path.
-    When the connection is closed, the subprocess is terminated. With an
-    unmanaged connection, if the service fails is goes offline, the client will
-    fail.
+    of connection is determined by the endpoint. If a "host:port" URL is
+    provided, an unmanaged connection is created. If the path of a file is
+    provided, a managed connection is used. The difference between a managed and
+    unmanaged connection is that with a managed connection, the lifecycle of the
+    service if controlled by the client connection. That is, when a managed
+    connection is created, a service subprocess is started by executing the
+    specified path. When the connection is closed, the subprocess is terminated.
+    With an unmanaged connection, if the service fails is goes offline, the
+    client will fail.
 
-    This class provides a common abstraction between the two types of connection,
-    and provides a call method for invoking remote procedures on the service.
+    This class provides a common abstraction between the two types of
+    connection, and provides a call method for invoking remote procedures on the
+    service.
 
     Example usage of an unmanaged service connection:
 
@@ -622,7 +635,9 @@ class CompilerGymServiceConnection:
     :ivar stub: A CompilerGymServiceStub that can be used as the first argument
         to :py:meth:`__call__()` to specify an RPC
         method to call.
+
     :ivar action_spaces: A list of action spaces provided by the service.
+
     :ivar observation_spaces: A list of observation spaces provided by the
         service.
     """
@@ -630,20 +645,40 @@ class CompilerGymServiceConnection:
     def __init__(
         self,
         endpoint: Union[str, Path],
-        opts: ConnectionOpts = None,
+        opts: ConnectionOpts,
+        owning_service_pool: Optional["ServiceConnectionPool"] = None,  # noqa: F821
     ):
         """Constructor.
 
+        .. note::
+
+            Starting new services is expensive. Consider using the
+            :class:`ServiceConnectionPool
+            <compiler_gym.service.ServiceConnectionPool>` class to manage
+            services rather than constructing them yourself.
+
         :param endpoint: The connection endpoint. Either the URL of a service,
             e.g. "localhost:8080", or the path of a local service binary.
+
         :param opts: The connection options.
+
+        :param owning_service_pool: A backref to the owning
+            :class:`ServiceConnectionPool
+            <compiler_gym.service.ServiceConnectionPool>`, if this service is
+            managed by one.
+
         :raises ValueError: If the provided options are invalid.
-        :raises FileNotFoundError: In case opts.local_service_binary is not found.
+
+        :raises FileNotFoundError: In case opts.local_service_binary is not
+            found.
+
         :raises TimeoutError: In case the service failed to start within
                 opts.init_max_seconds seconds.
         """
+        self.released = False
         self.endpoint = endpoint
         self.opts = opts or ConnectionOpts()
+        self.owning_service_pool = owning_service_pool
         self.connection = None
         self.stub = None
         self._establish_connection()
@@ -726,20 +761,72 @@ class CompilerGymServiceConnection:
         )
 
     def __repr__(self):
-        if self.connection is None:
-            return f"Closed connection to {self.endpoint}"
-        return str(self.endpoint)
+        return f"CompilerGymServiceConnection({self.connection or 'detached'})"
 
     @property
     def closed(self) -> bool:
         """Whether the connection is closed."""
-        return self.connection is None
+        # Defensive hasattr() because this property is accessed by destructor.
+        if hasattr(self, "connection"):
+            return self.connection is None
+        return True
 
-    def close(self):
+    def acquire(self) -> "CompilerGymServiceConnection":
+        """Mark this connection as in-use."""
+        if not self.released:
+            raise TypeError(
+                "Attempting to acquire a connection that is already acquired."
+            )
+        self.released = False
+        return self
+
+    def release(self) -> None:
+        """Mark this connection as not in-use."""
+        if not self.released:
+            self.owning_service_pool.release(self)
+            self.released = True
+
+    def shutdown(self):
+        """Shut down the connection.
+
+        Once a connection has been shutdown, it cannot be reused.
+        """
         if self.closed:
             return
-        self.connection.close()
+
+        try:
+            self.connection.close()
+        except ServiceError as e:
+            # close() can raise ServiceError if the service exists with a
+            # non-zero return code. We swallow the error here as we are
+            # disposing of the service.
+            logger.debug(
+                "Ignoring service error during shutdown attempt: %s (%s)",
+                e,
+                type(e).__name__,
+            )
         self.connection = None
+
+    def close(self):
+        """Mark this connection as closed.
+
+        If the service is managed by a :class:`ServiceConnectionPool
+        <compiler_gym.service.ServiceConnectionPool>`, this will indicate to the
+        pool that the connection is ready to be reused. If the service is not
+        managed by a pool, this will shut it down.
+        """
+        if self.owned_by_service_pool:
+            self.release()
+        else:
+            self.shutdown()
+
+    @property
+    def owned_by_service_pool(self):
+        # Defensive hasattr() test because this property is accessed by the
+        # destructor, where the object could be in a partially initialized
+        # state.
+        if hasattr(self, "owning_service_pool"):
+            return self.owning_service_pool is not None
 
     def __del__(self):
         # Don't let the subprocess be orphaned if user forgot to close(), or
@@ -825,3 +912,12 @@ class CompilerGymServiceConnection:
                 retry_wait_backoff_exponent or self.opts.retry_wait_backoff_exponent
             ),
         )
+
+    def __enter__(self) -> "CompilerGymServiceConnection":
+        """Support for 'with' statements."""
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Support for 'with' statements."""
+        self.close()
+        return False

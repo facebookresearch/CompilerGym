@@ -7,6 +7,7 @@ import codecs
 import json
 import pickle
 from pathlib import Path
+from threading import Lock
 from typing import Any, Dict, List, Optional, Union
 
 from compiler_gym.datasets import Benchmark
@@ -15,6 +16,7 @@ from compiler_gym.envs.gcc.gcc import Gcc, GccSpec
 from compiler_gym.envs.gcc.gcc_rewards import AsmSizeReward, ObjSizeReward
 from compiler_gym.service import ConnectionOpts
 from compiler_gym.service.client_service_compiler_env import ClientServiceCompilerEnv
+from compiler_gym.service.connection_pool import ServiceConnectionPoolBase
 from compiler_gym.spaces import Reward
 from compiler_gym.util.decorators import memoized_property
 from compiler_gym.util.gym_type_hints import ObservationType, OptionalArgumentValue
@@ -63,9 +65,11 @@ class GccEnv(ClientServiceCompilerEnv):
 
         :raises ServiceInitError: If the requested GCC version cannot be used.
         """
-        connection_settings = connection_settings or ConnectionOpts()
         # Pass the executable path via an environment variable
-        connection_settings.script_env = {"CC": gcc_bin}
+        connection_settings = connection_settings or ConnectionOpts()
+        connection_settings.script_env = connection_settings.script_env.set(
+            "CC", gcc_bin
+        )
 
         # Eagerly create a GCC compiler instance now because:
         #
@@ -75,6 +79,13 @@ class GccEnv(ClientServiceCompilerEnv):
         #    start the backend service, as otherwise the backend service
         #    initialization may time out.
         Gcc(bin=gcc_bin)
+
+        # NOTE(github.com/facebookresearch/CompilerGym/pull/583): The GCC
+        # environment stalls on the StartSession() RPC call when service
+        # connection caching is enabled. I believe this has something to do with
+        # the runtime code generation, but have not been able to diagnose it
+        # yet. For now, disable service connection caching for GCC environments.
+        kwargs["service_pool"] = ServiceConnectionPoolBase()
 
         super().__init__(
             *args,
@@ -87,6 +98,9 @@ class GccEnv(ClientServiceCompilerEnv):
             connection_settings=connection_settings,
         )
         self._timeout = timeout
+
+    def commandline_to_actions(self, commandline: str) -> List[int]:
+        return NotImplementedError
 
     def reset(
         self,
@@ -213,3 +227,19 @@ class GccEnv(ClientServiceCompilerEnv):
             "gcc_bin": self.gcc_spec.gcc.bin,
             **super()._init_kwargs(),
         }
+
+
+_GCC_ENV_DOCKER_CONSTRUCTOR_LOCK = Lock()
+
+
+def make(*args, gcc_bin: Union[str, Path] = DEFAULT_GCC, **kwargs):
+    """Construct a GccEnv class using a lock to ensure thread exclusivity.
+
+    This is to prevent multiple threads running the docker initialization
+    routines simultaneously as this can cause issues with the docker API.
+    """
+    if gcc_bin.startswith("docker:"):
+        with _GCC_ENV_DOCKER_CONSTRUCTOR_LOCK:
+            return GccEnv(*args, gcc_bin=gcc_bin, **kwargs)
+    else:
+        return GccEnv(*args, gcc_bin=gcc_bin, **kwargs)

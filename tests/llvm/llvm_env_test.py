@@ -20,7 +20,7 @@ from compiler_gym.compiler_env_state import (
 from compiler_gym.envs import CompilerEnv, llvm
 from compiler_gym.envs.llvm.llvm_env import LlvmEnv
 from compiler_gym.errors import ServiceError
-from compiler_gym.service.connection import CompilerGymServiceConnection
+from compiler_gym.service.connection import CompilerGymServiceConnection, ConnectionOpts
 from tests.pytest_plugins import llvm as llvm_plugin
 from tests.test_main import main
 
@@ -34,7 +34,9 @@ def env(request) -> CompilerEnv:
         with gym.make("llvm-v0") as env:
             yield env
     else:
-        service = CompilerGymServiceConnection(llvm.LLVM_SERVICE_BINARY)
+        service = CompilerGymServiceConnection(
+            llvm.LLVM_SERVICE_BINARY, ConnectionOpts()
+        )
         try:
             with LlvmEnv(service=service.connection.url) as env:
                 yield env
@@ -90,7 +92,7 @@ def test_connection_dies_default_reward(env: LlvmEnv):
     # with env.reset() above. For UnmanagedConnection, this error will not be
     # raised.
     try:
-        env.service.close()
+        env.service.shutdown()
     except ServiceError as e:
         assert "Service exited with returncode " in str(e)
 
@@ -114,7 +116,7 @@ def test_connection_dies_default_reward_negated(env: LlvmEnv):
     # with env.reset() above. For UnmanagedConnection, this error will not be
     # raised.
     try:
-        env.service.close()
+        env.service.shutdown()
     except ServiceError as e:
         assert "Service exited with returncode " in str(e)
 
@@ -144,7 +146,7 @@ def test_apply_state(env: LlvmEnv):
     """Test that apply() on a clean environment produces same state."""
     env.reward_space = "IrInstructionCount"
     env.reset(benchmark="cbench-v1/crc32")
-    env.step(env.action_space.flags.index("-mem2reg"))
+    env.step(env.action_space["-mem2reg"])
 
     with gym.make("llvm-v0", reward_space="IrInstructionCount") as other:
         other.apply(env.state)
@@ -174,7 +176,7 @@ def test_same_reward_after_reset(env: LlvmEnv):
     env.reward_space = "IrInstructionCount"
     env.benchmark = "cbench-v1/dijkstra"
 
-    action = env.action_space.flags.index("-instcombine")
+    action = env.action_space["-instcombine"]
     env.reset()
 
     _, reward_a, _, _ = env.step(action)
@@ -201,7 +203,7 @@ def test_ir_sha1(env: LlvmEnv, tmpwd: Path):
     env.reset(benchmark="cbench-v1/crc32")
     before = env.ir_sha1
 
-    _, _, done, info = env.step(env.action_space.flags.index("-mem2reg"))
+    _, _, done, info = env.step(env.action_space["-mem2reg"])
     assert not done, info
     assert not info["action_had_no_effect"], "sanity check failed, action had no effect"
 
@@ -218,8 +220,8 @@ def test_step_multiple_actions_list(env: LlvmEnv):
     """Pass a list of actions to step()."""
     env.reset(benchmark="cbench-v1/crc32")
     actions = [
-        env.action_space.flags.index("-mem2reg"),
-        env.action_space.flags.index("-reg2mem"),
+        env.action_space["-mem2reg"],
+        env.action_space["-reg2mem"],
     ]
     _, _, done, _ = env.multistep(actions)
     assert not done
@@ -230,14 +232,14 @@ def test_step_multiple_actions_generator(env: LlvmEnv):
     """Pass an iterable of actions to step()."""
     env.reset(benchmark="cbench-v1/crc32")
     actions = (
-        env.action_space.flags.index("-mem2reg"),
-        env.action_space.flags.index("-reg2mem"),
+        env.action_space["-mem2reg"],
+        env.action_space["-reg2mem"],
     )
     _, _, done, _ = env.multistep(actions)
     assert not done
     assert env.actions == [
-        env.action_space.flags.index("-mem2reg"),
-        env.action_space.flags.index("-reg2mem"),
+        env.action_space["-mem2reg"],
+        env.action_space["-reg2mem"],
     ]
 
 

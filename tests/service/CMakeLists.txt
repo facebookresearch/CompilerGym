@@ -15,7 +15,20 @@ if(COMPILER_GYM_ENABLE_LLVM_ENV)
         compiler_gym::compiler_gym
         compiler_gym::envs::envs
         compiler_gym::errors::errors
+        compiler_gym::service::service
         compiler_gym::service::service_cache
+        tests::test_main
+    )
+
+    cg_py_test(
+      NAME
+        connection_pool_test
+      SRCS
+        "connection_pool_test.py"
+      DEPS
+        compiler_gym::errors::errors
+        compiler_gym::service::service
+        tests::pytest_plugins::llvm
         tests::test_main
     )
 endif()

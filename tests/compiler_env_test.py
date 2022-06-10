@@ -9,7 +9,7 @@ from flaky import flaky
 
 from compiler_gym.envs import llvm
 from compiler_gym.envs.llvm import LlvmEnv
-from compiler_gym.service.connection import CompilerGymServiceConnection
+from compiler_gym.service.connection import CompilerGymServiceConnection, ConnectionOpts
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.llvm"]
@@ -174,7 +174,7 @@ def test_step_session_id_not_found(env: LlvmEnv):
 @pytest.fixture(scope="function")
 def remote_env() -> LlvmEnv:
     """A test fixture that yields a connection to a remote service."""
-    service = CompilerGymServiceConnection(llvm.LLVM_SERVICE_BINARY)
+    service = CompilerGymServiceConnection(llvm.LLVM_SERVICE_BINARY, ConnectionOpts())
     try:
         with LlvmEnv(service=service.connection.url) as env:
             yield env

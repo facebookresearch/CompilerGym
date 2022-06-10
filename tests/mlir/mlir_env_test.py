@@ -12,7 +12,7 @@ import pytest
 import compiler_gym
 from compiler_gym.envs import CompilerEnv, mlir
 from compiler_gym.envs.mlir import MlirEnv
-from compiler_gym.service.connection import CompilerGymServiceConnection
+from compiler_gym.service.connection import CompilerGymServiceConnection, ConnectionOpts
 from compiler_gym.spaces import (
     Box,
     Dict,
@@ -36,7 +36,9 @@ def env(request) -> CompilerEnv:
         with gym.make("mlir-v0") as env:
             yield env
     else:
-        service = CompilerGymServiceConnection(mlir.MLIR_SERVICE_BINARY)
+        service = CompilerGymServiceConnection(
+            mlir.MLIR_SERVICE_BINARY, ConnectionOpts()
+        )
         try:
             with MlirEnv(service=service.connection.url) as env:
                 yield env

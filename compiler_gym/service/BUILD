@@ -9,14 +9,15 @@ py_library(
     name = "service",
     srcs = [
         "__init__.py",
+        "connection_pool.py",
     ],
     visibility = ["//visibility:public"],
     deps = [
+        # TODO(github.com/facebookresearch/CompilerGym/pull/633):
+        # add this after circular dependencies are resolved:
+        # ":client_service_compiler_env",
         ":compilation_session",
         ":connection",
-        # TODO(github.com/facebookresearch/CompilerGym/pull/633):
-        # add this after circular dependencies are resolved
-        # ":client_service_compiler_env",
         ":service_cache",
         "//compiler_gym/errors",
         "//compiler_gym/service/proto",

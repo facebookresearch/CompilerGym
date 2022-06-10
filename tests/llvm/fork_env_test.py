@@ -8,7 +8,13 @@ import sys
 
 import pytest
 
-from compiler_gym.envs import LlvmEnv
+import compiler_gym
+from compiler_gym.envs.llvm import LLVM_SERVICE_BINARY, LlvmEnv
+from compiler_gym.service import (
+    CompilerGymServiceConnection,
+    ConnectionOpts,
+    ServiceError,
+)
 from compiler_gym.util.runfiles_path import runfiles_path
 from tests.test_main import main
 
@@ -31,70 +37,78 @@ def test_with_statement(env: LlvmEnv):
     assert env.in_episode
 
 
-def test_fork_child_process_is_not_orphaned(env: LlvmEnv):
-    env.reset("cbench-v1/crc32")
-    with env.fork() as fkd:
-        # Check that both environments share the same service.
-        assert isinstance(env.service.connection.process, subprocess.Popen)
-        assert isinstance(fkd.service.connection.process, subprocess.Popen)
+def test_fork_child_process_is_not_orphaned():
+    service = CompilerGymServiceConnection(LLVM_SERVICE_BINARY, ConnectionOpts())
 
-        assert env.service.connection.process.pid == fkd.service.connection.process.pid
-        process = env.service.connection.process
+    with compiler_gym.make("llvm-v0", service_connection=service) as env:
+        env.reset("cbench-v1/crc32")
+        with env.fork() as fkd:
+            # Check that both environments share the same service.
+            assert isinstance(env.service.connection.process, subprocess.Popen)
+            assert isinstance(fkd.service.connection.process, subprocess.Popen)
 
-        # Sanity check that both services are alive.
-        assert not env.service.connection.process.poll()
-        assert not fkd.service.connection.process.poll()
+            assert (
+                env.service.connection.process.pid == fkd.service.connection.process.pid
+            )
+            process = env.service.connection.process
 
-        # Close the parent service.
-        env.close()
+            # Sanity check that both services are alive.
+            assert not env.service.connection.process.poll()
+            assert not fkd.service.connection.process.poll()
 
-        # Check that the service is still alive.
-        assert not env.service
-        assert not fkd.service.connection.process.poll()
+            # Close the parent service.
+            env.close()
 
-        # Close the forked service.
-        fkd.close()
+            # Check that the service is still alive.
+            assert not env.service
+            assert not fkd.service.connection.process.poll()
 
-        # Check that the service has been killed.
-        assert process.poll() is not None
+            # Close the forked service.
+            fkd.close()
+
+            # Check that the service has been killed.
+            assert process.poll() is not None
 
 
 def test_fork_chain_child_processes_are_not_orphaned(env: LlvmEnv):
-    env.reset("cbench-v1/crc32")
+    service = CompilerGymServiceConnection(LLVM_SERVICE_BINARY, ConnectionOpts())
 
-    # Create a chain of forked environments.
-    a = env.fork()
-    b = a.fork()
-    c = b.fork()
-    d = c.fork()
+    with compiler_gym.make("llvm-v0", service_connection=service) as env:
+        env.reset()
 
-    try:
-        # Sanity check that they share the same underlying service.
-        assert (
-            env.service.connection.process
-            == a.service.connection.process
-            == b.service.connection.process
-            == c.service.connection.process
-            == d.service.connection.process
-        )
-        proc = env.service.connection.process
-        # Kill the forked environments one by one.
-        a.close()
-        assert proc.poll() is None
-        b.close()
-        assert proc.poll() is None
-        c.close()
-        assert proc.poll() is None
-        d.close()
-        assert proc.poll() is None
-        # Kill the final environment, refcount 0, service is closed.
-        env.close()
-        assert proc.poll() is not None
-    finally:
-        a.close()
-        b.close()
-        c.close()
-        d.close()
+        # Create a chain of forked environments.
+        a = env.fork()
+        b = a.fork()
+        c = b.fork()
+        d = c.fork()
+
+        try:
+            # Sanity check that they share the same underlying service.
+            assert (
+                env.service.connection.process
+                == a.service.connection.process
+                == b.service.connection.process
+                == c.service.connection.process
+                == d.service.connection.process
+            )
+            proc = env.service.connection.process
+            # Kill the forked environments one by one.
+            a.close()
+            assert proc.poll() is None
+            b.close()
+            assert proc.poll() is None
+            c.close()
+            assert proc.poll() is None
+            d.close()
+            assert proc.poll() is None
+            # Kill the final environment, refcount 0, service is closed.
+            env.close()
+            assert proc.poll() is not None
+        finally:
+            a.close()
+            b.close()
+            c.close()
+            d.close()
 
 
 def test_fork_before_reset(env: LlvmEnv):
@@ -187,7 +201,7 @@ def test_fork_modified_ir_is_the_same(env: LlvmEnv):
     env.reset("cbench-v1/crc32")
 
     # Apply an action that modifies the benchmark.
-    _, _, done, info = env.step(env.action_space.flags.index("-mem2reg"))
+    _, _, done, info = env.step(env.action_space["-mem2reg"])
     assert not done
     assert not info["action_had_no_effect"]
 
@@ -195,8 +209,8 @@ def test_fork_modified_ir_is_the_same(env: LlvmEnv):
         assert "\n".join(env.ir.split("\n")[1:]) == "\n".join(fkd.ir.split("\n")[1:])
 
         # Apply another action.
-        _, _, done, info = env.step(env.action_space.flags.index("-gvn"))
-        _, _, done, info = fkd.step(fkd.action_space.flags.index("-gvn"))
+        _, _, done, info = env.step(env.action_space["-gvn"])
+        _, _, done, info = fkd.step(fkd.action_space["-gvn"])
         assert not done
         assert not info["action_had_no_effect"]
 
@@ -213,7 +227,10 @@ def test_fork_rewards(env: LlvmEnv, reward_space: str):
     env.reward_space = reward_space
     env.reset("cbench-v1/dijkstra")
 
-    actions = [env.action_space.flags.index(n) for n in ["-mem2reg", "-simplifycfg"]]
+    actions = [
+        env.action_space["-mem2reg"],
+        env.action_space["-simplifycfg"],
+    ]
 
     forked = env.fork()
     try:
@@ -231,23 +248,40 @@ def test_fork_previous_cost_reward_update(env: LlvmEnv):
     env.reward_space = "IrInstructionCount"
     env.reset("cbench-v1/crc32")
 
-    env.step(env.action_space.flags.index("-mem2reg"))
+    env.step(env.action_space["-mem2reg"])
     with env.fork() as fkd:
-        _, a, _, _ = env.step(env.action_space.flags.index("-mem2reg"))
-        _, b, _, _ = fkd.step(env.action_space.flags.index("-mem2reg"))
+        _, a, _, _ = env.step(env.action_space["-mem2reg"])
+        _, b, _, _ = fkd.step(env.action_space["-mem2reg"])
         assert a == b
 
 
 def test_fork_previous_cost_lazy_reward_update(env: LlvmEnv):
     env.reset("cbench-v1/crc32")
 
-    env.step(env.action_space.flags.index("-mem2reg"))
-    env.reward["IrInstructionCount"]
+    env.step(env.action_space["-mem2reg"])
+    env.reward["IrInstructionCount"]  # noqa
     with env.fork() as fkd:
-        env.step(env.action_space.flags.index("-mem2reg"))
-        fkd.step(env.action_space.flags.index("-mem2reg"))
+        env.step(env.action_space["-mem2reg"])
+        fkd.step(env.action_space["-mem2reg"])
 
         assert env.reward["IrInstructionCount"] == fkd.reward["IrInstructionCount"]
+
+
+def test_forked_service_dies(env: LlvmEnv):
+    """Test that if the service dies on a forked environment, each environment
+    creates new, independent services.
+    """
+    with env.fork() as fkd:
+        assert env.service == fkd.service
+        try:
+            fkd.service.connection.close()
+        except ServiceError:
+            pass  # shutdown() raises service error if in-episode.
+        fkd.service.close()
+
+        env.reset()
+        fkd.reset()
+        assert env.service != fkd.service
 
 
 if __name__ == "__main__":
