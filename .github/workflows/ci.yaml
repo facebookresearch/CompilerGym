@@ -89,6 +89,30 @@ jobs:
                   if-no-files-found: error
                   retention-days: 7
 
+            - name: Upload compute_programl binary
+              uses: actions/upload-artifact@v2
+              with:
+                  name: linux-compute-programl-cmake
+                  path: compiler_gym/third_party/programl/compute_programl
+                  if-no-files-found: error
+                  retention-days: 7
+
+            - name: Upload loop_unroller binary
+              uses: actions/upload-artifact@v2
+              with:
+                  name: linux-loop-unroller-cmake
+                  path: examples/example_unrolling_service/loop_unroller/loop_unroller
+                  if-no-files-found: error
+                  retention-days: 7
+
+            - name: Upload opt_loops binary
+              uses: actions/upload-artifact@v2
+              with:
+                  name: linux-opt-loops-cmake
+                  path: examples/loop_optimizations_service/opt_loops/opt_loops
+                  if-no-files-found: error
+                  retention-days: 7
+
     build-mlir-env-linux-cmake:
         runs-on: ubuntu-latest
         steps:
@@ -233,6 +257,43 @@ jobs:
 
             - name: Install test dependencies
               run: python -m pip install -r tests/requirements.txt
+
+            - name: Download compute_programl
+              uses: actions/download-artifact@v2
+              with:
+                  name: linux-compute-programl-cmake
+
+            - name: Download loop_unroller
+              uses: actions/download-artifact@v2
+              with:
+                  name: linux-loop-unroller-cmake
+
+            - name: Download opt_loops
+              uses: actions/download-artifact@v2
+              with:
+                  name: linux-opt-loops-cmake
+
+            - name: Move examples and utility binaries
+              run: |
+                  chmod +x compute_programl
+                  chmod +x loop_unroller
+                  chmod +x opt_loops
+                  mv compute_programl ./compiler_gym/third_party/programl/compute_programl
+                  mv loop_unroller ./examples/example_unrolling_service/loop_unroller/loop_unroller
+                  mv opt_loops ./examples/loop_optimizations_service/opt_loops/opt_loops
+                  test ./compiler_gym/third_party/programl/compute_programl
+                  test ./examples/example_unrolling_service/loop_unroller/loop_unroller
+                  test ./examples/loop_optimizations_service/opt_loops/opt_loops
+              shell: bash
+
+            - name: Run environment examples
+              run: |
+                  cd examples
+                  python example_compiler_gym_service/demo_without_bazel.py
+                  python example_unrolling_service/example_without_bazel.py
+                  python loop_optimizations_service/example_without_bazel.py
+                  cd -
+              shell: bash
 
             - name: Run the test suite
               run: make install-test PYTEST_ARGS="--ignore tests/mlir"
