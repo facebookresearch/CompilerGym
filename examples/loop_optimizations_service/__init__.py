@@ -3,6 +3,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """This module registers the Loop Optimizations CompilerGym environment """
+import os
 import subprocess
 from pathlib import Path
 from typing import Iterable
@@ -20,10 +21,16 @@ LOOPS_OPT_PY_SERVICE_BINARY: Path = runfiles_path(
 )
 
 BENCHMARKS_PATH: Path = runfiles_path("examples/loop_optimizations_service/benchmarks")
+if not os.path.exists(BENCHMARKS_PATH):
+    BENCHMARKS_PATH = Path("loop_optimizations_service/benchmarks")
 
 NEURO_VECTORIZER_HEADER: Path = runfiles_path(
     "compiler_gym/third_party/neuro-vectorizer/header.h"
 )
+if not os.path.exists(NEURO_VECTORIZER_HEADER):
+    NEURO_VECTORIZER_HEADER: Path = Path(
+        "../compiler_gym/third_party/neuro-vectorizer/header.h"
+    )
 
 
 class RuntimeReward(Reward):

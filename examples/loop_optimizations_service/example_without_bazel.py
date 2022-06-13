@@ -92,22 +92,22 @@ class SizeReward(Reward):
 class LoopsDataset(Dataset):
     def __init__(self, *args, **kwargs):
         super().__init__(
-            name="benchmark://loops-opt-v0",
+            name="benchmark://loops-opt-v1",
             license="MIT",
             description="Loops optimization dataset",
         )
 
         self._benchmarks = {
             "/add": Benchmark.from_file_contents(
-                "benchmark://loops-opt-v0/add",
+                "benchmark://loops-opt-v1/add",
                 self.preprocess(BENCHMARKS_PATH / "add.c"),
             ),
             "/offsets1": Benchmark.from_file_contents(
-                "benchmark://loops-opt-v0/offsets1",
+                "benchmark://loops-opt-v1/offsets1",
                 self.preprocess(BENCHMARKS_PATH / "offsets1.c"),
             ),
             "/conv2d": Benchmark.from_file_contents(
-                "benchmark://loops-opt-v0/conv2d",
+                "benchmark://loops-opt-v1/conv2d",
                 self.preprocess(BENCHMARKS_PATH / "conv2d.c"),
             ),
         }
@@ -133,7 +133,7 @@ class LoopsDataset(Dataset):
         )
 
     def benchmark_uris(self) -> Iterable[str]:
-        yield from (f"benchmark://loops-opt-v0{k}" for k in self._benchmarks.keys())
+        yield from (f"benchmark://loops-opt-v1{k}" for k in self._benchmarks.keys())
 
     def benchmark_from_parsed_uri(self, uri: BenchmarkUri) -> Benchmark:
         if uri.path in self._benchmarks:
@@ -143,10 +143,10 @@ class LoopsDataset(Dataset):
 
 
 # Register the unrolling example service on module import. After importing this module,
-# the loops-opt-py-v0 environment will be available to gym.make(...).
+# the loops-opt-py-v1 environment will be available to gym.make(...).
 
 register(
-    id="loops-opt-py-v0",
+    id="loops-opt-py-v1",
     entry_point="compiler_gym.service.client_service_compiler_env:ClientServiceCompilerEnv",
     kwargs={
         "service": LOOPS_OPT_PY_SERVICE_BINARY,
@@ -156,8 +156,8 @@ register(
 )
 
 with compiler_gym.make(
-    "loops-opt-py-v0",
-    benchmark="loops-opt-v0/add",
+    "loops-opt-py-v1",
+    benchmark="loops-opt-v1/add",
     observation_space="Programl",
     reward_space="runtime",
 ) as env:
