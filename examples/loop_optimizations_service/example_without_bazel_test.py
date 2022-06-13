@@ -8,5 +8,5 @@ from loop_optimizations_service.example_without_bazel import main
 
 
 @flaky
-def test_demo_without_bazel():
+def test_example_without_bazel():
     main()

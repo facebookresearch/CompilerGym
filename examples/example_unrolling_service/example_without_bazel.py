@@ -14,6 +14,7 @@ Usage:
 
 It is equivalent in behavior to the example.py script in this directory.
 """
+import logging
 import subprocess
 from pathlib import Path
 from typing import Iterable
@@ -24,6 +25,7 @@ from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.envs.llvm.llvm_benchmark import get_system_library_flags
 from compiler_gym.spaces import Reward
 from compiler_gym.third_party import llvm
+from compiler_gym.util.logging import init_logging
 from compiler_gym.util.registration import register
 
 UNROLLING_PY_SERVICE_BINARY: Path = Path(
@@ -153,32 +155,41 @@ register(
     },
 )
 
-with compiler_gym.make(
-    "unrolling-py-v1",
-    benchmark="unrolling-v1/offsets1",
-    observation_space="features",
-    reward_space="runtime",
-) as env:
-    compiler_gym.set_debug_level(4)  # TODO: check why this has no effect
 
-    observation = env.reset()
-    print("observation: ", observation)
+def main():
+    # Use debug verbosity to print out extra logging information.
+    init_logging(level=logging.DEBUG)
 
-    print()
+    with compiler_gym.make(
+        "unrolling-py-v1",
+        benchmark="unrolling-v1/offsets1",
+        observation_space="features",
+        reward_space="runtime",
+    ) as env:
+        compiler_gym.set_debug_level(4)  # TODO: check why this has no effect
 
-    observation, reward, done, info = env.step(env.action_space.sample())
-    print("observation: ", observation)
-    print("reward: ", reward)
-    print("done: ", done)
-    print("info: ", info)
+        observation = env.reset()
+        print("observation: ", observation)
 
-    print()
+        print()
 
-    observation, reward, done, info = env.step(env.action_space.sample())
-    print("observation: ", observation)
-    print("reward: ", reward)
-    print("done: ", done)
-    print("info: ", info)
+        observation, reward, done, info = env.step(env.action_space.sample())
+        print("observation: ", observation)
+        print("reward: ", reward)
+        print("done: ", done)
+        print("info: ", info)
 
-    # TODO: implement write_bitcode(..) or write_ir(..)
-    # env.write_bitcode("/tmp/output.bc")
+        print()
+
+        observation, reward, done, info = env.step(env.action_space.sample())
+        print("observation: ", observation)
+        print("reward: ", reward)
+        print("done: ", done)
+        print("info: ", info)
+
+        # TODO: implement write_bitcode(..) or write_ir(..)
+        # env.write_bitcode("/tmp/output.bc")
+
+
+if __name__ == "__main__":
+    main()

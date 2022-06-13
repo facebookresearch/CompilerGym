@@ -8,5 +8,5 @@ from flaky import flaky
 
 
 @flaky
-def test_demo_without_bazel():
+def test_example_without_bazel():
     main()
