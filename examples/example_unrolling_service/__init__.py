@@ -3,6 +3,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """This module defines and registers the example gym environments."""
+import os
 import subprocess
 from pathlib import Path
 from typing import Iterable
@@ -13,17 +14,24 @@ from compiler_gym.envs.llvm.llvm_benchmark import get_system_library_flags
 from compiler_gym.spaces import Reward
 from compiler_gym.third_party import llvm
 from compiler_gym.util.registration import register
-from compiler_gym.util.runfiles_path import runfiles_path, site_data_path
+from compiler_gym.util.runfiles_path import runfiles_path
 
 UNROLLING_PY_SERVICE_BINARY: Path = runfiles_path(
     "examples/example_unrolling_service/service_py/example-unrolling-service-py"
 )
 
 BENCHMARKS_PATH: Path = runfiles_path("examples/example_unrolling_service/benchmarks")
+if not os.path.exists(BENCHMARKS_PATH):
+    BENCHMARKS_PATH = Path("example_unrolling_service/benchmarks")
+
 
 NEURO_VECTORIZER_HEADER: Path = runfiles_path(
     "compiler_gym/third_party/neuro-vectorizer/header.h"
 )
+if not os.path.exists(NEURO_VECTORIZER_HEADER):
+    NEURO_VECTORIZER_HEADER: Path = Path(
+        "../compiler_gym/third_party/neuro-vectorizer/header.h"
+    )
 
 
 class RuntimeReward(Reward):
@@ -84,9 +92,6 @@ class UnrollingDataset(Dataset):
             name="benchmark://unrolling-v0",
             license="MIT",
             description="Unrolling example dataset",
-            site_data_base=site_data_path(
-                "example_dataset"
-            ),  # TODO: what should we set this to? we are not using it
         )
 
         self._benchmarks = {

@@ -285,15 +285,6 @@ jobs:
                   test ./examples/loop_optimizations_service/opt_loops/opt_loops
               shell: bash
 
-            - name: Run environment examples
-              run: |
-                  cd examples
-                  python example_compiler_gym_service/demo_without_bazel.py
-                  python example_unrolling_service/example_without_bazel.py
-                  python loop_optimizations_service/example_without_bazel.py
-                  cd -
-              shell: bash
-
             - name: Run the test suite
               run: make install-test PYTEST_ARGS="--ignore tests/mlir"
 
@@ -627,7 +618,7 @@ jobs:
               run: make -C examples install
 
             - name: Run the test suite
-              run: make -C examples test
+              run: make -C examples test PYTEST_ARGS="--ignore example_unrolling_service --ignore loop_optimizations_service"
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
@@ -662,7 +653,7 @@ jobs:
               run: make -C examples install
 
             - name: Run the test suite
-              run: make -C examples test
+              run: make -C examples test PYTEST_ARGS="--ignore example_unrolling_service --ignore loop_optimizations_service"
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2

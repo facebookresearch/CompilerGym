@@ -14,6 +14,7 @@ Usage:
 
 It is equivalent in behavior to the example.py script in this directory.
 """
+import logging
 import subprocess
 from pathlib import Path
 from typing import Iterable
@@ -24,6 +25,7 @@ from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.envs.llvm.llvm_benchmark import get_system_library_flags
 from compiler_gym.spaces import Reward
 from compiler_gym.third_party import llvm
+from compiler_gym.util.logging import init_logging
 from compiler_gym.util.registration import register
 
 LOOPS_OPT_PY_SERVICE_BINARY: Path = Path(
@@ -92,22 +94,22 @@ class SizeReward(Reward):
 class LoopsDataset(Dataset):
     def __init__(self, *args, **kwargs):
         super().__init__(
-            name="benchmark://loops-opt-v0",
+            name="benchmark://loops-opt-v1",
             license="MIT",
             description="Loops optimization dataset",
         )
 
         self._benchmarks = {
             "/add": Benchmark.from_file_contents(
-                "benchmark://loops-opt-v0/add",
+                "benchmark://loops-opt-v1/add",
                 self.preprocess(BENCHMARKS_PATH / "add.c"),
             ),
             "/offsets1": Benchmark.from_file_contents(
-                "benchmark://loops-opt-v0/offsets1",
+                "benchmark://loops-opt-v1/offsets1",
                 self.preprocess(BENCHMARKS_PATH / "offsets1.c"),
             ),
             "/conv2d": Benchmark.from_file_contents(
-                "benchmark://loops-opt-v0/conv2d",
+                "benchmark://loops-opt-v1/conv2d",
                 self.preprocess(BENCHMARKS_PATH / "conv2d.c"),
             ),
         }
@@ -133,7 +135,7 @@ class LoopsDataset(Dataset):
         )
 
     def benchmark_uris(self) -> Iterable[str]:
-        yield from (f"benchmark://loops-opt-v0{k}" for k in self._benchmarks.keys())
+        yield from (f"benchmark://loops-opt-v1{k}" for k in self._benchmarks.keys())
 
     def benchmark_from_parsed_uri(self, uri: BenchmarkUri) -> Benchmark:
         if uri.path in self._benchmarks:
@@ -143,10 +145,10 @@ class LoopsDataset(Dataset):
 
 
 # Register the unrolling example service on module import. After importing this module,
-# the loops-opt-py-v0 environment will be available to gym.make(...).
+# the loops-opt-py-v1 environment will be available to gym.make(...).
 
 register(
-    id="loops-opt-py-v0",
+    id="loops-opt-py-v1",
     entry_point="compiler_gym.service.client_service_compiler_env:ClientServiceCompilerEnv",
     kwargs={
         "service": LOOPS_OPT_PY_SERVICE_BINARY,
@@ -155,26 +157,35 @@ register(
     },
 )
 
-with compiler_gym.make(
-    "loops-opt-py-v0",
-    benchmark="loops-opt-v0/add",
-    observation_space="Programl",
-    reward_space="runtime",
-) as env:
-    compiler_gym.set_debug_level(4)  # TODO: check why this has no effect
 
-    observation = env.reset()
-    print("observation: ", observation)
+def main():
+    # Use debug verbosity to print out extra logging information.
+    init_logging(level=logging.DEBUG)
 
-    print()
+    with compiler_gym.make(
+        "loops-opt-py-v1",
+        benchmark="loops-opt-v1/add",
+        observation_space="Programl",
+        reward_space="runtime",
+    ) as env:
+        compiler_gym.set_debug_level(4)  # TODO: check why this has no effect
 
-    observation, reward, done, info = env.step(env.action_space.sample())
-    print("observation: ", observation)
-    print("reward: ", reward)
-    print("done: ", done)
-    print("info: ", info)
+        observation = env.reset()
+        print("observation: ", observation)
 
-    env.close()
+        print()
 
-    # TODO: implement write_bitcode(..) or write_ir(..)
-    # env.write_bitcode("/tmp/output.bc")
+        observation, reward, done, info = env.step(env.action_space.sample())
+        print("observation: ", observation)
+        print("reward: ", reward)
+        print("done: ", done)
+        print("info: ", info)
+
+        env.close()
+
+        # TODO: implement write_bitcode(..) or write_ir(..)
+        # env.write_bitcode("/tmp/output.bc")
+
+
+if __name__ == "__main__":
+    main()
