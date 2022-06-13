@@ -4,12 +4,12 @@
 # LICENSE file in the root directory of this source tree.
 import json
 import logging
+import warnings
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
 
 import pandas as pd
-import ray
 import yaml
 from pydantic import BaseModel, Field
 from ray import tune
@@ -23,6 +23,11 @@ from .environment import Environment
 from .inference_result import InferenceResult
 from .testing import Testing
 from .training import Training
+
+# Ignore import deprecation warnings from ray.
+with warnings.catch_warnings():
+    warnings.filterwarnings("ignore", category=DeprecationWarning)
+    import ray
 
 logger = logging.getLogger(__name__)
 

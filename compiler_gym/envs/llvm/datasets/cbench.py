@@ -725,7 +725,13 @@ validator(
     cmd="$BIN 512",
 )
 
-for i in range(1, 21):
+# The cBench benchmarks contain 20 runtime datasets. When use all 20 datasets
+# when validating the correctness of one of these benchmarks, we use all 20
+# datasets. However, this takes a long time, so for CI jobs (determined by the
+# presence of the $CI environment variable), we use only 2 datasets for testing.
+NUM_DATASETS = 2 if os.environ.get("CI", "") == "1" else 20
+
+for i in range(1, NUM_DATASETS + 1):
 
     # NOTE(cummins): Disabled due to timeout errors, further investigation
     # needed.
