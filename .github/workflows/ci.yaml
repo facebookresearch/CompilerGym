@@ -662,7 +662,7 @@ jobs:
               run: make -C examples install
 
             - name: Run the test suite
-              run: make -C examples test
+              run: make -C examples test PYTEST_ARGS="--ignore example_unrolling_service --ignore loop_optimizations_service"
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
