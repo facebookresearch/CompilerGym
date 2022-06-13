@@ -1,48 +1,23 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>LLVM Environment Reference &mdash; CompilerGym 0.2.4 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
-
-  
-  
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
     <link rel="shortcut icon" href="../_static/favicon.png"/>
-  
-
-  
-  
-
-  
-
-  
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+    <script src="../_static/js/theme.js"></script>
     <link rel="author" title="About these documents" href="../about.html" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -50,36 +25,17 @@
     <link rel="prev" title="Frequently Asked Questions" href="../faq.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../index.html">
-          
-
-          
-            
             <img src="../_static/logo.png" class="logo" alt="Logo"/>
-          
           </a>
-
-          
-            
-            
               <div class="version">
                 0.2.4
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -87,18 +43,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
@@ -167,73 +112,32 @@
 <li class="toctree-l1"><a class="reference internal" href="../cc/compiler_gym/util.html">compiler_gym/util</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">CompilerGym</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>LLVM Environment Reference</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="../_sources/llvm/index.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <div class="section" id="llvm-environment-reference">
-<h1>LLVM Environment Reference<a class="headerlink" href="#llvm-environment-reference" title="Permalink to this headline">¶</a></h1>
+<h1>LLVM Environment Reference<a class="headerlink" href="#llvm-environment-reference" title="Permalink to this headline"></a></h1>
 <p><a class="reference external" href="https://llvm.org/">LLVM</a> is a production-grade compiler used throughout
 industry. It defines a machine independent intermediate representation (IR), and
 comprises a family of tools with frontends for C, C++, OpenCL, and many other
@@ -276,12 +180,12 @@ languages.</p>
 </ul>
 </div>
 <div class="section" id="installation">
-<h2><a class="toc-backref" href="#id4">Installation</a><a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id4">Installation</a><a class="headerlink" href="#installation" title="Permalink to this headline"></a></h2>
 <p>The LLVM environments are self-installing and work out of the box. A pack of
 required runtime data is downloaded and cached on first use of the environments.</p>
 </div>
 <div class="section" id="datasets">
-<h2><a class="toc-backref" href="#id5">Datasets</a><a class="headerlink" href="#datasets" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id5">Datasets</a><a class="headerlink" href="#datasets" title="Permalink to this headline"></a></h2>
 <p>We provide several datasets of open-source LLVM-IR benchmarks for use:</p>
 <table class="docutils align-default">
 <colgroup>
@@ -403,11 +307,11 @@ operations.</p>
 <img alt="../_images/datasets.png" src="../_images/datasets.png" />
 </div>
 <div class="section" id="observation-spaces">
-<h2><a class="toc-backref" href="#id6">Observation Spaces</a><a class="headerlink" href="#observation-spaces" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id6">Observation Spaces</a><a class="headerlink" href="#observation-spaces" title="Permalink to this headline"></a></h2>
 <p>We provide several observation spaces for LLVM based on published compiler
 research.</p>
 <div class="section" id="llvm-ir">
-<h3><a class="toc-backref" href="#id7">LLVM-IR</a><a class="headerlink" href="#llvm-ir" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id7">LLVM-IR</a><a class="headerlink" href="#llvm-ir" title="Permalink to this headline"></a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 51%" />
@@ -445,7 +349,7 @@ temporary directory that is removed when <a class="reference internal" href="../
 </div>
 </div>
 <div class="section" id="instcount">
-<h3><a class="toc-backref" href="#id8">InstCount</a><a class="headerlink" href="#instcount" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id8">InstCount</a><a class="headerlink" href="#instcount" title="Permalink to this headline"></a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 1%" />
@@ -846,7 +750,7 @@ feature vector:</p>
 deterministic, and platform independent.</p>
 </div>
 <div class="section" id="autophase">
-<h3><a class="toc-backref" href="#id9">Autophase</a><a class="headerlink" href="#autophase" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id9">Autophase</a><a class="headerlink" href="#autophase" title="Permalink to this headline"></a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 2%" />
@@ -1142,7 +1046,7 @@ they appear in the keys of the <code class="code docutils literal notranslate"><
 </div>
 </div>
 <div class="section" id="inst2vec">
-<h3><a class="toc-backref" href="#id10">Inst2vec</a><a class="headerlink" href="#inst2vec" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id10">Inst2vec</a><a class="headerlink" href="#inst2vec" title="Permalink to this headline"></a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 50%" />
@@ -1219,7 +1123,7 @@ produce a program embedding.</p>
 </div>
 </div>
 <div class="section" id="programl">
-<h3><a class="toc-backref" href="#id11">ProGraML</a><a class="headerlink" href="#programl" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id11">ProGraML</a><a class="headerlink" href="#programl" title="Permalink to this headline"></a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 33%" />
@@ -1271,7 +1175,7 @@ flow, and green edges are call flow.</p>
 </div>
 </div>
 <div class="section" id="hardware-information">
-<h3><a class="toc-backref" href="#id12">Hardware Information</a><a class="headerlink" href="#hardware-information" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id12">Hardware Information</a><a class="headerlink" href="#hardware-information" title="Permalink to this headline"></a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 8%" />
@@ -1300,7 +1204,7 @@ hardware. The values are independent of the compiler and program state.</p>
 </div>
 </div>
 <div class="section" id="cost-models">
-<h3><a class="toc-backref" href="#id13">Cost Models</a><a class="headerlink" href="#cost-models" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id13">Cost Models</a><a class="headerlink" href="#cost-models" title="Permalink to this headline"></a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 24%" />
@@ -1341,7 +1245,7 @@ hardware. The values are independent of the compiler and program state.</p>
 <p>Raw values from the cost models used to compute <a class="reference internal" href="#reward"><span class="std std-ref">rewards</span></a>.</p>
 </div>
 <div class="section" id="runtime">
-<h3><a class="toc-backref" href="#id14">Runtime</a><a class="headerlink" href="#runtime" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id14">Runtime</a><a class="headerlink" href="#runtime" title="Permalink to this headline"></a></h3>
 <p>🏗️ <strong>Experimental API:</strong> This runtime observation space
 is still in an experimental state and is not yet stable. There may be bugs and
 breaking changes in future releases.</p>
@@ -1374,7 +1278,7 @@ is runnable, else <code class="code docutils literal notranslate"><span class="p
 for a benchmark that is not runnable will return an empty list.</p>
 </div>
 <div class="section" id="build-time">
-<h3><a class="toc-backref" href="#id15">Build Time</a><a class="headerlink" href="#build-time" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id15">Build Time</a><a class="headerlink" href="#build-time" title="Permalink to this headline"></a></h3>
 <p>🏗️ <strong>Experimental API:</strong> This compiler time observation
 space is still in an experimental state and is not yet stable. There may be bugs
 and breaking changes in future releases.</p>
@@ -1407,7 +1311,7 @@ list.</p>
 </div>
 </div>
 <div class="section" id="reward-spaces">
-<span id="reward"></span><h2><a class="toc-backref" href="#id16">Reward Spaces</a><a class="headerlink" href="#reward-spaces" title="Permalink to this headline">¶</a></h2>
+<span id="reward"></span><h2><a class="toc-backref" href="#id16">Reward Spaces</a><a class="headerlink" href="#reward-spaces" title="Permalink to this headline"></a></h2>
 <p>The goal of CompilerGym tasks is to minimize a cost function <span class="math notranslate nohighlight">\(C(s)\)</span> which
 takes as input the current program state <span class="math notranslate nohighlight">\(s\)</span> and produces a real-valued
 cost. At a given timestep, reward is the reduction in cost from the previous
@@ -1433,7 +1337,7 @@ achieved by applying the baseline policy to produce a baseline state
 the reward space <code class="code docutils literal notranslate"><span class="pre">IrInstructionCountO3</span></code> is <code class="code docutils literal notranslate"><span class="pre">IrInstructionCount</span></code>
 reward normalized to the <code class="code docutils literal notranslate"><span class="pre">-O3</span></code> baseline policy.</p>
 <div class="section" id="ir-instruction-count">
-<h3><a class="toc-backref" href="#id17">IR Instruction Count</a><a class="headerlink" href="#ir-instruction-count" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id17">IR Instruction Count</a><a class="headerlink" href="#ir-instruction-count" title="Permalink to this headline"></a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 21%" />
@@ -1492,7 +1396,7 @@ platform-independent, but is not a measure of true codesize reduction as it does
 not take into account the effects of lowering.</p>
 </div>
 <div class="section" id="codesize">
-<h3><a class="toc-backref" href="#id18">Codesize</a><a class="headerlink" href="#codesize" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id18">Codesize</a><a class="headerlink" href="#codesize" title="Permalink to this headline"></a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 19%" />
@@ -1550,7 +1454,7 @@ object file code size depends on the target platform, see
 </div>
 </div>
 <div class="section" id="action-space">
-<h2><a class="toc-backref" href="#id19">Action Space</a><a class="headerlink" href="#action-space" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id19">Action Space</a><a class="headerlink" href="#action-space" title="Permalink to this headline"></a></h2>
 <p>The LLVM action space exposes the selection of semantics-preserving optimization
 transforms as a discrete space.</p>
 <table class="docutils align-default">
@@ -1937,9 +1841,9 @@ transforms as a discrete space.</p>
 </table>
 </div>
 <div class="section" id="faq">
-<h2><a class="toc-backref" href="#id20">FAQ</a><a class="headerlink" href="#faq" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id20">FAQ</a><a class="headerlink" href="#faq" title="Permalink to this headline"></a></h2>
 <div class="section" id="is-this-really-a-sequential-decision-process">
-<h3><a class="toc-backref" href="#id21">Is this really a sequential decision process?</a><a class="headerlink" href="#is-this-really-a-sequential-decision-process" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id21">Is this really a sequential decision process?</a><a class="headerlink" href="#is-this-really-a-sequential-decision-process" title="Permalink to this headline"></a></h3>
 <p>Yes. Compilers frequently package individual transformations as “optimization
 passes” which are then applied in a sequential order. Usually this order is
 fixed (e.g. <a class="reference external" href="https://github.com/llvm/llvm-project/blob/71a8e4e7d6b947c8b954ec0763ff7969b3879d7b/llvm/lib/Transforms/IPO/PassManagerBuilder.cpp#L517-L922">real world example</a>).
@@ -1947,7 +1851,7 @@ The CompilerGym LLVM environment replaces that fixed order with a sequential
 decision process where any pass may be applied at any stage.</p>
 </div>
 <div class="section" id="when-does-the-environment-consider-an-episode-done">
-<h3><a class="toc-backref" href="#id22">When does the environment consider an episode “done”?</a><a class="headerlink" href="#when-does-the-environment-consider-an-episode-done" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id22">When does the environment consider an episode “done”?</a><a class="headerlink" href="#when-does-the-environment-consider-an-episode-done" title="Permalink to this headline"></a></h3>
 <p>The compiler itself doesn’t have a signal for termination. Actions are like
 rewrite rules, it is up to the user to decide when no more improvement can be
 achieved from further rewrites. E.g. for simple random search we can use
@@ -1956,7 +1860,7 @@ The only exception is if the compiler crashes, or the code ends up in an
 unexpected state - we have to abort. This happens.</p>
 </div>
 <div class="section" id="how-do-i-run-this-on-my-own-program">
-<h3><a class="toc-backref" href="#id23">How do I run this on my own program?</a><a class="headerlink" href="#how-do-i-run-this-on-my-own-program" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id23">How do I run this on my own program?</a><a class="headerlink" href="#how-do-i-run-this-on-my-own-program" title="Permalink to this headline"></a></h3>
 <p>By compiling your program to an unoptimized LLVM bitcode file. This can be done
 automatically for C/C++ programs using the <a class="reference internal" href="api.html#compiler_gym.envs.llvm.make_benchmark" title="compiler_gym.envs.llvm.make_benchmark"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.make_benchmark()</span></code></a> API, or you can do this yourself using
 clang:</p>
@@ -1972,7 +1876,7 @@ tools using the <cite>–benchmark</cite> flag, e.g.</p>
 </div>
 </div>
 <div class="section" id="should-i-always-try-different-actions">
-<h3><a class="toc-backref" href="#id24">Should I always try different actions?</a><a class="headerlink" href="#should-i-always-try-different-actions" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id24">Should I always try different actions?</a><a class="headerlink" href="#should-i-always-try-different-actions" title="Permalink to this headline"></a></h3>
 <p>Some optimization actions may be called multiple times after other actions. An
 example of this is <a class="reference external" href="https://en.wikipedia.org/wiki/Dead_code_elimination">dead code elimination</a>, which can be used to
 “clean up mess” generated from a previous action. So repeating the same action
@@ -1983,63 +1887,44 @@ in different context can bring improvements.</p>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="../envs/gcc.html" class="btn btn-neutral float-right" title="GCC Environment Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="../faq.html" class="btn btn-neutral float-left" title="Frequently Asked Questions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../envs/gcc.html" class="btn btn-neutral float-right" title="GCC Environment Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright Meta Platforms, Inc.
-
-    </p>
+    <p>&#169; Copyright Meta Platforms, Inc.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
-
-  
-  
-    
     <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WJN2CKJJKH"></script>
     <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
 
-    ga('create', 'G-WJN2CKJJKH', 'auto');
-    
-    ga('send', 'pageview');
-    </script>
-
-    
-   
+      gtag('config', 'G-WJN2CKJJKH', {
+          'anonymize_ip': false,
+      });
+    </script> 
 
 </body>
 </html>

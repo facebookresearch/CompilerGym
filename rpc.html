@@ -1,47 +1,22 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>RPC Service Reference &mdash; CompilerGym 0.2.4 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
-
-  
-  
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
     <link rel="shortcut icon" href="_static/favicon.png"/>
-  
-
-  
-  
-
-  
-
-  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -49,36 +24,17 @@
     <link rel="prev" title="Command Line Reference" href="cli.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="index.html">
-          
-
-          
-            
             <img src="_static/logo.png" class="logo" alt="Logo"/>
-          
           </a>
-
-          
-            
-            
               <div class="version">
                 0.2.4
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -86,18 +42,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
@@ -143,73 +88,32 @@
 <li class="toctree-l1"><a class="reference internal" href="cc/compiler_gym/util.html">compiler_gym/util</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">CompilerGym</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>RPC Service Reference</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/rpc.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <div class="section" id="rpc-service-reference">
-<h1>RPC Service Reference<a class="headerlink" href="#rpc-service-reference" title="Permalink to this headline">¶</a></h1>
+<h1>RPC Service Reference<a class="headerlink" href="#rpc-service-reference" title="Permalink to this headline"></a></h1>
 <p>This document describes the remote procedure call (RPC) client/service
 architecture that CompilerGym to separate the user frontend code from the
 compiler backends.</p>
@@ -222,7 +126,7 @@ compiler backends.</p>
 </ul>
 </div>
 <div class="section" id="how-it-works">
-<h2><a class="toc-backref" href="#id1">How it Works</a><a class="headerlink" href="#how-it-works" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id1">How it Works</a><a class="headerlink" href="#how-it-works" title="Permalink to this headline"></a></h2>
 <p>The file <code class="code docutils literal notranslate"><span class="pre">compiler_gym/service/proto/compiler_gym_service.proto</span></code> defines a
 <a class="reference internal" href="#compilergymservice"><span class="std std-ref">CompilerGymService</span></a>, which is an interface that
 can be used by compilers to expose the incremental compilation of a program as
@@ -237,10 +141,10 @@ offers a higher level of abstraction and takes care of much of the boilerplate
 required for RPC communication. For further details check out the <a class="reference internal" href="cc/compiler_gym/service.html#compilationsession-h"><span class="std std-ref">C++</span></a> or <a class="reference internal" href="compiler_gym/service.html#compiler_gym.service.CompilationSession" title="compiler_gym.service.CompilationSession"><code class="xref py py-class docutils literal notranslate"><span class="pre">Python</span> <span class="pre">class</span></code></a> documentation.</p>
 </div>
 <div class="section" id="compilergymservice">
-<h2><a class="toc-backref" href="#id2">CompilerGymService</a><a class="headerlink" href="#compilergymservice" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id2">CompilerGymService</a><a class="headerlink" href="#compilergymservice" title="Permalink to this headline"></a></h2>
 <dl class="cpp type">
 <dt class="sig sig-object cpp" id="_CPPv418CompilerGymService">
-<span id="_CPPv318CompilerGymService"></span><span id="_CPPv218CompilerGymService"></span><span id="CompilerGymService"></span><span class="target" id="namespace_compiler_gym_service"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CompilerGymService</span></span></span><a class="headerlink" href="#_CPPv418CompilerGymService" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv318CompilerGymService"></span><span id="_CPPv218CompilerGymService"></span><span id="CompilerGymService"></span><span class="target" id="namespace_compiler_gym_service"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CompilerGymService</span></span></span><a class="headerlink" href="#_CPPv418CompilerGymService" title="Permalink to this definition"></a><br /></dt>
 <dd><p>The <a class="reference internal" href="#namespace_compiler_gym_service"><span class="std std-ref">CompilerGymService</span></a> is the interface that exposes the incremental optimization of a program as an interactive environment. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
@@ -303,28 +207,28 @@ required for RPC communication. For further details check out the <a class="refe
 
 </div>
 <div class="section" id="request-and-reply-messages">
-<h2><a class="toc-backref" href="#id3">Request and Reply Messages</a><a class="headerlink" href="#request-and-reply-messages" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id3">Request and Reply Messages</a><a class="headerlink" href="#request-and-reply-messages" title="Permalink to this headline"></a></h2>
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv417GetVersionRequest">
-<span id="_CPPv317GetVersionRequest"></span><span id="_CPPv217GetVersionRequest"></span><span id="GetVersionRequest"></span><span class="target" id="struct_get_version_request"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetVersionRequest</span></span></span><a class="headerlink" href="#_CPPv417GetVersionRequest" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv317GetVersionRequest"></span><span id="_CPPv217GetVersionRequest"></span><span id="GetVersionRequest"></span><span class="target" id="struct_get_version_request"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetVersionRequest</span></span></span><a class="headerlink" href="#_CPPv417GetVersionRequest" title="Permalink to this definition"></a><br /></dt>
 <dd><p>A <a class="reference internal" href="#namespace_compiler_gym_service_1a8278ab6f39cec56abaf02645e87d74bc"><span class="std std-ref">GetVersion()</span></a> request. </p>
 </dd></dl>
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv415GetVersionReply">
-<span id="_CPPv315GetVersionReply"></span><span id="_CPPv215GetVersionReply"></span><span id="GetVersionReply"></span><span class="target" id="struct_get_version_reply"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetVersionReply</span></span></span><a class="headerlink" href="#_CPPv415GetVersionReply" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv315GetVersionReply"></span><span id="_CPPv215GetVersionReply"></span><span id="GetVersionReply"></span><span class="target" id="struct_get_version_reply"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetVersionReply</span></span></span><a class="headerlink" href="#_CPPv415GetVersionReply" title="Permalink to this definition"></a><br /></dt>
 <dd><p>The <a class="reference internal" href="#namespace_compiler_gym_service_1a8278ab6f39cec56abaf02645e87d74bc"><span class="std std-ref">GetVersion()</span></a> response. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N15GetVersionReply15service_versionE">
-<span id="_CPPv3N15GetVersionReply15service_versionE"></span><span id="_CPPv2N15GetVersionReply15service_versionE"></span><span id="GetVersionReply::service_version__string"></span><span class="target" id="struct_get_version_reply_1a5b45baef72e3463c3e86953a9fefef47"></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">service_version</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N15GetVersionReply15service_versionE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N15GetVersionReply15service_versionE"></span><span id="_CPPv2N15GetVersionReply15service_versionE"></span><span id="GetVersionReply::service_version__string"></span><span class="target" id="struct_get_version_reply_1a5b45baef72e3463c3e86953a9fefef47"></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">service_version</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N15GetVersionReply15service_versionE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>The version string for this service. </p>
 </dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N15GetVersionReply16compiler_versionE">
-<span id="_CPPv3N15GetVersionReply16compiler_versionE"></span><span id="_CPPv2N15GetVersionReply16compiler_versionE"></span><span id="GetVersionReply::compiler_version__string"></span><span class="target" id="struct_get_version_reply_1ade37dae66e6cbee00c8087600b1c3762"></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">compiler_version</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><a class="headerlink" href="#_CPPv4N15GetVersionReply16compiler_versionE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N15GetVersionReply16compiler_versionE"></span><span id="_CPPv2N15GetVersionReply16compiler_versionE"></span><span id="GetVersionReply::compiler_version__string"></span><span class="target" id="struct_get_version_reply_1ade37dae66e6cbee00c8087600b1c3762"></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">compiler_version</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><a class="headerlink" href="#_CPPv4N15GetVersionReply16compiler_versionE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>The version string for the underlying compiler. </p>
 </dd></dl>
 
@@ -333,13 +237,13 @@ required for RPC communication. For further details check out the <a class="refe
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv416GetSpacesRequest">
-<span id="_CPPv316GetSpacesRequest"></span><span id="_CPPv216GetSpacesRequest"></span><span id="GetSpacesRequest"></span><span class="target" id="struct_get_spaces_request"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSpacesRequest</span></span></span><a class="headerlink" href="#_CPPv416GetSpacesRequest" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv316GetSpacesRequest"></span><span id="_CPPv216GetSpacesRequest"></span><span id="GetSpacesRequest"></span><span class="target" id="struct_get_spaces_request"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSpacesRequest</span></span></span><a class="headerlink" href="#_CPPv416GetSpacesRequest" title="Permalink to this definition"></a><br /></dt>
 <dd><p>A <a class="reference internal" href="#namespace_compiler_gym_service_1a4a87b6809c5013e51c594c0452a44385"><span class="std std-ref">GetSpaces()</span></a> request. </p>
 </dd></dl>
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv414GetSpacesReply">
-<span id="_CPPv314GetSpacesReply"></span><span id="_CPPv214GetSpacesReply"></span><span id="GetSpacesReply"></span><span class="target" id="struct_get_spaces_reply"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSpacesReply</span></span></span><a class="headerlink" href="#_CPPv414GetSpacesReply" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv314GetSpacesReply"></span><span id="_CPPv214GetSpacesReply"></span><span id="GetSpacesReply"></span><span class="target" id="struct_get_spaces_reply"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSpacesReply</span></span></span><a class="headerlink" href="#_CPPv414GetSpacesReply" title="Permalink to this definition"></a><br /></dt>
 <dd><p>A <a class="reference internal" href="#namespace_compiler_gym_service_1a4a87b6809c5013e51c594c0452a44385"><span class="std std-ref">GetSpaces()</span></a> reply. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
@@ -361,19 +265,19 @@ required for RPC communication. For further details check out the <a class="refe
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv419StartSessionRequest">
-<span id="_CPPv319StartSessionRequest"></span><span id="_CPPv219StartSessionRequest"></span><span id="StartSessionRequest"></span><span class="target" id="struct_start_session_request"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StartSessionRequest</span></span></span><a class="headerlink" href="#_CPPv419StartSessionRequest" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv319StartSessionRequest"></span><span id="_CPPv219StartSessionRequest"></span><span id="StartSessionRequest"></span><span class="target" id="struct_start_session_request"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StartSessionRequest</span></span></span><a class="headerlink" href="#_CPPv419StartSessionRequest" title="Permalink to this definition"></a><br /></dt>
 <dd><p>A <a class="reference internal" href="#namespace_compiler_gym_service_1a97f21312a12817cd55a1c08bb8bc52a7"><span class="std std-ref">StartSession()</span></a> request. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N19StartSessionRequest9benchmarkE">
-<span id="_CPPv3N19StartSessionRequest9benchmarkE"></span><span id="_CPPv2N19StartSessionRequest9benchmarkE"></span><span id="StartSessionRequest::benchmark__Benchmark"></span><span class="target" id="struct_start_session_request_1acc0057af1569e08a9bb21a19d6b3d398"></span><a class="reference internal" href="#_CPPv49Benchmark" title="Benchmark"><span class="n"><span class="pre">Benchmark</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">benchmark</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">4</span></span><a class="headerlink" href="#_CPPv4N19StartSessionRequest9benchmarkE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N19StartSessionRequest9benchmarkE"></span><span id="_CPPv2N19StartSessionRequest9benchmarkE"></span><span id="StartSessionRequest::benchmark__Benchmark"></span><span class="target" id="struct_start_session_request_1acc0057af1569e08a9bb21a19d6b3d398"></span><a class="reference internal" href="#_CPPv49Benchmark" title="Benchmark"><span class="n"><span class="pre">Benchmark</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">benchmark</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">4</span></span><a class="headerlink" href="#_CPPv4N19StartSessionRequest9benchmarkE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>The benchmark to use. </p>
 </dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N19StartSessionRequest12action_spaceE">
-<span id="_CPPv3N19StartSessionRequest12action_spaceE"></span><span id="_CPPv2N19StartSessionRequest12action_spaceE"></span><span id="StartSessionRequest::action_space__int32"></span><span class="target" id="struct_start_session_request_1a2c48cf05675494d667cd246ac191e1f1"></span><span class="n"><span class="pre">int32</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">action_space</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><a class="headerlink" href="#_CPPv4N19StartSessionRequest12action_spaceE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N19StartSessionRequest12action_spaceE"></span><span id="_CPPv2N19StartSessionRequest12action_spaceE"></span><span id="StartSessionRequest::action_space__int32"></span><span class="target" id="struct_start_session_request_1a2c48cf05675494d667cd246ac191e1f1"></span><span class="n"><span class="pre">int32</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">action_space</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><a class="headerlink" href="#_CPPv4N19StartSessionRequest12action_spaceE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>An index into the <a class="reference internal" href="#struct_get_spaces_reply_1ad0affed83d206a02f00dba63be3c14e7"><span class="std std-ref">GetSpacesReply.action_space_list</span></a> selecting the action space that is to be used for this session. </p>
 <p>Once set, the action space cannot be changed for the duration of the session. </p>
 </dd></dl>
@@ -389,20 +293,20 @@ required for RPC communication. For further details check out the <a class="refe
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv417StartSessionReply">
-<span id="_CPPv317StartSessionReply"></span><span id="_CPPv217StartSessionReply"></span><span id="StartSessionReply"></span><span class="target" id="struct_start_session_reply"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StartSessionReply</span></span></span><a class="headerlink" href="#_CPPv417StartSessionReply" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv317StartSessionReply"></span><span id="_CPPv217StartSessionReply"></span><span id="StartSessionReply"></span><span class="target" id="struct_start_session_reply"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StartSessionReply</span></span></span><a class="headerlink" href="#_CPPv417StartSessionReply" title="Permalink to this definition"></a><br /></dt>
 <dd><p>A <a class="reference internal" href="#namespace_compiler_gym_service_1a97f21312a12817cd55a1c08bb8bc52a7"><span class="std std-ref">StartSession()</span></a> reply. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N17StartSessionReply10session_idE">
-<span id="_CPPv3N17StartSessionReply10session_idE"></span><span id="_CPPv2N17StartSessionReply10session_idE"></span><span id="StartSessionReply::session_id__int64"></span><span class="target" id="struct_start_session_reply_1a90d37ba42c463ae539ca89e45e1df190"></span><span class="n"><span class="pre">int64</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">session_id</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N17StartSessionReply10session_idE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N17StartSessionReply10session_idE"></span><span id="_CPPv2N17StartSessionReply10session_idE"></span><span id="StartSessionReply::session_id__int64"></span><span class="target" id="struct_start_session_reply_1a90d37ba42c463ae539ca89e45e1df190"></span><span class="n"><span class="pre">int64</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">session_id</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N17StartSessionReply10session_idE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>The ID that has been assigned to the session. </p>
 <p>The client must use this ID in all subsequent interactions with the service for this session. </p>
 </dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N17StartSessionReply16new_action_spaceE">
-<span id="_CPPv3N17StartSessionReply16new_action_spaceE"></span><span id="_CPPv2N17StartSessionReply16new_action_spaceE"></span><span id="StartSessionReply::new_action_space__ActionSpace"></span><span class="target" id="struct_start_session_reply_1a8d990aa23f2a2ae2f8cf07bb9455b793"></span><a class="reference internal" href="#_CPPv411ActionSpace" title="ActionSpace"><span class="n"><span class="pre">ActionSpace</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">new_action_space</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><a class="headerlink" href="#_CPPv4N17StartSessionReply16new_action_spaceE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N17StartSessionReply16new_action_spaceE"></span><span id="_CPPv2N17StartSessionReply16new_action_spaceE"></span><span id="StartSessionReply::new_action_space__ActionSpace"></span><span class="target" id="struct_start_session_reply_1a8d990aa23f2a2ae2f8cf07bb9455b793"></span><a class="reference internal" href="#_CPPv411ActionSpace" title="ActionSpace"><span class="n"><span class="pre">ActionSpace</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">new_action_space</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><a class="headerlink" href="#_CPPv4N17StartSessionReply16new_action_spaceE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>A new action space. </p>
 <p>This is set only if, after initializing the session, the action space has changed from the default action space returned by <a class="reference internal" href="#namespace_compiler_gym_service_1a4a87b6809c5013e51c594c0452a44385"><span class="std std-ref">GetSpaces()</span></a>. If set, the environment should discard the previous action space and replace it with this one. Else, the action space remains unchanged. </p>
 </dd></dl>
@@ -418,13 +322,13 @@ required for RPC communication. For further details check out the <a class="refe
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv418ForkSessionRequest">
-<span id="_CPPv318ForkSessionRequest"></span><span id="_CPPv218ForkSessionRequest"></span><span id="ForkSessionRequest"></span><span class="target" id="struct_fork_session_request"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ForkSessionRequest</span></span></span><a class="headerlink" href="#_CPPv418ForkSessionRequest" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv318ForkSessionRequest"></span><span id="_CPPv218ForkSessionRequest"></span><span id="ForkSessionRequest"></span><span class="target" id="struct_fork_session_request"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ForkSessionRequest</span></span></span><a class="headerlink" href="#_CPPv418ForkSessionRequest" title="Permalink to this definition"></a><br /></dt>
 <dd><p>A Fork() request. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N18ForkSessionRequest10session_idE">
-<span id="_CPPv3N18ForkSessionRequest10session_idE"></span><span id="_CPPv2N18ForkSessionRequest10session_idE"></span><span id="ForkSessionRequest::session_id__int64"></span><span class="target" id="struct_fork_session_request_1a6b2302a665b78cb829b317d60991b022"></span><span class="n"><span class="pre">int64</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">session_id</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N18ForkSessionRequest10session_idE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N18ForkSessionRequest10session_idE"></span><span id="_CPPv2N18ForkSessionRequest10session_idE"></span><span id="ForkSessionRequest::session_id__int64"></span><span class="target" id="struct_fork_session_request_1a6b2302a665b78cb829b317d60991b022"></span><span class="n"><span class="pre">int64</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">session_id</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N18ForkSessionRequest10session_idE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>The ID of the session to fork. </p>
 </dd></dl>
 
@@ -433,13 +337,13 @@ required for RPC communication. For further details check out the <a class="refe
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv416ForkSessionReply">
-<span id="_CPPv316ForkSessionReply"></span><span id="_CPPv216ForkSessionReply"></span><span id="ForkSessionReply"></span><span class="target" id="struct_fork_session_reply"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ForkSessionReply</span></span></span><a class="headerlink" href="#_CPPv416ForkSessionReply" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv316ForkSessionReply"></span><span id="_CPPv216ForkSessionReply"></span><span id="ForkSessionReply"></span><span class="target" id="struct_fork_session_reply"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ForkSessionReply</span></span></span><a class="headerlink" href="#_CPPv416ForkSessionReply" title="Permalink to this definition"></a><br /></dt>
 <dd><p>A Fork() reply. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N16ForkSessionReply10session_idE">
-<span id="_CPPv3N16ForkSessionReply10session_idE"></span><span id="_CPPv2N16ForkSessionReply10session_idE"></span><span id="ForkSessionReply::session_id__int64"></span><span class="target" id="struct_fork_session_reply_1aa4bee8fe1b4274e90b27d3c75da515a2"></span><span class="n"><span class="pre">int64</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">session_id</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N16ForkSessionReply10session_idE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N16ForkSessionReply10session_idE"></span><span id="_CPPv2N16ForkSessionReply10session_idE"></span><span id="ForkSessionReply::session_id__int64"></span><span class="target" id="struct_fork_session_reply_1aa4bee8fe1b4274e90b27d3c75da515a2"></span><span class="n"><span class="pre">int64</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">session_id</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N16ForkSessionReply10session_idE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>The ID of the newly created session. </p>
 </dd></dl>
 
@@ -448,13 +352,13 @@ required for RPC communication. For further details check out the <a class="refe
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv417EndSessionRequest">
-<span id="_CPPv317EndSessionRequest"></span><span id="_CPPv217EndSessionRequest"></span><span id="EndSessionRequest"></span><span class="target" id="struct_end_session_request"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EndSessionRequest</span></span></span><a class="headerlink" href="#_CPPv417EndSessionRequest" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv317EndSessionRequest"></span><span id="_CPPv217EndSessionRequest"></span><span id="EndSessionRequest"></span><span class="target" id="struct_end_session_request"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EndSessionRequest</span></span></span><a class="headerlink" href="#_CPPv417EndSessionRequest" title="Permalink to this definition"></a><br /></dt>
 <dd><p>An <a class="reference internal" href="#namespace_compiler_gym_service_1a2f66a6faeebebdd63f006c990f3f5224"><span class="std std-ref">EndSession()</span></a> request. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N17EndSessionRequest10session_idE">
-<span id="_CPPv3N17EndSessionRequest10session_idE"></span><span id="_CPPv2N17EndSessionRequest10session_idE"></span><span id="EndSessionRequest::session_id__int64"></span><span class="target" id="struct_end_session_request_1aee1982dcc5b1cb7dfff959e53d297185"></span><span class="n"><span class="pre">int64</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">session_id</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N17EndSessionRequest10session_idE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N17EndSessionRequest10session_idE"></span><span id="_CPPv2N17EndSessionRequest10session_idE"></span><span id="EndSessionRequest::session_id__int64"></span><span class="target" id="struct_end_session_request_1aee1982dcc5b1cb7dfff959e53d297185"></span><span class="n"><span class="pre">int64</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">session_id</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N17EndSessionRequest10session_idE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>The ID of the session. </p>
 </dd></dl>
 
@@ -463,13 +367,13 @@ required for RPC communication. For further details check out the <a class="refe
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv415EndSessionReply">
-<span id="_CPPv315EndSessionReply"></span><span id="_CPPv215EndSessionReply"></span><span id="EndSessionReply"></span><span class="target" id="struct_end_session_reply"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EndSessionReply</span></span></span><a class="headerlink" href="#_CPPv415EndSessionReply" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv315EndSessionReply"></span><span id="_CPPv215EndSessionReply"></span><span id="EndSessionReply"></span><span class="target" id="struct_end_session_reply"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EndSessionReply</span></span></span><a class="headerlink" href="#_CPPv415EndSessionReply" title="Permalink to this definition"></a><br /></dt>
 <dd><p>An <a class="reference internal" href="#namespace_compiler_gym_service_1a2f66a6faeebebdd63f006c990f3f5224"><span class="std std-ref">EndSession()</span></a> reply. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N15EndSessionReply18remaining_sessionsE">
-<span id="_CPPv3N15EndSessionReply18remaining_sessionsE"></span><span id="_CPPv2N15EndSessionReply18remaining_sessionsE"></span><span id="EndSessionReply::remaining_sessions__int32"></span><span class="target" id="struct_end_session_reply_1a0d41234f1b753bd97af66b48fb4be37c"></span><span class="n"><span class="pre">int32</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">remaining_sessions</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N15EndSessionReply18remaining_sessionsE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N15EndSessionReply18remaining_sessionsE"></span><span id="_CPPv2N15EndSessionReply18remaining_sessionsE"></span><span id="EndSessionReply::remaining_sessions__int32"></span><span class="target" id="struct_end_session_reply_1a0d41234f1b753bd97af66b48fb4be37c"></span><span class="n"><span class="pre">int32</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">remaining_sessions</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N15EndSessionReply18remaining_sessionsE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>The number of sessions that the service currently has. </p>
 </dd></dl>
 
@@ -478,13 +382,13 @@ required for RPC communication. For further details check out the <a class="refe
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv411StepRequest">
-<span id="_CPPv311StepRequest"></span><span id="_CPPv211StepRequest"></span><span id="StepRequest"></span><span class="target" id="struct_step_request"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StepRequest</span></span></span><a class="headerlink" href="#_CPPv411StepRequest" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv311StepRequest"></span><span id="_CPPv211StepRequest"></span><span id="StepRequest"></span><span class="target" id="struct_step_request"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StepRequest</span></span></span><a class="headerlink" href="#_CPPv411StepRequest" title="Permalink to this definition"></a><br /></dt>
 <dd><p>A <a class="reference internal" href="#namespace_compiler_gym_service_1a6f01eb170e54de8fcc198bea9791334d"><span class="std std-ref">Step()</span></a> request. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N11StepRequest10session_idE">
-<span id="_CPPv3N11StepRequest10session_idE"></span><span id="_CPPv2N11StepRequest10session_idE"></span><span id="StepRequest::session_id__int64"></span><span class="target" id="struct_step_request_1a8fc03bff96510318affe1b889f0733d2"></span><span class="n"><span class="pre">int64</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">session_id</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N11StepRequest10session_idE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N11StepRequest10session_idE"></span><span id="_CPPv2N11StepRequest10session_idE"></span><span id="StepRequest::session_id__int64"></span><span class="target" id="struct_step_request_1a8fc03bff96510318affe1b889f0733d2"></span><span class="n"><span class="pre">int64</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">session_id</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N11StepRequest10session_idE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>The ID of the session. </p>
 </dd></dl>
 
@@ -505,27 +409,27 @@ required for RPC communication. For further details check out the <a class="refe
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv49StepReply">
-<span id="_CPPv39StepReply"></span><span id="_CPPv29StepReply"></span><span id="StepReply"></span><span class="target" id="struct_step_reply"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StepReply</span></span></span><a class="headerlink" href="#_CPPv49StepReply" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv39StepReply"></span><span id="_CPPv29StepReply"></span><span id="StepReply"></span><span class="target" id="struct_step_reply"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StepReply</span></span></span><a class="headerlink" href="#_CPPv49StepReply" title="Permalink to this definition"></a><br /></dt>
 <dd><p>A <a class="reference internal" href="#namespace_compiler_gym_service_1a6f01eb170e54de8fcc198bea9791334d"><span class="std std-ref">Step()</span></a> reply. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N9StepReply14end_of_sessionE">
-<span id="_CPPv3N9StepReply14end_of_sessionE"></span><span id="_CPPv2N9StepReply14end_of_sessionE"></span><span id="StepReply::end_of_session__b"></span><span class="target" id="struct_step_reply_1a1aa601714b742013cfb901b309c980a3"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">end_of_session</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N9StepReply14end_of_sessionE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N9StepReply14end_of_sessionE"></span><span id="_CPPv2N9StepReply14end_of_sessionE"></span><span id="StepReply::end_of_session__b"></span><span class="target" id="struct_step_reply_1a1aa601714b742013cfb901b309c980a3"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">end_of_session</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N9StepReply14end_of_sessionE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Indicates that the session has ended. </p>
 <p>This could be because there are no further actions that can be made, or because the action has led to an invalid state. Once this field has been set, you should make no further calls to step(). However, you mays still request reward and new observations. </p>
 </dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N9StepReply20action_had_no_effectE">
-<span id="_CPPv3N9StepReply20action_had_no_effectE"></span><span id="_CPPv2N9StepReply20action_had_no_effectE"></span><span id="StepReply::action_had_no_effect__b"></span><span class="target" id="struct_step_reply_1a346afbea3a0b9e31bf6fc27dda3bda23"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">action_had_no_effect</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><a class="headerlink" href="#_CPPv4N9StepReply20action_had_no_effectE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N9StepReply20action_had_no_effectE"></span><span id="_CPPv2N9StepReply20action_had_no_effectE"></span><span id="StepReply::action_had_no_effect__b"></span><span class="target" id="struct_step_reply_1a346afbea3a0b9e31bf6fc27dda3bda23"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">action_had_no_effect</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><a class="headerlink" href="#_CPPv4N9StepReply20action_had_no_effectE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>A service may set this field to true if the action is known not to have any effect. </p>
 <p>This allows an agent to assume that observations or rewards computed before this action remain valid, providing that they are deterministic. </p>
 </dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N9StepReply16new_action_spaceE">
-<span id="_CPPv3N9StepReply16new_action_spaceE"></span><span id="_CPPv2N9StepReply16new_action_spaceE"></span><span id="StepReply::new_action_space__ActionSpace"></span><span class="target" id="struct_step_reply_1af0058904ffc313a6ad28150cc99a3fbc"></span><a class="reference internal" href="#_CPPv411ActionSpace" title="ActionSpace"><span class="n"><span class="pre">ActionSpace</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">new_action_space</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><a class="headerlink" href="#_CPPv4N9StepReply16new_action_spaceE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N9StepReply16new_action_spaceE"></span><span id="_CPPv2N9StepReply16new_action_spaceE"></span><span id="StepReply::new_action_space__ActionSpace"></span><span class="target" id="struct_step_reply_1af0058904ffc313a6ad28150cc99a3fbc"></span><a class="reference internal" href="#_CPPv411ActionSpace" title="ActionSpace"><span class="n"><span class="pre">ActionSpace</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">new_action_space</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><a class="headerlink" href="#_CPPv4N9StepReply16new_action_spaceE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>A new action space. </p>
 <p>This field is set if, as a result of running the requested action, the action space has changed. Else, the action space remains unchanged. </p>
 </dd></dl>
@@ -541,7 +445,7 @@ required for RPC communication. For further details check out the <a class="refe
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv419AddBenchmarkRequest">
-<span id="_CPPv319AddBenchmarkRequest"></span><span id="_CPPv219AddBenchmarkRequest"></span><span id="AddBenchmarkRequest"></span><span class="target" id="struct_add_benchmark_request"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddBenchmarkRequest</span></span></span><a class="headerlink" href="#_CPPv419AddBenchmarkRequest" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv319AddBenchmarkRequest"></span><span id="_CPPv219AddBenchmarkRequest"></span><span id="AddBenchmarkRequest"></span><span class="target" id="struct_add_benchmark_request"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddBenchmarkRequest</span></span></span><a class="headerlink" href="#_CPPv419AddBenchmarkRequest" title="Permalink to this definition"></a><br /></dt>
 <dd><p>An <a class="reference internal" href="#namespace_compiler_gym_service_1abff6649f1c4c2a1f4106ce9b7ec8221f"><span class="std std-ref">AddBenchmark()</span></a> request. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
@@ -556,19 +460,19 @@ required for RPC communication. For further details check out the <a class="refe
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv417AddBenchmarkReply">
-<span id="_CPPv317AddBenchmarkReply"></span><span id="_CPPv217AddBenchmarkReply"></span><span id="AddBenchmarkReply"></span><span class="target" id="struct_add_benchmark_reply"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddBenchmarkReply</span></span></span><a class="headerlink" href="#_CPPv417AddBenchmarkReply" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv317AddBenchmarkReply"></span><span id="_CPPv217AddBenchmarkReply"></span><span id="AddBenchmarkReply"></span><span class="target" id="struct_add_benchmark_reply"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddBenchmarkReply</span></span></span><a class="headerlink" href="#_CPPv417AddBenchmarkReply" title="Permalink to this definition"></a><br /></dt>
 <dd><p>An <a class="reference internal" href="#namespace_compiler_gym_service_1abff6649f1c4c2a1f4106ce9b7ec8221f"><span class="std std-ref">AddBenchmark()</span></a> reply. </p>
 </dd></dl>
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv427SendSessionParameterRequest">
-<span id="_CPPv327SendSessionParameterRequest"></span><span id="_CPPv227SendSessionParameterRequest"></span><span id="SendSessionParameterRequest"></span><span class="target" id="struct_send_session_parameter_request"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SendSessionParameterRequest</span></span></span><a class="headerlink" href="#_CPPv427SendSessionParameterRequest" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv327SendSessionParameterRequest"></span><span id="_CPPv227SendSessionParameterRequest"></span><span id="SendSessionParameterRequest"></span><span class="target" id="struct_send_session_parameter_request"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SendSessionParameterRequest</span></span></span><a class="headerlink" href="#_CPPv427SendSessionParameterRequest" title="Permalink to this definition"></a><br /></dt>
 <dd><p>A <a class="reference internal" href="#namespace_compiler_gym_service_1a5c30050f6831c39575bfb50d00201519"><span class="std std-ref">SendSessionParameter()</span></a> request. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N27SendSessionParameterRequest10session_idE">
-<span id="_CPPv3N27SendSessionParameterRequest10session_idE"></span><span id="_CPPv2N27SendSessionParameterRequest10session_idE"></span><span id="SendSessionParameterRequest::session_id__int64"></span><span class="target" id="struct_send_session_parameter_request_1a8a5b6ef44e2121b710f655c4404b3884"></span><span class="n"><span class="pre">int64</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">session_id</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N27SendSessionParameterRequest10session_idE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N27SendSessionParameterRequest10session_idE"></span><span id="_CPPv2N27SendSessionParameterRequest10session_idE"></span><span id="SendSessionParameterRequest::session_id__int64"></span><span class="target" id="struct_send_session_parameter_request_1a8a5b6ef44e2121b710f655c4404b3884"></span><span class="n"><span class="pre">int64</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">session_id</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N27SendSessionParameterRequest10session_idE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>The ID of the session. </p>
 </dd></dl>
 
@@ -583,7 +487,7 @@ required for RPC communication. For further details check out the <a class="refe
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv425SendSessionParameterReply">
-<span id="_CPPv325SendSessionParameterReply"></span><span id="_CPPv225SendSessionParameterReply"></span><span id="SendSessionParameterReply"></span><span class="target" id="struct_send_session_parameter_reply"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SendSessionParameterReply</span></span></span><a class="headerlink" href="#_CPPv425SendSessionParameterReply" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv325SendSessionParameterReply"></span><span id="_CPPv225SendSessionParameterReply"></span><span id="SendSessionParameterReply"></span><span class="target" id="struct_send_session_parameter_reply"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SendSessionParameterReply</span></span></span><a class="headerlink" href="#_CPPv425SendSessionParameterReply" title="Permalink to this definition"></a><br /></dt>
 <dd><p>A <a class="reference internal" href="#namespace_compiler_gym_service_1a5c30050f6831c39575bfb50d00201519"><span class="std std-ref">SendSessionParameter()</span></a> reply. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
@@ -598,32 +502,32 @@ required for RPC communication. For further details check out the <a class="refe
 
 </div>
 <div class="section" id="core-message-types">
-<h2><a class="toc-backref" href="#id4">Core Message Types</a><a class="headerlink" href="#core-message-types" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id4">Core Message Types</a><a class="headerlink" href="#core-message-types" title="Permalink to this headline"></a></h2>
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv411ActionSpace">
-<span id="_CPPv311ActionSpace"></span><span id="_CPPv211ActionSpace"></span><span id="ActionSpace"></span><span class="target" id="struct_action_space"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ActionSpace</span></span></span><a class="headerlink" href="#_CPPv411ActionSpace" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv311ActionSpace"></span><span id="_CPPv211ActionSpace"></span><span id="ActionSpace"></span><span class="target" id="struct_action_space"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ActionSpace</span></span></span><a class="headerlink" href="#_CPPv411ActionSpace" title="Permalink to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv416ObservationSpace">
-<span id="_CPPv316ObservationSpace"></span><span id="_CPPv216ObservationSpace"></span><span id="ObservationSpace"></span><span class="target" id="struct_observation_space"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ObservationSpace</span></span></span><a class="headerlink" href="#_CPPv416ObservationSpace" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv316ObservationSpace"></span><span id="_CPPv216ObservationSpace"></span><span id="ObservationSpace"></span><span class="target" id="struct_observation_space"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ObservationSpace</span></span></span><a class="headerlink" href="#_CPPv416ObservationSpace" title="Permalink to this definition"></a><br /></dt>
 <dd><div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N16ObservationSpace13deterministicE">
-<span id="_CPPv3N16ObservationSpace13deterministicE"></span><span id="_CPPv2N16ObservationSpace13deterministicE"></span><span id="ObservationSpace::deterministic__b"></span><span class="target" id="struct_observation_space_1a7e2c352d76914b393ec2ee6f6526dbdd"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">deterministic</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><a class="headerlink" href="#_CPPv4N16ObservationSpace13deterministicE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N16ObservationSpace13deterministicE"></span><span id="_CPPv2N16ObservationSpace13deterministicE"></span><span id="ObservationSpace::deterministic__b"></span><span class="target" id="struct_observation_space_1a7e2c352d76914b393ec2ee6f6526dbdd"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">deterministic</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><a class="headerlink" href="#_CPPv4N16ObservationSpace13deterministicE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Whether the observation space is deterministic. </p>
 </dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N16ObservationSpace18platform_dependentE">
-<span id="_CPPv3N16ObservationSpace18platform_dependentE"></span><span id="_CPPv2N16ObservationSpace18platform_dependentE"></span><span id="ObservationSpace::platform_dependent__b"></span><span class="target" id="struct_observation_space_1a39c2d90953863e837c1d00f8ee3bbc60"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">platform_dependent</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">4</span></span><a class="headerlink" href="#_CPPv4N16ObservationSpace18platform_dependentE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N16ObservationSpace18platform_dependentE"></span><span id="_CPPv2N16ObservationSpace18platform_dependentE"></span><span id="ObservationSpace::platform_dependent__b"></span><span class="target" id="struct_observation_space_1a39c2d90953863e837c1d00f8ee3bbc60"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">platform_dependent</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">4</span></span><a class="headerlink" href="#_CPPv4N16ObservationSpace18platform_dependentE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Whether the observations depend on the service execution environment. </p>
 </dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N16ObservationSpace19default_observationE">
-<span id="_CPPv3N16ObservationSpace19default_observationE"></span><span id="_CPPv2N16ObservationSpace19default_observationE"></span><span id="ObservationSpace::default_observation__Event"></span><span class="target" id="struct_observation_space_1ae3758bb6f3b4206ad51b7d4dd2ec6d54"></span><a class="reference internal" href="#_CPPv45Event" title="Event"><span class="n"><span class="pre">Event</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">default_observation</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">5</span></span><a class="headerlink" href="#_CPPv4N16ObservationSpace19default_observationE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N16ObservationSpace19default_observationE"></span><span id="_CPPv2N16ObservationSpace19default_observationE"></span><span id="ObservationSpace::default_observation__Event"></span><span class="target" id="struct_observation_space_1ae3758bb6f3b4206ad51b7d4dd2ec6d54"></span><a class="reference internal" href="#_CPPv45Event" title="Event"><span class="n"><span class="pre">Event</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">default_observation</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">5</span></span><a class="headerlink" href="#_CPPv4N16ObservationSpace19default_observationE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>A default observation. </p>
 <p>This value should be used by the client in lieu of a true observation if the compiler service terminates abruptly, such as a crash while applying an action. </p>
 </dd></dl>
@@ -633,13 +537,13 @@ required for RPC communication. For further details check out the <a class="refe
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv45Event">
-<span id="_CPPv35Event"></span><span id="_CPPv25Event"></span><span id="Event"></span><span class="target" id="struct_event"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Event</span></span></span><a class="headerlink" href="#_CPPv45Event" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv35Event"></span><span id="_CPPv25Event"></span><span id="Event"></span><span class="target" id="struct_event"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Event</span></span></span><a class="headerlink" href="#_CPPv45Event" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Common structure shared between actions and observations. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N5Event14boolean_tensorE">
-<span id="_CPPv3N5Event14boolean_tensorE"></span><span id="_CPPv2N5Event14boolean_tensorE"></span><span id="Event::boolean_tensor__BooleanTensor"></span><span class="target" id="struct_event_1aba63f6ab5099d97dc8b0cba5fca2502f"></span><a class="reference internal" href="#_CPPv413BooleanTensor" title="BooleanTensor"><span class="n"><span class="pre">BooleanTensor</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">boolean_tensor</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">9</span></span><a class="headerlink" href="#_CPPv4N5Event14boolean_tensorE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N5Event14boolean_tensorE"></span><span id="_CPPv2N5Event14boolean_tensorE"></span><span id="Event::boolean_tensor__BooleanTensor"></span><span class="target" id="struct_event_1aba63f6ab5099d97dc8b0cba5fca2502f"></span><a class="reference internal" href="#_CPPv413BooleanTensor" title="BooleanTensor"><span class="n"><span class="pre">BooleanTensor</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">boolean_tensor</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">9</span></span><a class="headerlink" href="#_CPPv4N5Event14boolean_tensorE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Fixed and variable length sequences are represented as one-dimensional tensor. </p>
 </dd></dl>
 
@@ -648,7 +552,7 @@ required for RPC communication. For further details check out the <a class="refe
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv413BooleanTensor">
-<span id="_CPPv313BooleanTensor"></span><span id="_CPPv213BooleanTensor"></span><span id="BooleanTensor"></span><span class="target" id="struct_boolean_tensor"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BooleanTensor</span></span></span><a class="headerlink" href="#_CPPv413BooleanTensor" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv313BooleanTensor"></span><span id="_CPPv213BooleanTensor"></span><span id="BooleanTensor"></span><span class="target" id="struct_boolean_tensor"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BooleanTensor</span></span></span><a class="headerlink" href="#_CPPv413BooleanTensor" title="Permalink to this definition"></a><br /></dt>
 <dd><div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
@@ -662,12 +566,12 @@ required for RPC communication. For further details check out the <a class="refe
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv410ByteTensor">
-<span id="_CPPv310ByteTensor"></span><span id="_CPPv210ByteTensor"></span><span id="ByteTensor"></span><span class="target" id="struct_byte_tensor"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ByteTensor</span></span></span><a class="headerlink" href="#_CPPv410ByteTensor" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv310ByteTensor"></span><span id="_CPPv210ByteTensor"></span><span id="ByteTensor"></span><span class="target" id="struct_byte_tensor"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ByteTensor</span></span></span><a class="headerlink" href="#_CPPv410ByteTensor" title="Permalink to this definition"></a><br /></dt>
 <dd><div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N10ByteTensor5valueE">
-<span id="_CPPv3N10ByteTensor5valueE"></span><span id="_CPPv2N10ByteTensor5valueE"></span><span id="ByteTensor::value__bytes"></span><span class="target" id="struct_byte_tensor_1abb4f303a0ff885bc4e063eee33e0b9b2"></span><span class="n"><span class="pre">bytes</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">value</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><a class="headerlink" href="#_CPPv4N10ByteTensor5valueE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N10ByteTensor5valueE"></span><span id="_CPPv2N10ByteTensor5valueE"></span><span id="ByteTensor::value__bytes"></span><span class="target" id="struct_byte_tensor_1abb4f303a0ff885bc4e063eee33e0b9b2"></span><span class="n"><span class="pre">bytes</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">value</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><a class="headerlink" href="#_CPPv4N10ByteTensor5valueE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Flattened tensor of shape <code class="docutils literal notranslate"><span class="pre">shape</span></code> with C-like index order. </p>
 </dd></dl>
 
@@ -676,7 +580,7 @@ required for RPC communication. For further details check out the <a class="refe
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv411Int64Tensor">
-<span id="_CPPv311Int64Tensor"></span><span id="_CPPv211Int64Tensor"></span><span id="Int64Tensor"></span><span class="target" id="struct_int64_tensor"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Int64Tensor</span></span></span><a class="headerlink" href="#_CPPv411Int64Tensor" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv311Int64Tensor"></span><span id="_CPPv211Int64Tensor"></span><span id="Int64Tensor"></span><span class="target" id="struct_int64_tensor"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Int64Tensor</span></span></span><a class="headerlink" href="#_CPPv411Int64Tensor" title="Permalink to this definition"></a><br /></dt>
 <dd><div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
@@ -690,7 +594,7 @@ required for RPC communication. For further details check out the <a class="refe
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv411FloatTensor">
-<span id="_CPPv311FloatTensor"></span><span id="_CPPv211FloatTensor"></span><span id="FloatTensor"></span><span class="target" id="struct_float_tensor"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FloatTensor</span></span></span><a class="headerlink" href="#_CPPv411FloatTensor" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv311FloatTensor"></span><span id="_CPPv211FloatTensor"></span><span id="FloatTensor"></span><span class="target" id="struct_float_tensor"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FloatTensor</span></span></span><a class="headerlink" href="#_CPPv411FloatTensor" title="Permalink to this definition"></a><br /></dt>
 <dd><div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
@@ -704,7 +608,7 @@ required for RPC communication. For further details check out the <a class="refe
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv412DoubleTensor">
-<span id="_CPPv312DoubleTensor"></span><span id="_CPPv212DoubleTensor"></span><span id="DoubleTensor"></span><span class="target" id="struct_double_tensor"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DoubleTensor</span></span></span><a class="headerlink" href="#_CPPv412DoubleTensor" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv312DoubleTensor"></span><span id="_CPPv212DoubleTensor"></span><span id="DoubleTensor"></span><span class="target" id="struct_double_tensor"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DoubleTensor</span></span></span><a class="headerlink" href="#_CPPv412DoubleTensor" title="Permalink to this definition"></a><br /></dt>
 <dd><div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
@@ -718,7 +622,7 @@ required for RPC communication. For further details check out the <a class="refe
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv412StringTensor">
-<span id="_CPPv312StringTensor"></span><span id="_CPPv212StringTensor"></span><span id="StringTensor"></span><span class="target" id="struct_string_tensor"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StringTensor</span></span></span><a class="headerlink" href="#_CPPv412StringTensor" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv312StringTensor"></span><span id="_CPPv212StringTensor"></span><span id="StringTensor"></span><span class="target" id="struct_string_tensor"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StringTensor</span></span></span><a class="headerlink" href="#_CPPv412StringTensor" title="Permalink to this definition"></a><br /></dt>
 <dd><div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
@@ -732,7 +636,7 @@ required for RPC communication. For further details check out the <a class="refe
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv412BooleanRange">
-<span id="_CPPv312BooleanRange"></span><span id="_CPPv212BooleanRange"></span><span id="BooleanRange"></span><span class="target" id="struct_boolean_range"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BooleanRange</span></span></span><a class="headerlink" href="#_CPPv412BooleanRange" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv312BooleanRange"></span><span id="_CPPv212BooleanRange"></span><span id="BooleanRange"></span><span class="target" id="struct_boolean_range"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BooleanRange</span></span></span><a class="headerlink" href="#_CPPv412BooleanRange" title="Permalink to this definition"></a><br /></dt>
 <dd><p>The [min, max] range of a boolean scalar. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
@@ -753,7 +657,7 @@ required for RPC communication. For further details check out the <a class="refe
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv410Int64Range">
-<span id="_CPPv310Int64Range"></span><span id="_CPPv210Int64Range"></span><span id="Int64Range"></span><span class="target" id="struct_int64_range"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Int64Range</span></span></span><a class="headerlink" href="#_CPPv410Int64Range" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv310Int64Range"></span><span id="_CPPv210Int64Range"></span><span id="Int64Range"></span><span class="target" id="struct_int64_range"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Int64Range</span></span></span><a class="headerlink" href="#_CPPv410Int64Range" title="Permalink to this definition"></a><br /></dt>
 <dd><p>The [min, max] range of an int64 scalar. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
@@ -774,7 +678,7 @@ required for RPC communication. For further details check out the <a class="refe
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv410FloatRange">
-<span id="_CPPv310FloatRange"></span><span id="_CPPv210FloatRange"></span><span id="FloatRange"></span><span class="target" id="struct_float_range"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FloatRange</span></span></span><a class="headerlink" href="#_CPPv410FloatRange" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv310FloatRange"></span><span id="_CPPv210FloatRange"></span><span id="FloatRange"></span><span class="target" id="struct_float_range"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FloatRange</span></span></span><a class="headerlink" href="#_CPPv410FloatRange" title="Permalink to this definition"></a><br /></dt>
 <dd><p>The [min, max] range of an double scalar. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
@@ -795,7 +699,7 @@ required for RPC communication. For further details check out the <a class="refe
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv411DoubleRange">
-<span id="_CPPv311DoubleRange"></span><span id="_CPPv211DoubleRange"></span><span id="DoubleRange"></span><span class="target" id="struct_double_range"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DoubleRange</span></span></span><a class="headerlink" href="#_CPPv411DoubleRange" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv311DoubleRange"></span><span id="_CPPv211DoubleRange"></span><span id="DoubleRange"></span><span class="target" id="struct_double_range"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DoubleRange</span></span></span><a class="headerlink" href="#_CPPv411DoubleRange" title="Permalink to this definition"></a><br /></dt>
 <dd><p>The [min, max] range of an double scalar. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
@@ -816,49 +720,49 @@ required for RPC communication. For further details check out the <a class="refe
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv410BooleanBox">
-<span id="_CPPv310BooleanBox"></span><span id="_CPPv210BooleanBox"></span><span id="BooleanBox"></span><span class="target" id="struct_boolean_box"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BooleanBox</span></span></span><a class="headerlink" href="#_CPPv410BooleanBox" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv310BooleanBox"></span><span id="_CPPv210BooleanBox"></span><span id="BooleanBox"></span><span class="target" id="struct_boolean_box"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BooleanBox</span></span></span><a class="headerlink" href="#_CPPv410BooleanBox" title="Permalink to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv47ByteBox">
-<span id="_CPPv37ByteBox"></span><span id="_CPPv27ByteBox"></span><span id="ByteBox"></span><span class="target" id="struct_byte_box"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ByteBox</span></span></span><a class="headerlink" href="#_CPPv47ByteBox" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv37ByteBox"></span><span id="_CPPv27ByteBox"></span><span id="ByteBox"></span><span class="target" id="struct_byte_box"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ByteBox</span></span></span><a class="headerlink" href="#_CPPv47ByteBox" title="Permalink to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv48Int64Box">
-<span id="_CPPv38Int64Box"></span><span id="_CPPv28Int64Box"></span><span id="Int64Box"></span><span class="target" id="struct_int64_box"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Int64Box</span></span></span><a class="headerlink" href="#_CPPv48Int64Box" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv38Int64Box"></span><span id="_CPPv28Int64Box"></span><span id="Int64Box"></span><span class="target" id="struct_int64_box"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Int64Box</span></span></span><a class="headerlink" href="#_CPPv48Int64Box" title="Permalink to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv48FloatBox">
-<span id="_CPPv38FloatBox"></span><span id="_CPPv28FloatBox"></span><span id="FloatBox"></span><span class="target" id="struct_float_box"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FloatBox</span></span></span><a class="headerlink" href="#_CPPv48FloatBox" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv38FloatBox"></span><span id="_CPPv28FloatBox"></span><span id="FloatBox"></span><span class="target" id="struct_float_box"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FloatBox</span></span></span><a class="headerlink" href="#_CPPv48FloatBox" title="Permalink to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv49DoubleBox">
-<span id="_CPPv39DoubleBox"></span><span id="_CPPv29DoubleBox"></span><span id="DoubleBox"></span><span class="target" id="struct_double_box"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DoubleBox</span></span></span><a class="headerlink" href="#_CPPv49DoubleBox" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv39DoubleBox"></span><span id="_CPPv29DoubleBox"></span><span id="DoubleBox"></span><span class="target" id="struct_double_box"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DoubleBox</span></span></span><a class="headerlink" href="#_CPPv49DoubleBox" title="Permalink to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv49ListSpace">
-<span id="_CPPv39ListSpace"></span><span id="_CPPv29ListSpace"></span><span id="ListSpace"></span><span class="target" id="struct_list_space"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ListSpace</span></span></span><a class="headerlink" href="#_CPPv49ListSpace" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv39ListSpace"></span><span id="_CPPv29ListSpace"></span><span id="ListSpace"></span><span class="target" id="struct_list_space"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ListSpace</span></span></span><a class="headerlink" href="#_CPPv49ListSpace" title="Permalink to this definition"></a><br /></dt>
 <dd><p>A list of spaces. </p>
 </dd></dl>
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv49DictSpace">
-<span id="_CPPv39DictSpace"></span><span id="_CPPv29DictSpace"></span><span id="DictSpace"></span><span class="target" id="struct_dict_space"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DictSpace</span></span></span><a class="headerlink" href="#_CPPv49DictSpace" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv39DictSpace"></span><span id="_CPPv29DictSpace"></span><span id="DictSpace"></span><span class="target" id="struct_dict_space"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DictSpace</span></span></span><a class="headerlink" href="#_CPPv49DictSpace" title="Permalink to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv413DiscreteSpace">
-<span id="_CPPv313DiscreteSpace"></span><span id="_CPPv213DiscreteSpace"></span><span id="DiscreteSpace"></span><span class="target" id="struct_discrete_space"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DiscreteSpace</span></span></span><a class="headerlink" href="#_CPPv413DiscreteSpace" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv313DiscreteSpace"></span><span id="_CPPv213DiscreteSpace"></span><span id="DiscreteSpace"></span><span class="target" id="struct_discrete_space"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DiscreteSpace</span></span></span><a class="headerlink" href="#_CPPv413DiscreteSpace" title="Permalink to this definition"></a><br /></dt>
 <dd><p>A discrete space in :math:<code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">0,</span> <span class="pre">1,</span> <span class="pre">\\dots,</span> <span class="pre">n-1</span> <span class="pre">};</span></code>. </p>
 </dd></dl>
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv418NamedDiscreteSpace">
-<span id="_CPPv318NamedDiscreteSpace"></span><span id="_CPPv218NamedDiscreteSpace"></span><span id="NamedDiscreteSpace"></span><span class="target" id="struct_named_discrete_space"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NamedDiscreteSpace</span></span></span><a class="headerlink" href="#_CPPv418NamedDiscreteSpace" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv318NamedDiscreteSpace"></span><span id="_CPPv218NamedDiscreteSpace"></span><span id="NamedDiscreteSpace"></span><span class="target" id="struct_named_discrete_space"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NamedDiscreteSpace</span></span></span><a class="headerlink" href="#_CPPv418NamedDiscreteSpace" title="Permalink to this definition"></a><br /></dt>
 <dd><p>A discrete space in which every point in the space is named. </p>
 <p>This can be used for representing enumerations. </p>
 <div class="breathe-sectiondef docutils container">
@@ -875,22 +779,22 @@ required for RPC communication. For further details check out the <a class="refe
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv420BooleanSequenceSpace">
-<span id="_CPPv320BooleanSequenceSpace"></span><span id="_CPPv220BooleanSequenceSpace"></span><span id="BooleanSequenceSpace"></span><span class="target" id="struct_boolean_sequence_space"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BooleanSequenceSpace</span></span></span><a class="headerlink" href="#_CPPv420BooleanSequenceSpace" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv320BooleanSequenceSpace"></span><span id="_CPPv220BooleanSequenceSpace"></span><span id="BooleanSequenceSpace"></span><span class="target" id="struct_boolean_sequence_space"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BooleanSequenceSpace</span></span></span><a class="headerlink" href="#_CPPv420BooleanSequenceSpace" title="Permalink to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv417ByteSequenceSpace">
-<span id="_CPPv317ByteSequenceSpace"></span><span id="_CPPv217ByteSequenceSpace"></span><span id="ByteSequenceSpace"></span><span class="target" id="struct_byte_sequence_space"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ByteSequenceSpace</span></span></span><a class="headerlink" href="#_CPPv417ByteSequenceSpace" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv317ByteSequenceSpace"></span><span id="_CPPv217ByteSequenceSpace"></span><span id="ByteSequenceSpace"></span><span class="target" id="struct_byte_sequence_space"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ByteSequenceSpace</span></span></span><a class="headerlink" href="#_CPPv417ByteSequenceSpace" title="Permalink to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv418BytesSequenceSpace">
-<span id="_CPPv318BytesSequenceSpace"></span><span id="_CPPv218BytesSequenceSpace"></span><span id="BytesSequenceSpace"></span><span class="target" id="struct_bytes_sequence_space"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BytesSequenceSpace</span></span></span><a class="headerlink" href="#_CPPv418BytesSequenceSpace" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv318BytesSequenceSpace"></span><span id="_CPPv218BytesSequenceSpace"></span><span id="BytesSequenceSpace"></span><span class="target" id="struct_bytes_sequence_space"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BytesSequenceSpace</span></span></span><a class="headerlink" href="#_CPPv418BytesSequenceSpace" title="Permalink to this definition"></a><br /></dt>
 <dd><div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N18BytesSequenceSpace12length_rangeE">
-<span id="_CPPv3N18BytesSequenceSpace12length_rangeE"></span><span id="_CPPv2N18BytesSequenceSpace12length_rangeE"></span><span id="BytesSequenceSpace::length_range__Int64Range"></span><span class="target" id="struct_bytes_sequence_space_1a5a25171229dea77e0a2cbbfce31fe280"></span><a class="reference internal" href="#_CPPv410Int64Range" title="Int64Range"><span class="n"><span class="pre">Int64Range</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">length_range</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N18BytesSequenceSpace12length_rangeE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N18BytesSequenceSpace12length_rangeE"></span><span id="_CPPv2N18BytesSequenceSpace12length_rangeE"></span><span id="BytesSequenceSpace::length_range__Int64Range"></span><span class="target" id="struct_bytes_sequence_space_1a5a25171229dea77e0a2cbbfce31fe280"></span><a class="reference internal" href="#_CPPv410Int64Range" title="Int64Range"><span class="n"><span class="pre">Int64Range</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">length_range</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N18BytesSequenceSpace12length_rangeE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Number of byte arrays in the sequence. </p>
 </dd></dl>
 
@@ -899,27 +803,27 @@ required for RPC communication. For further details check out the <a class="refe
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv418Int64SequenceSpace">
-<span id="_CPPv318Int64SequenceSpace"></span><span id="_CPPv218Int64SequenceSpace"></span><span id="Int64SequenceSpace"></span><span class="target" id="struct_int64_sequence_space"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Int64SequenceSpace</span></span></span><a class="headerlink" href="#_CPPv418Int64SequenceSpace" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv318Int64SequenceSpace"></span><span id="_CPPv218Int64SequenceSpace"></span><span id="Int64SequenceSpace"></span><span class="target" id="struct_int64_sequence_space"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Int64SequenceSpace</span></span></span><a class="headerlink" href="#_CPPv418Int64SequenceSpace" title="Permalink to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv418FloatSequenceSpace">
-<span id="_CPPv318FloatSequenceSpace"></span><span id="_CPPv218FloatSequenceSpace"></span><span id="FloatSequenceSpace"></span><span class="target" id="struct_float_sequence_space"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FloatSequenceSpace</span></span></span><a class="headerlink" href="#_CPPv418FloatSequenceSpace" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv318FloatSequenceSpace"></span><span id="_CPPv218FloatSequenceSpace"></span><span id="FloatSequenceSpace"></span><span class="target" id="struct_float_sequence_space"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FloatSequenceSpace</span></span></span><a class="headerlink" href="#_CPPv418FloatSequenceSpace" title="Permalink to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv419DoubleSequenceSpace">
-<span id="_CPPv319DoubleSequenceSpace"></span><span id="_CPPv219DoubleSequenceSpace"></span><span id="DoubleSequenceSpace"></span><span class="target" id="struct_double_sequence_space"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DoubleSequenceSpace</span></span></span><a class="headerlink" href="#_CPPv419DoubleSequenceSpace" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv319DoubleSequenceSpace"></span><span id="_CPPv219DoubleSequenceSpace"></span><span id="DoubleSequenceSpace"></span><span class="target" id="struct_double_sequence_space"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DoubleSequenceSpace</span></span></span><a class="headerlink" href="#_CPPv419DoubleSequenceSpace" title="Permalink to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv419StringSequenceSpace">
-<span id="_CPPv319StringSequenceSpace"></span><span id="_CPPv219StringSequenceSpace"></span><span id="StringSequenceSpace"></span><span class="target" id="struct_string_sequence_space"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StringSequenceSpace</span></span></span><a class="headerlink" href="#_CPPv419StringSequenceSpace" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv319StringSequenceSpace"></span><span id="_CPPv219StringSequenceSpace"></span><span id="StringSequenceSpace"></span><span class="target" id="struct_string_sequence_space"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StringSequenceSpace</span></span></span><a class="headerlink" href="#_CPPv419StringSequenceSpace" title="Permalink to this definition"></a><br /></dt>
 <dd><div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N19StringSequenceSpace12length_rangeE">
-<span id="_CPPv3N19StringSequenceSpace12length_rangeE"></span><span id="_CPPv2N19StringSequenceSpace12length_rangeE"></span><span id="StringSequenceSpace::length_range__Int64Range"></span><span class="target" id="struct_string_sequence_space_1aef6822273f5098f810d5a77c33e01cd4"></span><a class="reference internal" href="#_CPPv410Int64Range" title="Int64Range"><span class="n"><span class="pre">Int64Range</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">length_range</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N19StringSequenceSpace12length_rangeE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N19StringSequenceSpace12length_rangeE"></span><span id="_CPPv2N19StringSequenceSpace12length_rangeE"></span><span id="StringSequenceSpace::length_range__Int64Range"></span><span class="target" id="struct_string_sequence_space_1aef6822273f5098f810d5a77c33e01cd4"></span><a class="reference internal" href="#_CPPv410Int64Range" title="Int64Range"><span class="n"><span class="pre">Int64Range</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">length_range</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N19StringSequenceSpace12length_rangeE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>The number of strings in the sequence. </p>
 </dd></dl>
 
@@ -928,13 +832,13 @@ required for RPC communication. For further details check out the <a class="refe
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv418SpaceSequenceSpace">
-<span id="_CPPv318SpaceSequenceSpace"></span><span id="_CPPv218SpaceSequenceSpace"></span><span id="SpaceSequenceSpace"></span><span class="target" id="struct_space_sequence_space"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SpaceSequenceSpace</span></span></span><a class="headerlink" href="#_CPPv418SpaceSequenceSpace" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv318SpaceSequenceSpace"></span><span id="_CPPv218SpaceSequenceSpace"></span><span id="SpaceSequenceSpace"></span><span class="target" id="struct_space_sequence_space"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SpaceSequenceSpace</span></span></span><a class="headerlink" href="#_CPPv418SpaceSequenceSpace" title="Permalink to this definition"></a><br /></dt>
 <dd><p>A variable length sequence of spaces. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N18SpaceSequenceSpace12length_rangeE">
-<span id="_CPPv3N18SpaceSequenceSpace12length_rangeE"></span><span id="_CPPv2N18SpaceSequenceSpace12length_rangeE"></span><span id="SpaceSequenceSpace::length_range__Int64Range"></span><span class="target" id="struct_space_sequence_space_1a4d5ecc1e67988cea75b7b0a7f36cd111"></span><a class="reference internal" href="#_CPPv410Int64Range" title="Int64Range"><span class="n"><span class="pre">Int64Range</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">length_range</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N18SpaceSequenceSpace12length_rangeE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N18SpaceSequenceSpace12length_rangeE"></span><span id="_CPPv2N18SpaceSequenceSpace12length_rangeE"></span><span id="SpaceSequenceSpace::length_range__Int64Range"></span><span class="target" id="struct_space_sequence_space_1a4d5ecc1e67988cea75b7b0a7f36cd111"></span><a class="reference internal" href="#_CPPv410Int64Range" title="Int64Range"><span class="n"><span class="pre">Int64Range</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">length_range</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N18SpaceSequenceSpace12length_rangeE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>The number of spaces in the sequence. </p>
 </dd></dl>
 
@@ -943,53 +847,53 @@ required for RPC communication. For further details check out the <a class="refe
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv411StringSpace">
-<span id="_CPPv311StringSpace"></span><span id="_CPPv211StringSpace"></span><span id="StringSpace"></span><span class="target" id="struct_string_space"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StringSpace</span></span></span><a class="headerlink" href="#_CPPv411StringSpace" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv311StringSpace"></span><span id="_CPPv211StringSpace"></span><span id="StringSpace"></span><span class="target" id="struct_string_space"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StringSpace</span></span></span><a class="headerlink" href="#_CPPv411StringSpace" title="Permalink to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv46Opaque">
-<span id="_CPPv36Opaque"></span><span id="_CPPv26Opaque"></span><span id="Opaque"></span><span class="target" id="struct_opaque"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Opaque</span></span></span><a class="headerlink" href="#_CPPv46Opaque" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv36Opaque"></span><span id="_CPPv26Opaque"></span><span id="Opaque"></span><span class="target" id="struct_opaque"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Opaque</span></span></span><a class="headerlink" href="#_CPPv46Opaque" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Can be used in Space.any_value or Event.any_value to describe an opaque serialized data. </p>
 </dd></dl>
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv416CommandlineSpace">
-<span id="_CPPv316CommandlineSpace"></span><span id="_CPPv216CommandlineSpace"></span><span id="CommandlineSpace"></span><span class="target" id="struct_commandline_space"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CommandlineSpace</span></span></span><a class="headerlink" href="#_CPPv416CommandlineSpace" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv316CommandlineSpace"></span><span id="_CPPv216CommandlineSpace"></span><span id="CommandlineSpace"></span><span class="target" id="struct_commandline_space"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CommandlineSpace</span></span></span><a class="headerlink" href="#_CPPv416CommandlineSpace" title="Permalink to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv49ListEvent">
-<span id="_CPPv39ListEvent"></span><span id="_CPPv29ListEvent"></span><span id="ListEvent"></span><span class="target" id="struct_list_event"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ListEvent</span></span></span><a class="headerlink" href="#_CPPv49ListEvent" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv39ListEvent"></span><span id="_CPPv29ListEvent"></span><span id="ListEvent"></span><span class="target" id="struct_list_event"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ListEvent</span></span></span><a class="headerlink" href="#_CPPv49ListEvent" title="Permalink to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv49DictEvent">
-<span id="_CPPv39DictEvent"></span><span id="_CPPv29DictEvent"></span><span id="DictEvent"></span><span class="target" id="struct_dict_event"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DictEvent</span></span></span><a class="headerlink" href="#_CPPv49DictEvent" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv39DictEvent"></span><span id="_CPPv29DictEvent"></span><span id="DictEvent"></span><span class="target" id="struct_dict_event"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DictEvent</span></span></span><a class="headerlink" href="#_CPPv49DictEvent" title="Permalink to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv49Benchmark">
-<span id="_CPPv39Benchmark"></span><span id="_CPPv29Benchmark"></span><span id="Benchmark"></span><span class="target" id="struct_benchmark"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Benchmark</span></span></span><a class="headerlink" href="#_CPPv49Benchmark" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv39Benchmark"></span><span id="_CPPv29Benchmark"></span><span id="Benchmark"></span><span class="target" id="struct_benchmark"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Benchmark</span></span></span><a class="headerlink" href="#_CPPv49Benchmark" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Representation of the input to a compiler. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N9Benchmark3uriE">
-<span id="_CPPv3N9Benchmark3uriE"></span><span id="_CPPv2N9Benchmark3uriE"></span><span id="Benchmark::uri__string"></span><span class="target" id="struct_benchmark_1aaca16215c7f8bc854867ea6c4120dc7d"></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">uri</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N9Benchmark3uriE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N9Benchmark3uriE"></span><span id="_CPPv2N9Benchmark3uriE"></span><span id="Benchmark::uri__string"></span><span class="target" id="struct_benchmark_1aaca16215c7f8bc854867ea6c4120dc7d"></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">uri</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N9Benchmark3uriE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>The name of the benchmark to add. </p>
 <p>In case of conflict with an existing benchmark, this new benchmark replaces the existing one. </p>
 </dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N9Benchmark7programE">
-<span id="_CPPv3N9Benchmark7programE"></span><span id="_CPPv2N9Benchmark7programE"></span><span id="Benchmark::program__File"></span><span class="target" id="struct_benchmark_1a37d1f2a03191188e127b16d11d3a3b5b"></span><a class="reference internal" href="#_CPPv44File" title="File"><span class="n"><span class="pre">File</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">program</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><a class="headerlink" href="#_CPPv4N9Benchmark7programE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N9Benchmark7programE"></span><span id="_CPPv2N9Benchmark7programE"></span><span id="Benchmark::program__File"></span><span class="target" id="struct_benchmark_1a37d1f2a03191188e127b16d11d3a3b5b"></span><a class="reference internal" href="#_CPPv44File" title="File"><span class="n"><span class="pre">File</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">program</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><a class="headerlink" href="#_CPPv4N9Benchmark7programE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>The description of the program that is being compiled. </p>
 <p>It is up to the service to determine how to interpret this file, and it is the responsibility of the client to ensure that it provides the correct format. For example, the service could expect that this file contains serialized IR data, or an input source file. </p>
 </dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N9Benchmark14dynamic_configE">
-<span id="_CPPv3N9Benchmark14dynamic_configE"></span><span id="_CPPv2N9Benchmark14dynamic_configE"></span><span id="Benchmark::dynamic_config__BenchmarkDynamicConfig"></span><span class="target" id="struct_benchmark_1acf1f71ca48630d8cf9e4287d7860fded"></span><a class="reference internal" href="#_CPPv422BenchmarkDynamicConfig" title="BenchmarkDynamicConfig"><span class="n"><span class="pre">BenchmarkDynamicConfig</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dynamic_config</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><a class="headerlink" href="#_CPPv4N9Benchmark14dynamic_configE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N9Benchmark14dynamic_configE"></span><span id="_CPPv2N9Benchmark14dynamic_configE"></span><span id="Benchmark::dynamic_config__BenchmarkDynamicConfig"></span><span class="target" id="struct_benchmark_1acf1f71ca48630d8cf9e4287d7860fded"></span><a class="reference internal" href="#_CPPv422BenchmarkDynamicConfig" title="BenchmarkDynamicConfig"><span class="n"><span class="pre">BenchmarkDynamicConfig</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dynamic_config</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><a class="headerlink" href="#_CPPv4N9Benchmark14dynamic_configE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>An optional configuration option that details how to build and run the benchmark program. </p>
 </dd></dl>
 
@@ -998,13 +902,13 @@ required for RPC communication. For further details check out the <a class="refe
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv44File">
-<span id="_CPPv34File"></span><span id="_CPPv24File"></span><span id="File"></span><span class="target" id="struct_file"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">File</span></span></span><a class="headerlink" href="#_CPPv44File" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv34File"></span><span id="_CPPv24File"></span><span id="File"></span><span class="target" id="struct_file"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">File</span></span></span><a class="headerlink" href="#_CPPv44File" title="Permalink to this definition"></a><br /></dt>
 <dd><p>A <a class="reference internal" href="#struct_file"><span class="std std-ref">File</span></a> message represents a file object. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N4File3uriE">
-<span id="_CPPv3N4File3uriE"></span><span id="_CPPv2N4File3uriE"></span><span id="File::uri__string"></span><span class="target" id="struct_file_1a9080fef478973339f4816d03f075176c"></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">uri</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><a class="headerlink" href="#_CPPv4N4File3uriE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N4File3uriE"></span><span id="_CPPv2N4File3uriE"></span><span id="File::uri__string"></span><span class="target" id="struct_file_1a9080fef478973339f4816d03f075176c"></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">uri</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><a class="headerlink" href="#_CPPv4N4File3uriE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>The URI of the file which can be accessed. </p>
 <p>Note that this requires that the compiler service and the Python frontend share a file system, which cannot be assumed for general use. </p>
 </dd></dl>
@@ -1014,19 +918,19 @@ required for RPC communication. For further details check out the <a class="refe
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv422BenchmarkDynamicConfig">
-<span id="_CPPv322BenchmarkDynamicConfig"></span><span id="_CPPv222BenchmarkDynamicConfig"></span><span id="BenchmarkDynamicConfig"></span><span class="target" id="struct_benchmark_dynamic_config"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BenchmarkDynamicConfig</span></span></span><a class="headerlink" href="#_CPPv422BenchmarkDynamicConfig" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv322BenchmarkDynamicConfig"></span><span id="_CPPv222BenchmarkDynamicConfig"></span><span id="BenchmarkDynamicConfig"></span><span class="target" id="struct_benchmark_dynamic_config"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BenchmarkDynamicConfig</span></span></span><a class="headerlink" href="#_CPPv422BenchmarkDynamicConfig" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Description of how to build and run a benchmark binary. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N22BenchmarkDynamicConfig9build_cmdE">
-<span id="_CPPv3N22BenchmarkDynamicConfig9build_cmdE"></span><span id="_CPPv2N22BenchmarkDynamicConfig9build_cmdE"></span><span id="BenchmarkDynamicConfig::build_cmd__Command"></span><span class="target" id="struct_benchmark_dynamic_config_1a561a15f9acbf86379d500d5020314e06"></span><a class="reference internal" href="#_CPPv47Command" title="Command"><span class="n"><span class="pre">Command</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">build_cmd</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N22BenchmarkDynamicConfig9build_cmdE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N22BenchmarkDynamicConfig9build_cmdE"></span><span id="_CPPv2N22BenchmarkDynamicConfig9build_cmdE"></span><span id="BenchmarkDynamicConfig::build_cmd__Command"></span><span class="target" id="struct_benchmark_dynamic_config_1a561a15f9acbf86379d500d5020314e06"></span><a class="reference internal" href="#_CPPv47Command" title="Command"><span class="n"><span class="pre">Command</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">build_cmd</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N22BenchmarkDynamicConfig9build_cmdE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>A command to execute to build the benchmark for dynamic execution. </p>
 </dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N22BenchmarkDynamicConfig7run_cmdE">
-<span id="_CPPv3N22BenchmarkDynamicConfig7run_cmdE"></span><span id="_CPPv2N22BenchmarkDynamicConfig7run_cmdE"></span><span id="BenchmarkDynamicConfig::run_cmd__Command"></span><span class="target" id="struct_benchmark_dynamic_config_1ab6edbf57c8898a834b691d1bd9e73a3b"></span><a class="reference internal" href="#_CPPv47Command" title="Command"><span class="n"><span class="pre">Command</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">run_cmd</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><a class="headerlink" href="#_CPPv4N22BenchmarkDynamicConfig7run_cmdE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N22BenchmarkDynamicConfig7run_cmdE"></span><span id="_CPPv2N22BenchmarkDynamicConfig7run_cmdE"></span><span id="BenchmarkDynamicConfig::run_cmd__Command"></span><span class="target" id="struct_benchmark_dynamic_config_1ab6edbf57c8898a834b691d1bd9e73a3b"></span><a class="reference internal" href="#_CPPv47Command" title="Command"><span class="n"><span class="pre">Command</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">run_cmd</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><a class="headerlink" href="#_CPPv4N22BenchmarkDynamicConfig7run_cmdE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>A command to execute to run the benchmark. </p>
 </dd></dl>
 
@@ -1047,7 +951,7 @@ required for RPC communication. For further details check out the <a class="refe
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv47Command">
-<span id="_CPPv37Command"></span><span id="_CPPv27Command"></span><span id="Command"></span><span class="target" id="struct_command"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Command</span></span></span><a class="headerlink" href="#_CPPv47Command" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv37Command"></span><span id="_CPPv27Command"></span><span id="Command"></span><span class="target" id="struct_command"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Command</span></span></span><a class="headerlink" href="#_CPPv47Command" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Representation of a command that can be executed. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
@@ -1059,13 +963,13 @@ required for RPC communication. For further details check out the <a class="refe
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N7Command3envE">
-<span id="_CPPv3N7Command3envE"></span><span id="_CPPv2N7Command3envE"></span><span id="Command::env__map:string.string:"></span><span class="target" id="struct_command_1a24edb539ccd6f6d0123abf9eb651e482"></span><span class="n"><span class="pre">map</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">env</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><a class="headerlink" href="#_CPPv4N7Command3envE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N7Command3envE"></span><span id="_CPPv2N7Command3envE"></span><span id="Command::env__map:string.string:"></span><span class="target" id="struct_command_1a24edb539ccd6f6d0123abf9eb651e482"></span><span class="n"><span class="pre">map</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">env</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><a class="headerlink" href="#_CPPv4N7Command3envE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>An optional key-value mapping of environment variables to set. </p>
 </dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N7Command15timeout_secondsE">
-<span id="_CPPv3N7Command15timeout_secondsE"></span><span id="_CPPv2N7Command15timeout_secondsE"></span><span id="Command::timeout_seconds__int32"></span><span class="target" id="struct_command_1a0ea342d896a5a75306bf89ac3eb20e0a"></span><span class="n"><span class="pre">int32</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">timeout_seconds</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><a class="headerlink" href="#_CPPv4N7Command15timeout_secondsE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N7Command15timeout_secondsE"></span><span id="_CPPv2N7Command15timeout_secondsE"></span><span id="Command::timeout_seconds__int32"></span><span class="target" id="struct_command_1a0ea342d896a5a75306bf89ac3eb20e0a"></span><span class="n"><span class="pre">int32</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">timeout_seconds</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><a class="headerlink" href="#_CPPv4N7Command15timeout_secondsE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>The maximum runtime of the command. </p>
 </dd></dl>
 
@@ -1088,19 +992,19 @@ required for RPC communication. For further details check out the <a class="refe
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv416SessionParameter">
-<span id="_CPPv316SessionParameter"></span><span id="_CPPv216SessionParameter"></span><span id="SessionParameter"></span><span class="target" id="struct_session_parameter"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SessionParameter</span></span></span><a class="headerlink" href="#_CPPv416SessionParameter" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv316SessionParameter"></span><span id="_CPPv216SessionParameter"></span><span id="SessionParameter"></span><span class="target" id="struct_session_parameter"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SessionParameter</span></span></span><a class="headerlink" href="#_CPPv416SessionParameter" title="Permalink to this definition"></a><br /></dt>
 <dd><p>An arbitrary string parameter value for a session. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N16SessionParameter3keyE">
-<span id="_CPPv3N16SessionParameter3keyE"></span><span id="_CPPv2N16SessionParameter3keyE"></span><span id="SessionParameter::key__string"></span><span class="target" id="struct_session_parameter_1a3a9e524a558fe4198f6d14469360e451"></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">key</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N16SessionParameter3keyE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N16SessionParameter3keyE"></span><span id="_CPPv2N16SessionParameter3keyE"></span><span id="SessionParameter::key__string"></span><span class="target" id="struct_session_parameter_1a3a9e524a558fe4198f6d14469360e451"></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">key</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N16SessionParameter3keyE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>A string key. </p>
 </dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N16SessionParameter5valueE">
-<span id="_CPPv3N16SessionParameter5valueE"></span><span id="_CPPv2N16SessionParameter5valueE"></span><span id="SessionParameter::value__string"></span><span class="target" id="struct_session_parameter_1a54c032c9efba21b61f0f0383bc241e2b"></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">value</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><a class="headerlink" href="#_CPPv4N16SessionParameter5valueE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N16SessionParameter5valueE"></span><span id="_CPPv2N16SessionParameter5valueE"></span><span id="SessionParameter::value__string"></span><span class="target" id="struct_session_parameter_1a54c032c9efba21b61f0f0383bc241e2b"></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">value</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><a class="headerlink" href="#_CPPv4N16SessionParameter5valueE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>A string value. </p>
 </dd></dl>
 
@@ -1112,63 +1016,44 @@ required for RPC communication. For further details check out the <a class="refe
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="changelog.html" class="btn btn-neutral float-right" title="Changelog" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="cli.html" class="btn btn-neutral float-left" title="Command Line Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="changelog.html" class="btn btn-neutral float-right" title="Changelog" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright Meta Platforms, Inc.
-
-    </p>
+    <p>&#169; Copyright Meta Platforms, Inc.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
-
-  
-  
-    
     <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WJN2CKJJKH"></script>
     <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
 
-    ga('create', 'G-WJN2CKJJKH', 'auto');
-    
-    ga('send', 'pageview');
-    </script>
-
-    
-   
+      gtag('config', 'G-WJN2CKJJKH', {
+          'anonymize_ip': false,
+      });
+    </script> 
 
 </body>
 </html>
