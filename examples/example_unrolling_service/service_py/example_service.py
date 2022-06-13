@@ -120,18 +120,6 @@ class UnrollingCompilationSession(CompilationSession):
         # LLVM's opt does not always enforce the unrolling options passed as cli arguments. Hence, we created our own exeutable with custom unrolling pass in examples/example_unrolling_service/loop_unroller that enforces the unrolling factors passed in its cli.
         # if self._use_custom_opt is true, use our custom exeutable, otherwise use LLVM's opt
         self._use_custom_opt = use_custom_opt
-        if self._use_custom_opt:
-            # verify that loop_unroller executable exists, otherwise build it
-            if os.path.exists("../loop_unroller/loop_unroller") is False:
-                os.environ["LLVM_DIR"] = str(llvm.download_llvm_files())
-                run_command(
-                    [
-                        "make",
-                        "-C",
-                        "../loop_unroller/standalone_build",
-                    ],
-                    timeout=30,
-                )
 
         # Dump the benchmark source to disk.
         self._src_path = str(self.working_dir / "benchmark.c")
