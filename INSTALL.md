@@ -31,7 +31,7 @@ Now proceed to [All platforms](#all-platforms) below.
 On debian-based linux systems, install the required toolchain using:
 
 ```sh
-sudo apt install -y clang-9 clang-format golang libjpeg-dev \
+sudo apt install -y clang clang-format golang libjpeg-dev \
   libtinfo5 m4 make patch zlib1g-dev tar bzip2 wget
 mkdir -pv ~/.local/bin
 wget https://github.com/bazelbuild/bazelisk/releases/download/v1.7.5/bazelisk-linux-amd64 -O ~/.local/bin/bazel
@@ -131,8 +131,8 @@ By default most dependencies are built together with Compiler Gym. To search for
 
 ```bash
 cmake \
-  -DCMAKE_C_COMPILER=clang-9 \
-  -DCMAKE_CXX_COMPILER=clang++-9 \
+  -DCMAKE_C_COMPILER=clang \
+  -DCMAKE_CXX_COMPILER=clang++ \
   -S "<path to source directory>" \
   -B "<path to build directory>"
 
@@ -165,9 +165,9 @@ Additional optional configuration arguments:
 * For faster linking.
 
     ```bash
-    -DCMAKE_EXE_LINKER_FLAGS_INIT="-fuse-ld=lld-9"
-    -DCMAKE_MODULE_LINKER_FLAGS_INIT="-fuse-ld=lld-9"
-    -DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=lld-9"
+    -DCMAKE_EXE_LINKER_FLAGS_INIT="-fuse-ld=lld"
+    -DCMAKE_MODULE_LINKER_FLAGS_INIT="-fuse-ld=lld"
+    -DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=lld"
     ```
 
 By default, CompilerGym builds LLVM from source. This takes a long time and a
