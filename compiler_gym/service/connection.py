@@ -52,6 +52,8 @@ logger = logging.getLogger(__name__)
 class ConnectionOpts(BaseModel):
     """The options used to configure a connection to a service."""
 
+    # Deprecated.
+    # This is for backwards compatibility and will be removed in a future release.
     rpc_call_max_seconds: float = 300
     """The maximum number of seconds to wait for an RPC method call to succeed."""
 
@@ -760,7 +762,7 @@ class CompilerGymServiceConnection:
         self,
         stub_method: StubMethod,
         request: Request,
-        timeout: Optional[float] = None,
+        timeout: Optional[float] = 300,
         max_retries: Optional[int] = None,
         retry_wait_seconds: Optional[float] = None,
         retry_wait_backoff_exponent: Optional[float] = None,
@@ -782,9 +784,7 @@ class CompilerGymServiceConnection:
 
         :param stub_method: An RPC method attribute on `CompilerGymServiceStub`.
         :param request: A request message.
-        :param timeout: The maximum number of seconds to await a reply. If not
-            provided, the default value is
-            :code:`ConnectionOpts.rpc_call_max_seconds`.
+        :param timeout: The maximum number of seconds to await a reply.
         :param max_retries: The maximum number of failed attempts to communicate
             with the RPC service before raising an error. Retries are made only
             for communication errors. Failures from other causes such as error
@@ -818,7 +818,7 @@ class CompilerGymServiceConnection:
         return self.connection(
             stub_method,
             request,
-            timeout=timeout or self.opts.rpc_call_max_seconds,
+            timeout=timeout,
             max_retries=max_retries or self.opts.rpc_max_retries,
             retry_wait_seconds=retry_wait_seconds or self.opts.retry_wait_seconds,
             retry_wait_backoff_exponent=(
