@@ -239,7 +239,7 @@ Status Benchmark::computeRuntime(Event& observation) {
   // Run the warmup runs.
   VLOG(3) << "Running " << getWarmupRunsPerRuntimeObservationCount()
           << " warmup iterations of binary";
-  for (int i = 0; i < getRuntimesPerObservationCount(); ++i) {
+  for (int i = 0; i < getWarmupRunsPerRuntimeObservationCount(); ++i) {
     RETURN_IF_ERROR(cfg.runCommand().checkCall());
   }
 
