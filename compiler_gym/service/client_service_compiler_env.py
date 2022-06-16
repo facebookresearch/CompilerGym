@@ -926,7 +926,9 @@ class ClientServiceCompilerEnv(CompilerEnv):
             TimeoutError,
             SessionNotFound,
         ) as e:
-            # Gather user through the `info` dict.
+            # Gracefully handle "expected" error types. These non-fatal errors
+            # end the current episode and provide some diagnostic information to
+            # the user through the `info` dict.
             info = {
                 "error_type": type(e).__name__,
                 "error_details": str(e),
