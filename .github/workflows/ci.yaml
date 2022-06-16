@@ -55,12 +55,11 @@ jobs:
             - name: Download LLVM 10.0.0 release
               run: |
                   if [ "$(uname)" = "Darwin" ]; then
-                    wget https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/clang+llvm-10.0.0-x86_64-apple-darwin.tar.xz -O ~/llvm.tar.xz
+                    wget --quiet https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/clang+llvm-10.0.0-x86_64-apple-darwin.tar.xz -O ~/llvm.tar.xz
                   else
-                    wget https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz -O ~/llvm.tar.xz
+                    wget --quiet https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz -O ~/llvm.tar.xz
                   fi
-                  # TODO(cummins): Remove 'v' debugging flag:
-                  mkdir ~/llvm && tar xvf ~/llvm.tar.xz --strip-components 1 -C ~/llvm
+                  mkdir ~/llvm && tar xf ~/llvm.tar.xz --strip-components 1 -C ~/llvm
                   rm ~/llvm.tar.xz
                   echo "Unpacked, testing for expected file:"
                   test -d ~/llvm/lib/cmake/llvm
@@ -89,6 +88,30 @@ jobs:
                   if-no-files-found: error
                   retention-days: 7
 
+            - name: Upload compute_programl binary
+              uses: actions/upload-artifact@v2
+              with:
+                  name: linux-compute-programl-cmake
+                  path: compiler_gym/third_party/programl/compute_programl
+                  if-no-files-found: error
+                  retention-days: 7
+
+            - name: Upload loop_unroller binary
+              uses: actions/upload-artifact@v2
+              with:
+                  name: linux-loop-unroller-cmake
+                  path: examples/example_unrolling_service/loop_unroller/loop_unroller
+                  if-no-files-found: error
+                  retention-days: 7
+
+            - name: Upload opt_loops binary
+              uses: actions/upload-artifact@v2
+              with:
+                  name: linux-opt-loops-cmake
+                  path: examples/loop_optimizations_service/opt_loops/opt_loops
+                  if-no-files-found: error
+                  retention-days: 7
+
     build-mlir-env-linux-cmake:
         runs-on: ubuntu-latest
         steps:
@@ -104,11 +127,11 @@ jobs:
             - name: Download LLVM 14.0.0 release
               run: |
                   if [ "$(uname)" = "Darwin" ]; then
-                    wget https://github.com/llvm/llvm-project/releases/download/llvmorg-14.0.0/clang+llvm-14.0.0-x86_64-apple-darwin.tar.xz -O ~/llvm.tar.xz
+                    wget --quiet https://github.com/llvm/llvm-project/releases/download/llvmorg-14.0.0/clang+llvm-14.0.0-x86_64-apple-darwin.tar.xz -O ~/llvm.tar.xz
                   else
-                    wget https://github.com/llvm/llvm-project/releases/download/llvmorg-14.0.0/clang+llvm-14.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz -O ~/llvm.tar.xz
+                    wget --quiet https://github.com/llvm/llvm-project/releases/download/llvmorg-14.0.0/clang+llvm-14.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz -O ~/llvm.tar.xz
                   fi
-                  mkdir ~/llvm && tar xvf ~/llvm.tar.xz --strip-components 1 -C ~/llvm
+                  mkdir ~/llvm && tar xf ~/llvm.tar.xz --strip-components 1 -C ~/llvm
                   rm ~/llvm.tar.xz
                   echo "Unpacked, testing for expected file:"
                   test -d ~/llvm/lib/cmake/llvm
@@ -234,8 +257,36 @@ jobs:
             - name: Install test dependencies
               run: python -m pip install -r tests/requirements.txt
 
+            - name: Download compute_programl
+              uses: actions/download-artifact@v2
+              with:
+                  name: linux-compute-programl-cmake
+
+            - name: Download loop_unroller
+              uses: actions/download-artifact@v2
+              with:
+                  name: linux-loop-unroller-cmake
+
+            - name: Download opt_loops
+              uses: actions/download-artifact@v2
+              with:
+                  name: linux-opt-loops-cmake
+
+            - name: Move examples and utility binaries
+              run: |
+                  chmod +x compute_programl
+                  chmod +x loop_unroller
+                  chmod +x opt_loops
+                  mv compute_programl ./compiler_gym/third_party/programl/compute_programl
+                  mv loop_unroller ./examples/example_unrolling_service/loop_unroller/loop_unroller
+                  mv opt_loops ./examples/loop_optimizations_service/opt_loops/opt_loops
+                  test ./compiler_gym/third_party/programl/compute_programl
+                  test ./examples/example_unrolling_service/loop_unroller/loop_unroller
+                  test ./examples/loop_optimizations_service/opt_loops/opt_loops
+              shell: bash
+
             - name: Run the test suite
-              run: make install-test PYTEST_ARGS="--ignore tests/mlir"
+              run: make install-test CI=1 PYTEST_ARGS="--ignore tests/mlir"
 
     test-mlir-env-linux-cmake:
         needs: build-mlir-env-linux-cmake
@@ -267,7 +318,7 @@ jobs:
               run: python -m pip install -r tests/requirements.txt
 
             - name: Run the test suite
-              run: make install-test-cov TEST_TARGET="tests/mlir"
+              run: make install-test-cov CI=1 TEST_TARGET="tests/mlir"
 
     test-macos:
         needs: build-macos
@@ -301,6 +352,7 @@ jobs:
             - name: Run the test suite
               run: |
                   make install-test-cov \
+                  CI=1 \
                   PYTEST_ARGS="--ignore tests/llvm --ignore tests/gcc --ignore tests/loop_tool --ignore tests/mlir"
 
             - name: Upload coverage report to Codecov
@@ -335,7 +387,7 @@ jobs:
               run: python -m pip install -r tests/requirements.txt
 
             - name: Run the test suite
-              run: make install-test-cov TEST_TARGET="tests/llvm"
+              run: make install-test-cov CI=1 TEST_TARGET="tests/llvm"
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
@@ -369,7 +421,7 @@ jobs:
               run: python -m pip install -r tests/requirements.txt
 
             - name: Run the test suite
-              run: make install-test-cov TEST_TARGET="tests/llvm"
+              run: make install-test-cov CI=1 TEST_TARGET="tests/llvm"
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
@@ -403,7 +455,7 @@ jobs:
               run: python -m pip install -r tests/requirements.txt
 
             - name: Run the test suite
-              run: make install-test-cov TEST_TARGET="tests/gcc"
+              run: make install-test-cov CI=1 TEST_TARGET="tests/gcc"
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
@@ -439,7 +491,7 @@ jobs:
               run: python -m pip install -r tests/requirements.txt
 
             - name: Run the test suite
-              run: make install-test-cov TEST_TARGET="tests/gcc"
+              run: make install-test-cov CI=1 TEST_TARGET="tests/gcc"
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
@@ -470,7 +522,7 @@ jobs:
               run: python -m pip install -r tests/requirements.txt
 
             - name: Run the test suite
-              run: make install-test-cov TEST_TARGET="tests/gcc"
+              run: make install-test-cov CI=1 TEST_TARGET="tests/gcc"
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
@@ -501,7 +553,7 @@ jobs:
               run: python -m pip install -r tests/requirements.txt
 
             - name: Run the test suite
-              run: make install-test-cov TEST_TARGET="tests/loop_tool"
+              run: make install-test-cov CI=1 TEST_TARGET="tests/loop_tool"
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
@@ -532,7 +584,7 @@ jobs:
               run: python -m pip install -r tests/requirements.txt
 
             - name: Run the test suite
-              run: make install-test-cov TEST_TARGET="tests/loop_tool"
+              run: make install-test-cov CI=1 TEST_TARGET="tests/loop_tool"
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
@@ -567,7 +619,7 @@ jobs:
               run: make -C examples install
 
             - name: Run the test suite
-              run: make -C examples test
+              run: make -C examples test PYTEST_ARGS="--ignore example_unrolling_service --ignore loop_optimizations_service"
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
@@ -602,7 +654,7 @@ jobs:
               run: make -C examples install
 
             - name: Run the test suite
-              run: make -C examples test
+              run: make -C examples test PYTEST_ARGS="--ignore example_unrolling_service --ignore loop_optimizations_service"
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
@@ -683,7 +735,7 @@ jobs:
               run: python -m pip install -r tests/requirements.txt
 
             - name: Test
-              run: make install-test TEST_TARGET=tests/llvm
+              run: make install-test CI=1 TEST_TARGET=tests/llvm
               env:
                   ASAN_OPTIONS: detect_leaks=1
                   CC: clang

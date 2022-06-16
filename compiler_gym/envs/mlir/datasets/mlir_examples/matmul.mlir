@@ -1,3 +1,7 @@
+// Copyright (c) Facebook, Inc. and its affiliates.
+//
+// This source code is licensed under the MIT license found in the
+// LICENSE file in the root directory of this source tree.
 func @matmul(%a: tensor<${M}x${K}xf32> {linalg.buffer_layout = affine_map<(i, j)[s0, s1] -> (i, j)>},
              %b: tensor<${K}x${N}xf32> {linalg.buffer_layout = affine_map<(i, j)[s0, s1] -> (i, j)>},
              %c: tensor<${M}x${N}xf32> {linalg.buffer_layout = affine_map<(i, j)[s0, s1] -> (i, j)>})
