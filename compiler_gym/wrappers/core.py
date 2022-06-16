@@ -58,6 +58,7 @@ class CompilerEnvWrapper(CompilerEnv, Wrapper):
         reward_spaces: Optional[Iterable[Union[str, Reward]]] = None,
         observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
         rewards: Optional[Iterable[Union[str, Reward]]] = None,
+        timeout: Optional[float] = 300,
     ):
         if isinstance(action, IterableType):
             warnings.warn(
@@ -99,6 +100,7 @@ class CompilerEnvWrapper(CompilerEnv, Wrapper):
         reward_spaces: Optional[Iterable[Union[str, Reward]]] = None,
         observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
         rewards: Optional[Iterable[Union[str, Reward]]] = None,
+        timeout: Optional[float] = 300,
     ):
         if observations is not None:
             warnings.warn(
@@ -125,6 +127,14 @@ class CompilerEnvWrapper(CompilerEnv, Wrapper):
         mode="human",
     ) -> Optional[str]:
         return self.env.render(mode)
+
+    @property
+    def timeout(self) -> float:
+        return self.env.timeout
+
+    @timeout.setter
+    def timeout(self, timeout: float):
+        self.env.timeout = timeout
 
     @property
     def reward_range(self) -> Tuple[float, float]:
@@ -283,6 +293,7 @@ class ActionWrapper(CompilerEnvWrapper):
         reward_spaces: Optional[Iterable[Reward]] = None,
         observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
         rewards: Optional[Iterable[Union[str, Reward]]] = None,
+        timeout: Optional[float] = 300,
     ):
         return self.env.multistep(
             [self.action(a) for a in actions],
@@ -317,6 +328,7 @@ class ObservationWrapper(CompilerEnvWrapper, ABC):
         reward_spaces: Optional[Iterable[Union[str, Reward]]] = None,
         observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
         rewards: Optional[Iterable[Union[str, Reward]]] = None,
+        timeout: Optional[float] = 300,
     ):
         observation, reward, done, info = self.env.multistep(
             actions,
@@ -349,6 +361,7 @@ class RewardWrapper(CompilerEnvWrapper, ABC):
         reward_spaces: Optional[Iterable[Union[str, Reward]]] = None,
         observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
         rewards: Optional[Iterable[Union[str, Reward]]] = None,
+        timeout: Optional[float] = 300,
     ):
         observation, reward, done, info = self.env.multistep(
             actions,
