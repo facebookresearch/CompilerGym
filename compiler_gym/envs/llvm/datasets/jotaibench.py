@@ -134,8 +134,6 @@ class JotaiBenchDataset(TarDatasetWithManifest):
 
 
 class JotaiBenchRunnableDataset(TarDataset):
-    """TODO."""
-
     def __init__(
         self,
         site_data_base: Path,
@@ -144,24 +142,17 @@ class JotaiBenchRunnableDataset(TarDataset):
             name="benchmark://jotai-runnable-v0",
             description="Runnable C/C++ functions extracted from GitHub",
             references={
-                # TODO: Update these as necessary:
                 "Paper": "https://homepages.dcc.ufmg.br/~fernando/publications/papers/FaustinoCGO21.pdf",
                 "Homepage": "http://cuda.dcc.ufmg.br/angha/",
             },
-            license="",  # TODO: License name.
+            license="",  
             site_data_base=site_data_base,
             tar_urls=[
-                # TODO: URL of where to download a tarball that contains the
-                # benchmarks. For debugging, you could use something like
-                # Dropbox or similar. For eventual production we can host them
-                # in our S3 bucket for you.
                 "http://cuda.dcc.ufmg.br/Jotai/src/Jotai_printRetVal.tar.bz2"
             ],
-            tar_sha256="7d2c6326036d87a02318e81a29560f9bb4ead3dc33ffbd43e4fb2e95e09dd621",  # TODO: sha256sum of the above tarfile.
-            strip_prefix="programs_no-ub_printableRetVal",  # TODO: If there is a subdirectory to strip, specify it here.
+            tar_sha256="7d2c6326036d87a02318e81a29560f9bb4ead3dc33ffbd43e4fb2e95e09dd621",  
+            strip_prefix="programs_no-ub_printableRetVal",  
             tar_compression="bz2",
-            # TODO: The file extension that is used to automatically enumerate
-            # the benchmarks.
             benchmark_file_suffix=".c",
         )
 
@@ -199,26 +190,18 @@ class JotaiBenchRunnableDataset(TarDataset):
             uri, bitcode_abspath, "function.c", c_file_abspath
         )
 
-        # TODO: Here is where we specify how to build and run the benchmark.
         # This is what makes a benchmark "runnable".
         benchmark.proto.dynamic_config.MergeFrom(
             BenchmarkDynamicConfig(
                 build_cmd=Command(
-                    # TODO: Here is where you specify the command to build the
-                    # benchmark. Assuming no deps, this should be fine.
                     argument=["$CC", "$IN"] + get_system_library_flags(),
                     timeout_seconds=60,
                     outfile=["a.out"],
                 ),
                 run_cmd=Command(
-                    # TODO: Here is where you specify the command to build the
-                    # benchmark. Assuming no deps, this should be fine.
                     argument=["./a.out 0"],
                     timeout_seconds=60,
-                    # TODO: If the benchmark needs any input files, specify it here.
                     infile=[],
-                    # TODO: If the benchmark produces any output files, specify it
-                    # here.
                     outfile=[],
                 ),
             )
