@@ -1,6 +1,13 @@
+# Copyright (c) Facebook, Inc. and its affiliates.
+#
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
+
 from pathlib import Path
 from typing import Tuple, Optional, Union, List
-from compiler_gym.envs.cgra.service.cgra_service import CGRASession, observation_space, Schedule, CGRA, relative_placement_directions
+from compiler_gym.envs.cgra.service.cgra_service import BufferSchedule, CGRASession, NOCSchedule, observation_space, Schedule, CGRA, relative_placement_directions
+from compiler_gym.envs.cgra.compile_settings import CGRACompileSettings, RelativePlacementSettings
+import random
 from compiler_gym.spaces import Reward
 import traceback
 from compiler_gym.service import CompilationSession
@@ -48,7 +55,7 @@ class RelativePlacementCGRASession(CGRASession):
             # after every reset, it is important for some (e.g. genetic algorithms)
             self.dfg = pickle.loads(benchmark.program.contents)
             print("Loaded DFG " + str(self.dfg))
-            # TODO --- support better seeds.
+            # TODO(jcw) --- support better seeds.
             self.schedule = Schedule(self.cgra, self.dfg)
             self.initial_placement = self.get_initial_placement(self.dfg, 0)
 
@@ -85,40 +92,103 @@ class RelativePlacementCGRASession(CGRASession):
             raise e
 
     def get_initial_placement(self, dfg, seed):
-        try:
-            # For now, just place the nodes in order on the CGRA.
-            # Iterate through the PEs, and then increment the clock cycle
-            # if we can't place.
-            pe_ind = 0
-            time = 0
-            max_pe = self.cgra.cells_as_list()
-            nodes = dfg.bfs()
-            iterating = True
-            was_set = True
-            while iterating:
-                # only move to next node if we properly set the operation last time.
-                if was_set:
-                    n = next(nodes, None)
-                    if n is None:
-                        # Finished scheduling!
-                        iterating = False
-                        continue
-                was_set = self.schedule.set_operation(time, pe_ind, n, n.operation.latency)
-                if was_set:
-                    print("Set initial placement for node", str(n))
-                    print("Position is ", self.schedule.get_location(n))
+        mode = CGRACompileSettings['InitialPlacementMode']
+        if mode == 'random':
+            self.get_initial_placement_random(dfg, seed)
+        elif mode == 'first_avail':
+            self.get_initial_placement_nth_avail(dfg, seed, 1)
+        elif mode == 'second_avail':
+            # First avail results in compressed sequences.
+            # second avail spreads things out better?
+            self.get_initial_placement_nth_avail(dfg, seed, 2)
+        elif mode == 'lee2021':
+            self.get_initial_placement_linear(dfg, seed)
 
-                # TODO -- should we check that this produces a schedule with an II?
-                # Aim is to start with a very spread-out schedule that should just work ---
-                # let the SA algorithm compress it, rather than trying to make
-                # the SA algorithm find a valid schedule.
-                pe_ind += 1
-                time += n.operation.latency
-                if pe_ind >= len(max_pe):
-                    pe_ind = 0
-        except Exception as e:
-            print(traceback.format_exc())
-            raise e
+    def get_initial_placement_nth_avail(self, dfg, seed, n):
+        nodes = dfg.bfs()
+        noc_schedule = NOCSchedule()
+        buffer_schedule = BufferSchedule()
+
+        for node in nodes:
+            # Take the first possible placmenent
+            dependences = dfg.get_preds(node)
+            lat = node.operation.latency
+            poss_placements = self.schedule.get_valid_slots(dependences, lat, noc_schedule, buffer_schedule)
+            i = n
+            t_placement, loc = None, None
+            while i > 0:
+                t_placement, loc, required_paths, required_buffer_placements = next(poss_placements)
+                i -= 1
+            self.schedule.set_operation(t_placement, loc, node, node.operation.latency)
+            for path in required_paths:
+                noc_schedule.occupy_path(path)
+            for from_time, to_time in required_buffer_placements:
+                buffer_schedule.occupy_buffer(loc, from_time, to_time)
+
+        # When using the first_avail placement, it should result
+        # in a valid schedule to start with.
+        initial_InitializationInterval, _ = self.schedule.get_InitializationInterval(dfg)
+        print("After initial placement (mode, first_avail), got InitializationInterval", initial_InitializationInterval)
+        assert initial_InitializationInterval is not None #should be a valid schedule.
+
+
+    # Do a random initial placment --- requires
+    # extensively smart agents to then go and correct this.
+    def get_initial_placement_random(self, dfg, seed):
+        max_pe = self.cgra.cells_as_list()
+        nodes = dfg.bfs()
+        time = 0
+        # RODO -- setup seed.
+
+        was_set = False
+        iterating = True
+        while iterating:
+            if was_set:
+                n = next(nodes, None)
+                if n is None:
+                    iterating = False
+                    continue
+            else:
+                # Try at new time
+                time += 1
+            pe_ind = random.randomint(0, len(max_pe) - 1)
+            was_set = self.schedule.set_operation(time, pe_ind, n, n.operation.latency)
+
+    # This is like a crappy approxiation of Lee 2021 DAC (Crappy
+    # because it's not guaranteed to give you the right thing.)
+    # It's also not quite that --- because that was truly on
+    # he diagonal, while this is using a zig-zag approach.
+    def get_initial_placement_linear(self, dfg, seed):
+        # For now, just place the nodes in order on the CGRA.
+        # Iterate through the PEs, and then increment the clock cycle
+        # if we can't place.
+        pe_ind = 0
+        time = 0
+        max_pe = self.cgra.cells_as_list()
+        nodes = dfg.bfs()
+        iterating = True
+        was_set = True
+        while iterating:
+            # only move to next node if we properly set the operation last time.
+            if was_set:
+                n = next(nodes, None)
+                if n is None:
+                    # Finished scheduling!
+                    iterating = False
+                    continue
+            was_set = self.schedule.set_operation(time, pe_ind, n, n.operation.latency)
+            if was_set:
+                print("Set initial placement for node", str(n))
+                print("Position is ", self.schedule.get_location(n))
+
+            # TODO -- should we check that this produces a schedule with an InitializationInterval?
+            # Aim is to start with a very spread-out schedule that should just work ---
+            # let the SA algorithm compress it, rather than trying to make
+            # the SA algorithm find a valid schedule.
+            pe_ind += 1
+            time += n.operation.latency
+            if pe_ind >= len(max_pe):
+                pe_ind = 0
 
     def apply_action(self, action: Event) -> Tuple[bool, Optional[ActionSpace], bool]:
         try:
@@ -149,9 +219,10 @@ class RelativePlacementCGRASession(CGRASession):
                 else:
                     new_location = self.cgra.get_neighbour(action_to_do, current_location)
 
+            print("Before swap, InitializationInterval is ", self.schedule.get_InitializationInterval(self.dfg), "iteration is ", self.iteration_number)
             if new_location is not None:
                 print("Swapping between", current_location, 'and', new_location)
-                swapped = self.schedule.swap(current_time, current_location, new_time, new_location)
+                swapped = self.schedule.swap(current_time, current_location, new_time, new_location, self.dfg, allow_invalid=RelativePlacementSettings['AllowInvalidIntermediateSchedules'])
             else:
                 # If the new location is none, that means that we picked a direction
                 # that is invalid (ie. doesn't exist for the node in question).  To make
@@ -167,6 +238,7 @@ class RelativePlacementCGRASession(CGRASession):
 
             print("After iteration, schedule is ", self.schedule)
             print("Swapped is ", swapped)
+            print("InitializationInterval is ", self.schedule.get_InitializationInterval(self.dfg))
 
             return False, None, swapped
         except Exception as e:
@@ -176,8 +248,8 @@ class RelativePlacementCGRASession(CGRASession):
     def get_observation(self, observation_space: ObservationSpace) -> Event:
         try:
             result = super().get_observation(observation_space=observation_space)
-            if observation_space.name == 'II':
-                ii, finished = self.schedule.get_II(self.dfg)
+            if observation_space.name == 'InitializationInterval':
+                ii, finished = self.schedule.get_InitializationInterval(self.dfg)
                 if not finished:
                     # The RLLib library can't handle nones, so
                     # Just return a large punishment if this fails

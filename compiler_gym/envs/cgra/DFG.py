@@ -1,3 +1,8 @@
+# Copyright (c) Facebook, Inc. and its affiliates.
+#
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
+
 import json
 from pathlib import Path
 import random
@@ -24,7 +29,7 @@ class Node(object):
         return "Node with name " + self.name + " and op " + str(self.operation)
 
 class DFG(object):
-    def __init__(self, working_directory: Optional[Path] = None, benchmark: Optional[Benchmark] = None, from_json: Optional[Path] = None, from_text: Optional[str] = None):
+    def __init__(self, working_directory: Optional[Path] = None, from_json: Optional[Path] = None, from_text: Optional[str] = None):
         # Copied from here: https://github.com/facebookresearch/CompilerGym/blob/development/examples/loop_optimizations_service/service_py/loops_opt_service.py
         # self.inst2vec = _INST2VEC_ENCODER
 
@@ -32,33 +37,18 @@ class DFG(object):
             self.load_dfg_from_json(from_json)
         elif from_text is not None:
             self.load_dfg_from_text(from_text)
-        elif benchmark is not None:
-            # Only re-create the JSON file if we aren't providing an existing one.
-            # The existing ones are mostly a debugging functionality.
-            with open(self.working_directory / "benchmark.c", "wb") as f:
-                f.write(benchmark.program.contents)
-
-            # We use CGRA-Mapper to produce a DFG in JSON.
-            run_command(
-                ["cgra-mapper", self.src_path, self.dfg_path]
-            )
-
-            # Now, load in the DFG.
-            self.load_dfg_from_json(self.dfg_path)
 
     def __str__(self):
         res = "nodes are: " + str(self.nodes) + " and edges are " + str(self.adj)
         return res
 
     def load_dfg_from_json(self, path):
-        import json
         with open(path, 'r') as p:
             # This isnt' text, but I think the json.loads
             # that this calls just works?
             self.load_dfg_from_text(p)
 
     def load_dfg_from_text(self, text):
-        import json
         f = json.loads(text)
         self.nodes = {}
         self.node_names = []
@@ -97,7 +87,13 @@ class DFG(object):
             succs.append(self.nodes[n])
         return succs
 
-    # TODO -- fix this, because for a graph with multiple entry nodes,
+    def build_preds_lookup(self):
+        preds_lookup = {}
+        for n in self.node_names:
+            preds_lookup[n] = self.get_preds(self.nodes[n])
+        return preds_lookup
+
+    # TODO(jcw) -- fix this, because for a graph with multiple entry nodes,
     # this doesn't actually give the right answer :)
     # (should do in most cases)
     def bfs(self):
@@ -105,6 +101,10 @@ class DFG(object):
         print ("Doing BFS, entry points are ")
         print(self.entry_points)
         seen = set()
+
+        # build a lookup based on the predecessors
+        # for each node.
+        preds_lookup = self.build_preds_lookup()
 
         while len(to_explore) > 0:
             head = to_explore[0]
@@ -114,9 +114,30 @@ class DFG(object):
             seen.add(head)
             yield self.nodes[head]
 
-            # Get the following nodes.
-            following_nodes = self.adj[head]
-            to_explore += following_nodes
+            # Add the next batch of nodes that we have
+            # visited all the preds for if there are more
+            # nodes to explore.
+            if len(to_explore) == 0 and len(seen) != len(self.node_names):
+                for node_name in self.node_names:
+                    if node_name in seen:
+                        continue
+                    else:
+                        # Unseen --- have we seen all th preds?
+                        failed = False
+                        for p in preds_lookup[node_name]:
+                            if p.name not in seen:
+                                failed = True
+                        if not failed:
+                            to_explore.append(node_name)
+                if len(to_explore) == 0: # We added nothing despite trying
+                    # to.
+
+                    # TODO(jcw) -- Fix this, as support for cyclical DFGs
+                    # is important to be able to support loops with 
+                    # cross-loop dependencies.
+                    print("Cyclical DFG --- Impossible to do a true BFS")
+                    print("DFG is ", str(self))
+                    assert False
 
 # Generate a test DFG using the operations in
 # 'operations'.
@@ -175,7 +196,7 @@ def generate_DFG(operations: List[Operation], size, seed=0):
             else:
                 inputs.append(random.choice(nodes_list))
         # If the node has no arguments, then we should add it
-        # as an entry point.  --- todo --- should we just skip
+        # as an entry point.  --- todo(jcw) --- should we just skip
         # this avoid creating graphs with too many constant loads?
         if operation.inputs == 0:
             entry_points.append(name)

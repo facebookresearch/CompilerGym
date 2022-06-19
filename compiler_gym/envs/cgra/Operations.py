@@ -1,3 +1,7 @@
+# Copyright (c) Facebook, Inc. and its affiliates.
+#
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
 
 class Operation(object):
     def __init__(self, name, inputs, outputs, latency):
@@ -10,7 +14,7 @@ class Operation(object):
         return self.name
 
 Operations = [
-    # TODO --- should we support more operations as heterogeneous?
+    # TODO(jcw) --- should we support more operations as heterogeneous?
     # IMO most of the other things that are scheduled are
     # pretty vacuous, although we could explore supporting those.
     # Operation is: name, inputs, outputs, cycles.
@@ -44,7 +48,7 @@ def operation_index_of(op):
     return -1
 
 def operation_latency(op):
-    # TODO --- model latency --- or at least expost this
+    # TODO(jcw) --- model latency --- or at least expost this
     # to a configuration.
     return op.latency
 

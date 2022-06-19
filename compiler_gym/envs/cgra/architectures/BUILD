@@ -6,15 +6,10 @@
 load("@rules_python//python:defs.bzl", "py_library")
 
 py_library(
-    name = "datasets",
+    name = "architectures",
     srcs = [
         "__init__.py",
-        "dfg_bench.py"
+        "CGRA.py"
     ],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//compiler_gym/datasets",
-        "//compiler_gym/service/proto",
-        "//compiler_gym/util",
-    ]
+    visibility = ["//visibility:public"]
 )

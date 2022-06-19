@@ -2,7 +2,7 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-load("@rules_python//python:defs.bzl", "py_library", "py_test")
+load("@rules_python//python:defs.bzl", "py_library")
 
 py_library(
     name = "cgra",
@@ -10,6 +10,7 @@ py_library(
         "__init__.py",
         "cgra_rewards.py",
         "Operations.py",
+        "compile_settings.py",
         "DFG.py"
     ],
     data = [
@@ -18,6 +19,7 @@ py_library(
     visibility = ["//visibility:public"],
     deps = [
         "//compiler_gym/envs/cgra/datasets",
+        "//compiler_gym/envs/cgra/architectures",
         "//compiler_gym/errors",
         "//compiler_gym/service:client_service_compiler_env",
         "//compiler_gym/service/runtime",  # Implicit dependency of service.

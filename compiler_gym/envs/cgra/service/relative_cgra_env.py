@@ -1,4 +1,7 @@
-
+# Copyright (c) Facebook, Inc. and its affiliates.
+#
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
 
 from compiler_gym.util.gym_type_hints import OptionalArgumentValue
 from compiler_gym.service.client_service_compiler_env import ClientServiceCompilerEnv
@@ -7,14 +10,14 @@ from typing import Iterable, List, Optional, Union, cast
 from compiler_gym.datasets import Benchmark
 
 from compiler_gym.envs.cgra.datasets import get_cgra_datasets
-from compiler_gym.envs.cgra.cgra_rewards import IntermediateIIReward, FinalIIReward
+from compiler_gym.envs.cgra.cgra_rewards import IntermediateInitializationIntervalReward, FinalInitializationIntervalReward
 
 class RelativeCgraEnv(ClientServiceCompilerEnv):
     def __init__(self, *args, punish_intermediate: bool = True, datasets_site_path: Optional[Path] = None, benchmark: Optional[Union[str, Benchmark]], **kwargs):
         if punish_intermediate:
-            reward = IntermediateIIReward()
+            reward = IntermediateInitializationIntervalReward()
         else:
-            reward = FinalIIReward()
+            reward = FinalInitializationIntervalReward()
         super().__init__(
             *args,
             **kwargs,

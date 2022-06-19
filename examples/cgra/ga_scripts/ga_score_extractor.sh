@@ -12,7 +12,7 @@ while [[ $# -gt 0 ]]; do
 	input=$1
 	shift
 
-	# Get the second to last line, which has the II for the graph.
+	# Get the second to last line, which has the InitializationInterval for the graph.
 	ii=$(tail -n 2 $input | head -n 1 | cut -f 7 -d' ' )
 
 	echo "$ii, " >> $output

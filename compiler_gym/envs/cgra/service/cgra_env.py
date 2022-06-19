@@ -1,3 +1,8 @@
+# Copyright (c) Facebook, Inc. and its affiliates.
+#
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
+
 import os
 import shutil
 from pathlib import Path
@@ -16,7 +21,7 @@ from compiler_gym.spaces import Box, Commandline
 from compiler_gym.spaces import Dict as DictSpace
 from compiler_gym.spaces import Scalar, Sequence
 
-from compiler_gym.envs.cgra.cgra_rewards import IntermediateIIReward
+from compiler_gym.envs.cgra.cgra_rewards import IntermediateInitializationIntervalReward
 
 class CgraEnv(ClientServiceCompilerEnv):
     def __init__(self, *args, datasets_site_path: Optional[Path] = None, benchmark: Optional[Union[str, Benchmark]] = None, datasets_set_path: Optional[Path] = None, **kwargs):
@@ -25,26 +30,13 @@ class CgraEnv(ClientServiceCompilerEnv):
             **kwargs,
             benchmark = benchmark or "dfg_10/1",
             datasets=get_cgra_datasets(site_data_base=datasets_site_path),
-            rewards=[IntermediateIIReward()]
-            ,
-            derived_observation_spaces=[
-                # {
-                #     "id": "CurrentOperation",
-                #     "base_id": 
-                # }
-            ]
+            rewards=[IntermediateInitializationIntervalReward()]
         )
 
     def reset(self, reward_space = OptionalArgumentValue.UNCHANGED, *args, **kwargs):
         observation = super().reset(reward_space=reward_space, *args, **kwargs)
 
         return observation
-
-    def make_benchmark(
-        self, inputs, copt, system_include: bool = True, timeout: int=600
-    ):
-        # TOOD
-        return None
 
     def render(self, mode="human"):
         if mode == "human":

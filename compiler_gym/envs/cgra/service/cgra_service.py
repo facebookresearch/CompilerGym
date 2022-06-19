@@ -1,15 +1,22 @@
+# Copyright (c) Facebook, Inc. and its affiliates.
+#
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
+
 import logging
 from re import I
 import pickle
 
 from typing import Optional, Tuple, List, Dict, Set, Union
 from pathlib import Path
+from compiler_gym.envs.cgra.compile_settings import CGRACompileSettings
 from compiler_gym.views import ObservationSpaceSpec
 from compiler_gym.spaces import Reward
 from compiler_gym.envs.llvm.llvm_rewards import CostFunctionReward
 from compiler_gym.service.client_service_compiler_env import ClientServiceCompilerEnv
 from compiler_gym.util.gym_type_hints import ObservationType, OptionalArgumentValue
 from compiler_gym.service import CompilationSession
+from compiler_gym.envs.cgra.architectures.CGRA import CGRA, NOC, DictNOC, DataPath
 from compiler_gym.util.commands import run_command
 from compiler_gym.service.proto import (
 ActionSpace,
@@ -32,47 +39,15 @@ from compiler_gym.envs.cgra.Operations import *
 from compiler_gym.service.proto.compiler_gym_service_pb2 import Int64SequenceSpace
 #from compiler_gym.service.runtime import create_and_run_compiler_gym_service
 
-CompileSettings = {
-    # When this is set, the scheduler will take schedules
-    # that don't account for delays appropriately, and try
-    # to stretch them out to account for delays correctly.
-    # When this is false, the compiler will just reject
-    # such invalid schedules.
-    # (when set, something like x + (y * z), scheduled
-    # as +: PE0 on cycle 0, *: PE1 on cycle 0 is valid).
-    "IntroduceRequiredDelays": False
-}
-
 def load_CGRA(self, file):
-    # TODO -- properly load CGRA
+    # TODO(jcw) -- properly load CGRA
     return CGRA(5, 5)
 
 def load_NOC(self, file):
-    # TODO -- properly load NOC.
+    # TODO(jcw) -- properly load NOC (network on chip).
 
     # Initialize to a straight-line NOC
-    return NOC([(x, x + 1) for x in range(5)])
-
-class CGRA(object):
-    # Assume a rectangular matrix with neighbour
-    # connections.  We can handle the rest later.
-    def __init__(self, nodes, noc):
-        self.nodes = nodes
-        self.noc = noc
-        self.dim = len(self.nodes)
-
-    def __str__(self):
-        return "CGRA: (" + (str(self.nodes)) + " nodes)"
-
-    def is_supported(node_index, op):
-        # TODO -- support heterogeneity
-        return True
-
-    def cells_as_list(self):
-        return self.nodes[:]
-
-    def get_neighbour(self, direction, location_from):
-        return self.noc.get_neighbour(direction, location_from)
+    return DictNOC([(x, x + 1) for x in range(5)])
 
 # This is just a wrapper around an actual object that
 # is a schedule --- see the Schedule object for something
@@ -82,6 +57,120 @@ class InternalSchedule(object):
         self.dfg = dfg # For tensorization.
         self.cgra = cgra
         self.operations = self.initialize_schedule()
+
+    # Returns a complicated 4-tuple.
+    # (Timeslot, Location, Path Requirements, BufferRequirements)
+    # Path Requirements is a List[DataPath]
+    # BufferRequirements is List[(Start Time, End Time)] with
+    # the buffering location implicitly at the Location.
+    def get_valid_slots(self, dependencies, latency, noc_schedule, buffer_schedule):
+        # First, get the finished location of each of the dependencies.
+        min_time = 0
+        dep_locations = []
+        for dep in dependencies:
+            time, location = self.get_location(dep)
+            # The operation must be scheduled --- it's a dependnecy! (support for loops needed.)
+            if time is None:
+                print ("Operation dependency", dep, " has not been scheduled (cross-dependencies not supported).")
+                assert False
+            latency = self.get_latency(time, location)
+
+            min_time = max(min_time, time + latency)
+            dep_locations.append((dep, time, location, latency))
+
+        # Starting from the min time, iterate over every unoccupied
+        # tile and see if it's reachable.  If it is both unoccupied
+        # and reachable by all the deps, then we can use it.
+        t = min_time
+        # Keep track of the number of tries we've had without
+        # finding a valid slot.  We fail if this gets too high---
+        # the point is just to make this easier to debug, although
+        # perhaps some algorithms could make better use of this.
+        tries_since_slot_found = 0
+        while True:
+            if tries_since_slot_found > 1000:
+                print("It has been more than 1000 slots looked at since we found a valid slot --- likely in an infinite loop.")
+                assert False
+            while t >= len(self.operations):
+                # Make sure we aren't past the end of the schedule.
+                self.operations.append(self.add_timestep())
+
+            for loc in range(len(self.operations[t])):
+                # Check first if this is occupied:
+                if CGRACompileSettings['DebugGetValidSlots']:
+                    print("Searchign location ", loc, "at time", t)
+                is_free = self.slots_are_free(loc, t, t + latency)
+                if not is_free:
+                    if CGRACompileSettings['DebugGetValidSlots']:
+                        print("Location was not free.")
+                    # The latency compute step is expensive, so skip
+                    # if possible.
+                    continue
+                
+                # Now, check to see if all of the operands can reach
+                # this --- note that we can't have them sharing routing
+                # resources, so we have  to keep track of what we are using
+                # here.
+                used_resources = []
+                arrival_times = []
+                # We operate on a cloned copy becase we haven't actually
+                # scheduled the op yet --- just trying to look
+                # for valid locations!
+                noc_schedule_clone = noc_schedule.clone()
+                buffer_schedule_clone = buffer_schedule.clone()
+                earliest_execution_time = t
+
+                failed = False
+                # Keep track fo the resrouces that are getting reserved
+                # within these clones so they can be
+                # returned and updated in a scheduling state.
+                paths = []
+                buffer_slots = []
+
+                for (dep, dep_time, dep_loc, dep_latency) in dep_locations:
+                    if CGRACompileSettings['DebugGetValidSlots']:
+                        print("Checking dependency from ", dep_time, "and location", dep_loc)
+                    if CGRACompileSettings['BufferingMode'] == 'before_transmit':
+                        pass
+                    else:
+                        pass
+
+                    finish_time = dep_time + dep_latency
+                    path = self.cgra.noc.shortest_available_path(finish_time, dep, dep_loc, loc, noc_schedule_clone)
+                    if path is None:
+                        if CGRACompileSettings['DebugGetValidSlots']:
+                            print("Path was not free.")
+                        # Couldn't schedule the node here!
+                        failed = True
+                        break
+                    else:
+                        arrival_times.append(finish_time + len(path))
+                        # Reserve the routing resources in the NOC clone.
+                        noc_schedule_clone.occupy_path(path)
+                        paths.append(path) # Keep track of the paths this requies.
+                        earliest_execution_time = max(earliest_execution_time, finish_time + len(path))
+                for arrival_time in arrival_times:
+                    # TODO(jcw) --- note that if the problem is that the buffers
+                    # get full, it's unlikely that dealying further will solve
+                    # the problem.  Not 100% sure what the actual solution to
+                    # this will be.
+                    reserved = buffer_schedule_clone.occupy_buffer(loc, arrival_time, earliest_execution_time)
+                    if CGRACompileSettings['DebugGetValidSlots']:
+                        print("Trying to reserve buffering space from arrival time ", arrival_time, "...")
+                        print("Reserved:", reserved)
+                    buffer_slots.append((arrival_time, earliest_execution_time))
+                    if not reserved:
+                        # Not enough buffering
+                        failed = True
+                        break
+                if not failed:
+                    # We were able to route everything tof this possible placement.
+                    tries_since_slot_found = 0
+                    yield t, loc, paths, buffer_slots
+                else:
+                    tries_since_slot_found += 1
+                    
+            t += 1
 
     # Returns a fixed-length tensor for this schedule.
     # It focuses on the last few cycles.
@@ -260,121 +349,75 @@ class InternalSchedule(object):
             else:
                 free_before = True
 
+class BufferSchedule(object):
+    def __init__(self):
+        self.schedule = []
+
+    def clone(self):
+        new_sched = BufferSchedule()
+        for bufs in self.schedule:
+            new_sched.schedule.append(dict(bufs))
+        return new_sched
+
+    def occupy_buffer(self, loc, from_time, to_time):
+        for t in range(from_time, to_time + 1):
+            while t >= len(self.schedule):
+                self.schedule.append({})
+
+            if loc in self.schedule[t]:
+                self.schedule[t][loc] += 1
+                max_buf = CGRACompileSettings['BufferLimits']
+                # if the max buffering is set to 0 or -ve, assume
+                # infinite buffering.
+                if max_buf > 0 and self.schedule[t][loc] > max_buf:
+                    return False
+            else:
+                self.schedule[t][loc] = 1
+
+        return True
+
 class NOCSchedule(object):
     def __init__(self):
         self.schedule = []
 
-    def occupy_path(self, start_cycle, path):
-        for hop in path:
-            self.occupy_connection(start_cycle, hop)
+    def clone(self):
+        # Return a deep copy of this schedule.
+        new_schedule = NOCSchedule()
+        for conns in self.schedule:
+            new_schedule.schedule.append(dict(conns))
+        return new_schedule
+
+    def occupy_path(self, path: DataPath):
+        start_cycle = path.start_cycle
+        for hop in path.path:
+            self.occupy_connection(path.source_node, start_cycle, hop)
             start_cycle += 1
 
-    def occupy_connection(self, time, connection):
+    def occupy_connection(self, node: Node, time: int, connection):
         while time >= len(self.schedule):
-            self.schedule.append(set())
+            self.schedule.append({})
 
-        if connection in self.schedule[time]:
+        if connection in self.schedule[time] and self.schedule[time][connection] != node.name:
             # Can't occuoy an already occupied connection.
+            print("Tried to occupy connection already occupied by ", self.schedule[time][connection], "with node", node.name)
             assert False
         else:
-            self.schedule[time].add(connection)
+            self.schedule[time][connection] = node.name
 
-    def is_occupied(self, time, hop):
+    def is_occupied(self, source_dfg_node: Node, time, hop):
         if time >= len(self.schedule):
             # Not occupied if beyond current suecule
             return False
         else:
-            return hop in self.schedule[time]
-
-# A class representing a NOC.
-class NOC(object):
-    def __init__(self, nodes, neighbours: Dict[str, List[str]]):
-        # A list of all the nodes.
-        self.nodes = nodes
-        # A directed list of one-hop connections between nodes.
-        self.neighbours = neighbours
-
-    # Returns the neighbour within a 3D space.  I don't really
-    # know how best to set this up in reality ---- espc if a node
-    # doesn't really have e.g. an 'up' neighbour, but only a 'up and left at
-    # the same time neighbour'.  The key constraint currently implemented
-    # here is that only six directions are supported (up, down, north, south, east
-    # west)
-    def get_neighbour(self, direction, location):
-        ns = self.neighbours[location]
-        index = None
-        # TODO --- we need a better way of storing these
-        # so it isn't implicit in the connection --- this implies
-        # that everything that has a 'south' connection must
-        # also have a north connection.
-        if direction == 'north':
-            index = 0
-        elif direction == 'south':
-            index = 1
-        elif direction == 'east':
-            index = 2
-        elif direction == 'west':
-            index = 3
-        elif direction == 'up':
-            index = 4
-        elif direction == 'down':
-            index = 5
-
-        if index is None:
-            print("Unknown index ", direction)
-            assert False
-
-        if index < len(ns):
-            print("Returning a node ", len(ns))
-            return ns[index]
-        else:
-            return None
-
-    # Work out the shortest path from from_n to to_n in
-    # the current NoC.
-    def shortest_path(self, from_n, to_n):
-        return self.shortest_available_path(0, from_n, to_n, None)
-
-    def shortest_available_path(self, start_time, from_n, to_n, schedule):
-        # So we should obviously do this better.
-        # Just a hack-y BFS search.
-        seen = set()
-        # Keep track of node and path so far.
-        # Invariant: this is sorted by shortest
-        # path.
-        to_see = [(from_n, [])]
-
-        while len(to_see) > 0:
-            n, path_to = to_see[0]
-            to_see = to_see[1:]
-            
-            if n == to_n:
-                # Found the path.  By invariant, this is the shortest
-                # path.
-                return path_to
-
-            nexts = self.neighbours[n]
-            for node in nexts:
-                if node in seen:
-                    pass
-                else:
-                    curr_time = start_time + len(path_to)
-                    if schedule is not None:
-                        if schedule.is_occupied(curr_time, (n, node)):
-                            # Can't use this as a path if it's currently
-                            # occupied.
-                            # TODO --- Add support for buffered delays.
-                            # continue
-                            if CompileSettings['IntroduceRequiredDelays']:
-                                continue
-                            else:
-                                return None
-                    # This is BFS, so everything must bewithin
-                    # one hop of the current search.  Therefore
-                    # this is the longest one, and can go at the back.
-                    to_see.append((node, path_to + [(n, node)]))
-        # No path between nodes.
-        return None
+            if hop in self.schedule[time]:
+                if self.schedule[time] == source_dfg_node.name:
+                    return False # Technically ocupied, but can be
+                    # shared.
+                print("Slot is occupired with node ", self.schedule[time].name)
+                print("Looking to use it for node ", source_dfg_node.name)
+                return True
+            else:
+                return False
 
 class Schedule(object):
     def __init__(self, cgra, dfg):
@@ -397,7 +440,7 @@ class Schedule(object):
         # of operations on nodes.
         return self.operations.to_rlmap_tensor(node, time_window_size=time_window_size)
 
-    def swap(self, origin_time, origin_index, target_time, target_index):
+    def swap(self, origin_time, origin_index, target_time, target_index, dfg, allow_invalid=True):
         # This is a slightly non-trivial function since operations may have non-one
         # latency.  We treat swap-points as the starting-points of the operation ---
         # if the target point is in the middle of another operation, we choose to
@@ -415,14 +458,34 @@ class Schedule(object):
 
         target_window_is_clear = self.operations.set_operation(target_time, target_index, operation_node, operation_node.operation.latency)
         # Now do the swap of operations
-        if target_window_is_clear:
-            print("Doing swap between ", origin_index, 'at', origin_time, 'to', target_index, 'at', target_time, 'with latency', op_latency)
+        if target_window_is_clear and target_time >= 0: # Dont' swap into past!
+            print("Doing swap between ", origin_index, 'at', origin_time, 'to', target_index, 'at', target_time, 'with latency', op_latency, "(invalid swaps is allowed is ", allow_invalid, ")")
+            InitializationInterval, _ = self.get_InitializationInterval(dfg)
+            assert InitializationInterval is not None #We are tryign to preserve this invariant through the scheduling.
             self.operations.set_operation(target_time, target_index, operation_node, op_latency)
             self.operations.clear_operation(origin_time, origin_index, op_latency)
+            if not allow_invalid:
+                # Check that this produced a valid schedule.
+                # TODO --- make this check more efficient -- we don't have
+                # to recompute the whole InitializationInterval.
+                InitializationInterval, _ = self.get_InitializationInterval(dfg)
+                if InitializationInterval is None:
+                    print("Undo the swap!")
+                    # Undo the swap
+                    self.operations.set_operation(origin_time, origin_index, operation_node, op_latency)
+                    self.operations.clear_operation(target_time, target_index, op_latency)
+                    InitializationInterval, _ = self.get_InitializationInterval(dfg)
+                    assert InitializationInterval is not None
+                    return False
             return True
         else:
             return False
 
+    # This returns an iterator that iterates over possible
+    # valid slots for an operation.  This allows for things like
+    # random placement.
+    def get_valid_slots(self, dependencies, latency, noc_schedule, buffer_schedule):
+        return self.operations.get_valid_slots(dependencies, latency, noc_schedule, buffer_schedule)
 
     def clear_operation(self, time, index, latency):
         self.operations.clear_operation(time, index, latency)
@@ -436,7 +499,7 @@ class Schedule(object):
         n2_t, n2_loc = self.get_location(n2)
 
         # TODO -- a sanity-check that cycle is after this might be a good idea.
-        path = self.cgra.noc.shortest_available_path(cycle, n1_loc, n2_loc, noc_schedule)
+        path = self.cgra.noc.shortest_available_path(cycle, n1, n1_loc, n2_loc, noc_schedule)
 
         if path is None:
             # TODO --- we should probably punish the agent a lot here
@@ -444,13 +507,13 @@ class Schedule(object):
             print("Schedule has not valid path between ", n1_loc, "and", n2_loc, "at time", cycle)
             return None
         else:
-            noc_schedule.occupy_path(cycle, path)
+            noc_schedule.occupy_path(path)
         
         # I think we don't need the whole path?  Not too sure though.
         return len(path)
 
-    def get_II(self, dfg):
-        # Compute the II of the current schedule.
+    def get_InitializationInterval(self, dfg):
+        # Compute the InitializationInterval of the current schedule.
 
         # We don't require the placement part to be actually correct ---
         # do the actual schedule what we generate can differ
@@ -459,6 +522,7 @@ class Schedule(object):
         noc_schedule = NOCSchedule() # The NOC schedule is recomputed
         # every time because it is dependent on the actual
         # schedule.
+        buffer_schedule = BufferSchedule()
 
         # What cycle does this node get executed on?
         cycles_start = {}
@@ -492,20 +556,26 @@ class Schedule(object):
                 # This is not a complete operation
                 continue
 
-            print("Looking at node ", node)
-            print("Has preds ", [str(p) for p in preds])
+            if CGRACompileSettings['DebugGetInitializationInterval']:
+                print("Looking at node ", node)
+                print("Has preds ", [str(p) for p in preds])
+
+            arrival_times = []
             for pred in preds:
                 if pred.name not in cycles_end:
                     finished = False
                     continue
 
                 pred_cycle = cycles_end[pred.name]
-                print ("Have pred that finishes at cycle", pred_cycle)
+                if CGRACompileSettings['DebugGetInitializationInterval']:
+                    print ("Have pred that finishes at cycle", pred_cycle)
 
                 # Compute the time to this node, and
                 # reserve those paths on the NoC.
                 distance = self.compute_and_reserve_communication_distance(pred_cycle, pred, node, noc_schedule)
 
+                if CGRACompileSettings['DebugGetInitializationInterval']:
+                    print("Failed due to distance not working", distance)
                 if distance is None:
                     # This schedule isn't possible due to conflicting memory requirements.
                     return None, False
@@ -513,9 +583,20 @@ class Schedule(object):
                 # Compute when this predecessor reaches this node:
                 arrival_time = distance + pred_cycle
                 earliest_time = max(earliest_time, arrival_time)
+                arrival_times.append(arrival_time)
 
-                # TODO --- compute a penalty based on the gap between
-                # operations to account for buffering.
+            # Setup the buffering requirements:
+            for arr_time in arrival_times:
+                ntim, nloc = self.get_location(node)
+                reserved = buffer_schedule.occupy_buffer(nloc, arrival_time, earliest_time)
+                if not reserved:
+                    # This schedule isn't possible due to buffering requirements.
+                    # TODO --- can we delay computation to get the buffering
+                    # satified?
+                    return None, False
+
+            # TODO --- compute a penalty based on the gap between
+            # operations to account for buffering.
 
             # Check that the PE is actually free at this time --- if it
             # isn't, push the operation back.
@@ -536,13 +617,14 @@ class Schedule(object):
             cycles_start[node.name] = free_time
             cycles_end[node.name] = free_time + operation_latency(node.operation)
 
-            print ("Node ", node.name, "has earliest time", earliest_time)
+            if CGRACompileSettings['DebugGetInitializationInterval']:
+                print("Node ", node.name, "has earliest time", earliest_time)
 
         # Now that we've done that, we need to go through all the nodes and
-        # work out the II.
+        # work out the InitializationInterval.
         # When was this computation slot last used? (i.e. when could
         # we overlap the next iteration?)
-        min_II = 0
+        min_InitializationInterval = 0
         for loc in actual_schedule.locations():
             # Now, we could achieve better performance
             # by overlapping these in a more fine-grained
@@ -556,12 +638,13 @@ class Schedule(object):
                 first_alloc = min(actual_schedule.alloc_times(loc))
 
                 difference = last_free - first_alloc
-                print ("Diff at loc", loc, "is", difference)
-                min_II = max(min_II, difference)
+                if CGRACompileSettings['DebugGetInitializationInterval']:
+                    print ("Diff at loc", loc, "is", difference)
+                min_InitializationInterval = max(min_InitializationInterval, difference)
 
         # TODO --- we should probably return some kind of object
         # that would enable final compilation also.
-        return min_II, finished
+        return min_InitializationInterval, finished
 
 # Create a dummy CGRA that is a bunch of PEs in a row with neighbor-wise communciations
 nodes = [1, 2, 3, 4]
@@ -571,7 +654,7 @@ for n in range(1, len(nodes)):
 neighbours_dict[0] = [n + 1]
 neighbours_dict[len(nodes)] = [n - 1]
 
-compilation_session_noc = NOC(nodes, neighbours_dict)
+compilation_session_noc = DictNOC(nodes, neighbours_dict)
 compilation_session_cgra = CGRA(nodes, compilation_session_noc)
 
 action_space = [ActionSpace(name="Schedule",
@@ -626,7 +709,7 @@ observation_space = [
                 space=Space(
                     int64_value=Int64Range(min=0, max=MAX_WINDOW_SIZE)
                 )),
-            ObservationSpace(name="II",
+            ObservationSpace(name="InitializationInterval",
                 space=Space(
                     int64_value=Int64Range(min=0)
                 )),
@@ -731,10 +814,10 @@ class CGRASession(CompilationSession):
             latency = operation_latency(node.operation)
             op_set = self.schedule.set_operation(self.time, response - 1, node, latency)
 
-            # Check that the II still exists:
-            II, finished = self.schedule.get_II(self.dfg)
-            has_II = II is not None
-            if not has_II:
+            # Check that the InitializationInterval still exists:
+            InitializationInterval, finished = self.schedule.get_InitializationInterval(self.dfg)
+            has_InitializationInterval = InitializationInterval is not None
+            if not has_InitializationInterval:
                 # Unset that operation:
                 print("Setting operation resulted in failed DFG mapping")
                 print(self.schedule)
@@ -742,14 +825,14 @@ class CGRASession(CompilationSession):
                 print("After clearning, have")
                 print(self.schedule)
                 op_set = False # Need to punish.
-                new_II, _ = self.schedule.get_II(self.dfg)
-                assert (new_II is not None) # This should not
+                new_InitializationInterval, _ = self.schedule.get_InitializationInterval(self.dfg)
+                assert (new_InitializationInterval is not None) # This should not
                 # be non-existent after un-scheduling.
 
             if op_set:
                 had_effect = True
                 print("Scheduled operation", str(self.node_order[self.current_operation_index]))
-                print("Got an II of ", II)
+                print("Got an InitializationInterval of ", InitializationInterval)
                 self.current_operation_index += 1
         elif response == 0:
             self.time += 1
@@ -787,11 +870,11 @@ class CGRASession(CompilationSession):
         elif observation_space.name == "CurrentInstructionIndex":
             # Return a way to localize the instruction within the graph.
             return Event(int64_value=self.current_operation_index)
-        elif observation_space.name == "II":
-            print("Computing II for schedule:")
+        elif observation_space.name == "InitializationInterval":
+            print("Computing InitializationInterval for schedule:")
             print(self.schedule)
-            ii, finished = self.schedule.get_II(self.dfg)
-            print("Got II", ii)
+            ii, finished = self.schedule.get_InitializationInterval(self.dfg)
+            print("Got InitializationInterval", ii)
             print ("Finished is ", finished)
             return Event(int64_value=ii)
         elif observation_space.name == "RLMapObservations":

@@ -7,17 +7,19 @@ cg_add_all_subdirs()
 
 cg_py_library(
   NAME
-    gcc
+    cgra
   SRCS
     "__init__.py"
-    "gcc.py"
-    "gcc_env.py"
-    "gcc_rewards.py"
+    "cgra_rewards.py"
+    "Operations.py"
+    "compile_settings.py"
+    "DFG.py"
   DATA
-    compiler_gym::envs::gcc::service::service
+    compiler_gym::envs::cgra::service::service
   DEPS
     compiler_gym::service::client_service_compiler_env
-    compiler_gym::envs::gcc::datasets::datasets
+    compiler_gym::envs::cgra::datasets::datasets
+    compiler_gym::engs::cgra::architectures::architectures
     compiler_gym::errors::errors
     compiler_gym::service::runtime::runtime
     compiler_gym::util::util

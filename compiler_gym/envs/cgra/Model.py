@@ -1,2 +1,0 @@
-class ScheduleModel(object):
-    def

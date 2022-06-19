@@ -3,7 +3,6 @@ from compiler_gym.wrappers.datasets import CycleOverBenchmarks
 from compiler_gym.envs.compiler_env import CompilerEnv
 from compiler_gym.wrappers import TimeLimit
 import compiler_gym
-import model
 from ray import tune
 from ray.rllib.agents.ppo import PPOTrainer
 import ray
@@ -11,18 +10,11 @@ import matplotlib.pyplot as plt
 from itertools import islice
 import argparse
 
-class RelativePlacementModel(model.Model):
-    def __init__(self):
-        super().__init__()
-
-    def get_action(observations):
-        return super().get_action()
-
 def make_env() -> compiler_gym.envs.CompilerEnv:
     env = compiler_gym.make(
         "relative-cgra-v0",
         observation_space="RLMapObservations",
-        reward_space="II",
+        reward_space="InitializationInterval",
         action_space="move",
         benchmark='dfg_10/0' # I think this gets overwritten in the running loop.
     )
@@ -45,7 +37,7 @@ def run_agent_on_benchmarks(bmarks):
                 action = int(agent.compute_action(observation))
                 print(type(action))
                 observation, reward, done, _ = env.step(action)
-            # Just append the last reward, because that is the II. (or a large -ve noting
+            # Just append the last reward, because that is the InitializationInterval. (or a large -ve noting
             # failure)
             rewards.append(reward)
             print ("Exectuted ", i, "th benchmark of", len(bmarks))
@@ -55,12 +47,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run a recreation of the RLMap tool.")
     parser.add_argument('--train', dest='train', default=False, action='store_true')
     parser.add_argument('--test', dest='test', default=None)
+    parser.add_argument('--number', dest='number', default=50, help='Number of benchmarks to run test on.', type=int)
+    parser.add_argument('--train-size', dest='train_size', default=500, help='Number of benchmarks to train on', type=int)
     args = parser.parse_args()
 
     with make_env() as env:
         bench = env.datasets['dfg_10']
-        train_benchmarks = list(islice(bench.benchmarks(), 650))
-        train_benchmarks, val_benchmarks, test_benchmarks = train_benchmarks[:500], train_benchmarks[500:550], train_benchmarks[550:650]
+        train_benchmarks = list(islice(bench.benchmarks(), args.train_size + 50 + args.number))
+        train_benchmarks, val_benchmarks, test_benchmarks = train_benchmarks[:args.train_size], train_benchmarks[args.train_size:args.train_size + 50], train_benchmarks[550:550 + args.number]
 
         print("Number of benchmarks for training: ", len(train_benchmarks))
         print("Number of benchmarks for vlaidation: ", len(val_benchmarks))
@@ -109,7 +103,7 @@ if __name__ == "__main__":
         )
 
         agent.restore(checkpoint)
-        val_rewards = run_agent_on_benchmarks(val_benchmarks)
+        val_rewards = run_agent_on_benchmarks(test_benchmarks)
 
         plot_results(val_rewards)
     else:

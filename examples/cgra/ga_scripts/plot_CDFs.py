@@ -10,7 +10,7 @@ def load_cdf_from_file(f):
         for item in lines.split(','):
             if item.strip():
                 try:
-                    data.append(int(item.strip()))
+                    data.append(abs(int(item.strip())))
                 except:
                     # Plenty of reasons this could fail -- mostly due to
 
@@ -36,7 +36,7 @@ def compute_cdf(data):
     return x_points, cdf
 
 
-def plot_datas(datas):
+def plot_datas(datas, names):
     # First, compute the CDF from the raw data
     cdfs = []
     xvals = []
@@ -47,21 +47,31 @@ def plot_datas(datas):
 
     xvs_max = 0
     for i in range(len(cdfs)):
-        plt.plot(xvals[i], cdfs[i])
+        plt.plot(xvals[i], cdfs[i], label=names[i])
         xvs_max = max(max(xvals[i]), xvs_max)
 
     plt.ylim([0.0, 1.0])
     plt.xlim([0,  xvs_max])
+    plt.ylabel('CDF')
+    plt.xlabel('InitializationInterval')
+    plt.legend()
     plt.savefig('cdfs.png')
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    # Alternate between files and names.
     parser.add_argument('files', nargs='+')
     args = parser.parse_args()
 
     datas = []
+    names = []
+    name = False
     for file in args.files:
-        data = load_cdf_from_file(file)
-        datas.append(data)
+        if name:
+            names.append(file)
+        else:
+            data = load_cdf_from_file(file)
+            datas.append(data)
+        name = not name
 
-    plot_datas(datas)
+    plot_datas(datas, names)

@@ -1,14 +1,19 @@
+# Copyright (c) Facebook, Inc. and its affiliates.
+#
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
+
 from compiler_gym.spaces import Reward
 
-class IntermediateIIReward(Reward):
+class IntermediateInitializationIntervalReward(Reward):
     """An example reward that uses changes in the "runtime" observation value
     to compute incremental reward.
     """
 
     def __init__(self):
         super().__init__(
-            name="II",
-            observation_spaces=["II"],
+            name="InitializationInterval",
+            observation_spaces=["InitializationInterval"],
             default_value=0,
             default_negates_returns=True,
             deterministic=True,
@@ -23,7 +28,7 @@ class IntermediateIIReward(Reward):
         del action
         del observation_view
 
-        print("Computing Reward: got II of ", observations[0])
+        print("Computing Reward: got InitializationInterval of ", observations[0])
         if observations[0] is None:
             # If we just failed to generate a valid schedule all together,
             # return a punishment.  Not 100% sure what this punishment should
@@ -37,11 +42,11 @@ class IntermediateIIReward(Reward):
 For algorithms where a 'right' answer is quick to arrive at,
 the intermediate rewards are less important.
 """
-class FinalIIReward(Reward):
+class FinalInitializationIntervalReward(Reward):
     def __init__(self):
         super().__init__(
-            name='II',
-            observation_spaces=['II', 'Done'],
+            name='InitializationInterval',
+            observation_spaces=['InitializationInterval', 'Done'],
             default_value=0,
             default_negates_returns=True,
             deterministic=True,
@@ -55,7 +60,7 @@ class FinalIIReward(Reward):
         del action
         del observation_view
 
-        print ("Computing Reward: get II of ", observations[0])
+        print ("Computing Reward: get InitializationInterval of ", observations[0])
         print ("Got finished: ", observations[1])
 
         if observations[0] is None:
