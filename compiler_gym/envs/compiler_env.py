@@ -90,16 +90,6 @@ class CompilerEnv(gym.Env, ABC):
 
     @property
     @abstractmethod
-    def timeout(self) -> float:
-        raise NotImplementedError("abstract method")
-
-    @timeout.setter
-    @abstractmethod
-    def timeout(self, timeout: Optional[float]):
-        raise NotImplementedError("abstract method")
-
-    @property
-    @abstractmethod
     def observation_space_spec(self) -> ObservationSpaceSpec:
         raise NotImplementedError("abstract method")
 
