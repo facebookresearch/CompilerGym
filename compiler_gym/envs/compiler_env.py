@@ -330,6 +330,13 @@ class CompilerEnv(gym.Env, ABC):
             >>> new_env.step(1) == env.step(1)
             True
 
+        .. note::
+
+            The client/service implementation of CompilerGym means that the
+            forked and base environments share a common backend resource. This
+            means that if either of them crash, such as due to a compiler
+            assertion, both environments must be reset.
+
         :return: A new environment instance.
         """
         raise NotImplementedError("abstract method")
