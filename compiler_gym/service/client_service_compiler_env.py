@@ -319,14 +319,6 @@ class ClientServiceCompilerEnv(CompilerEnv):
         self.reward_space = reward_space
 
     @property
-    def timeout(self) -> float:
-        return self._timeout
-
-    @timeout.setter
-    def timeout(self, timeout: Optional[float]):
-        self._timeout = timeout
-
-    @property
     def observation_space_spec(self) -> ObservationSpaceSpec:
         return self._observation_space_spec
 
