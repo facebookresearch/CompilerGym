@@ -129,14 +129,6 @@ class CompilerEnvWrapper(CompilerEnv, Wrapper):
         return self.env.render(mode)
 
     @property
-    def timeout(self) -> float:
-        return self.env.timeout
-
-    @timeout.setter
-    def timeout(self, timeout: float):
-        self.env.timeout = timeout
-
-    @property
     def reward_range(self) -> Tuple[float, float]:
         return self.env.reward_range
 
