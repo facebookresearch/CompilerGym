@@ -352,6 +352,7 @@ class CompilerEnv(gym.Env, ABC):
         reward_space: Union[
             OptionalArgumentValue, str, Reward
         ] = OptionalArgumentValue.UNCHANGED,
+        timeout: Optional[float] = 300,
     ) -> Optional[ObservationType]:
         """Reset the environment state.
 
@@ -388,6 +389,9 @@ class CompilerEnv(gym.Env, ABC):
             available spaces, see :class:`env.reward.spaces
             <compiler_gym.views.RewardView>`.
 
+        :param timeout: The maximum number of seconds to wait for an RPC method
+            call to succeed. Accepts a float value. The default is 300 seconds.
+
         :return: The initial observation.
 
         :raises BenchmarkInitError: If the benchmark is invalid. In this case,
@@ -406,6 +410,7 @@ class CompilerEnv(gym.Env, ABC):
         reward_spaces: Optional[Iterable[Union[str, Reward]]] = None,
         observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
         rewards: Optional[Iterable[Union[str, Reward]]] = None,
+        timeout: Optional[float] = 300,
     ) -> StepType:
         """Take a step.
 
@@ -422,6 +427,9 @@ class CompilerEnv(gym.Env, ABC):
             tuple to be a list of rewards from the requested spaces. The default
             :code:`env.reward_space` is not returned.
 
+        :param timeout: The maximum number of seconds to wait for an RPC method
+            call to succeed. Accepts a float value. The default is 300 seconds.
+
         :return: A tuple of observation, reward, done, and info. Observation and
             reward are None if default observation/reward is not set.
         """
@@ -435,6 +443,7 @@ class CompilerEnv(gym.Env, ABC):
         reward_spaces: Optional[Iterable[Union[str, Reward]]] = None,
         observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
         rewards: Optional[Iterable[Union[str, Reward]]] = None,
+        timeout: Optional[float] = 300,
     ):
         """Take a sequence of steps and return the final observation and reward.
 
@@ -450,6 +459,9 @@ class CompilerEnv(gym.Env, ABC):
             provided, this changes the :code:`reward` element of the return
             tuple to be a list of rewards from the requested spaces. The default
             :code:`env.reward_space` is not returned.
+
+        :param timeout: The maximum number of seconds to wait for an RPC method
+            call to succeed. Accepts a float value. The default is 300 seconds.
 
         :return: A tuple of observation, reward, done, and info. Observation and
             reward are None if default observation/reward is not set.
