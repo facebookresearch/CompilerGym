@@ -69,10 +69,6 @@ roadmap](https://github.com/facebookresearch/CompilerGym/projects/1).
 
 ## News & Events
 
-- April 2022: 🏆 We are running the first **code optimization competition** at
-  [MLArchSys'22](https://sites.google.com/view/mlarchsys/isca-2022/compiler-optimization-competition)!
-  All are welcome to participate. Details
-  [here](https://sites.google.com/view/mlarchsys/isca-2022/compiler-optimization-competition).
 - April 2022: ⭐️ CompilerGym wins the **distinguished paper award** at
   [CGO'22](https://conf.researchr.org/home/cgo-2022)! You can read our work
   [here](https://arxiv.org/pdf/2109.08267.pdf).
