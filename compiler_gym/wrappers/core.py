@@ -7,6 +7,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Iterable as IterableType
 from typing import Any, Iterable, List, Optional, Tuple, Union
 
+from deprecated.sphinx import deprecated
 from gym import Wrapper
 from gym.spaces import Space
 
@@ -256,9 +257,15 @@ class CompilerEnvWrapper(CompilerEnv, Wrapper):
     def state(self) -> CompilerEnvState:
         return self.env.state
 
+    @deprecated(
+        version="0.2.5", reason="Use env.action_space.to_string(env.actions) instead"
+    )
     def commandline(self) -> str:
         return self.env.commandline()
 
+    @deprecated(
+        version="0.2.5", reason='Use env.action_space.from_string("...") instead'
+    )
     def commandline_to_actions(self, commandline: str) -> List[ActionType]:
         return self.env.commandline_to_actions(commandline)
 

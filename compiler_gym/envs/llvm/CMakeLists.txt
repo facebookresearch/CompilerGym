@@ -20,6 +20,7 @@ cg_py_library(
     ::benchmark_from_command_line
     ::compute_observation
     ::llvm_benchmark
+    ::llvm_command_line
     ::llvm_env
     compiler_gym::util::util
   PUBLIC
@@ -44,6 +45,14 @@ cg_py_library(
 
 cg_py_library(
   NAME
+    lexed_ir
+  SRCS
+    "lexed_ir.py"
+  PUBLIC
+)
+
+cg_py_library(
+  NAME
     llvm_benchmark
   SRCS
     "llvm_benchmark.py"
@@ -58,10 +67,12 @@ cg_py_library(
 
 cg_py_library(
   NAME
-    lexed_ir
+    llvm_command_line
   SRCS
-    "lexed_ir.py"
-  PUBLIC
+    llvm_command_line.py
+  DEPS
+    compiler_gym::spaces::spaces
+    compiler_gym::util::util
 )
 
 cg_py_library(
@@ -71,6 +82,7 @@ cg_py_library(
     "llvm_env.py"
   DEPS
     ::llvm_benchmark
+    ::llvm_command_line
     ::llvm_rewards
     compiler_gym::datasets::datasets
     compiler_gym::errors::errors

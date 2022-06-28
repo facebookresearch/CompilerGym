@@ -2,7 +2,7 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-"""Fuzz test for LlvmEnv.commandline()."""
+"""Fuzz test for LlvmEnv.action_space.to_string()."""
 import os
 import subprocess
 from pathlib import Path
@@ -25,7 +25,7 @@ RANDOM_TRAJECTORY_LENGTH_RANGE = (1, 50)
 
 @pytest.mark.timeout(600)
 def test_fuzz(env: LlvmEnv, tmpwd: Path, llvm_opt: Path, llvm_diff: Path):
-    """This test produces a random trajectory and then uses the commandline()
+    """This test produces a random trajectory and then uses the commandline
     generated with opt to check that the states are equivalent.
     """
     del tmpwd
@@ -39,7 +39,7 @@ def test_fuzz(env: LlvmEnv, tmpwd: Path, llvm_opt: Path, llvm_diff: Path):
     apply_random_trajectory(
         env, random_trajectory_length_range=RANDOM_TRAJECTORY_LENGTH_RANGE, timeout=30
     )
-    commandline = env.commandline(textformat=True)
+    commandline = env.action_space.to_string(env.actions)
     print(env.state)  # For debugging in case of failure.
 
     # Write the post-trajectory state to file.

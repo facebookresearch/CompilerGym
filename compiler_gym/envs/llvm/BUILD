@@ -16,6 +16,7 @@ py_library(
         ":benchmark_from_command_line",
         ":compute_observation",
         ":llvm_benchmark",
+        ":llvm_command_line",
         ":llvm_env",
         "//compiler_gym/util",
     ],
@@ -42,6 +43,12 @@ py_library(
 )
 
 py_library(
+    name = "lexed_ir",
+    srcs = ["lexed_ir.py"],
+    data = ["//compiler_gym/third_party/LexedIr:unlex-files"],
+)
+
+py_library(
     name = "llvm_benchmark",
     srcs = ["llvm_benchmark.py"],
     visibility = ["//compiler_gym:__subpackages__"],
@@ -55,9 +62,12 @@ py_library(
 )
 
 py_library(
-    name = "lexed_ir",
-    srcs = ["lexed_ir.py"],
-    data = ["//compiler_gym/third_party/LexedIr:unlex-files"],
+    name = "llvm_command_line",
+    srcs = ["llvm_command_line.py"],
+    deps = [
+        "//compiler_gym/spaces",
+        "//compiler_gym/util",
+    ],
 )
 
 py_library(
@@ -67,6 +77,7 @@ py_library(
         ":benchmark_from_command_line",
         ":lexed_ir",
         ":llvm_benchmark",
+        ":llvm_command_line",
         ":llvm_rewards",
         "//compiler_gym/datasets",
         "//compiler_gym/envs/llvm/datasets",

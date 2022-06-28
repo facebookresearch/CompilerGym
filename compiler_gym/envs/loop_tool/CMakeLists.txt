@@ -9,7 +9,6 @@ cg_py_library(
   NAME loop_tool
   SRCS
     "__init__.py"
-    "loop_tool_env.py"
   DATA compiler_gym::envs::loop_tool::service::service
   DEPS
     compiler_gym::service::client_service_compiler_env

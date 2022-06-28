@@ -11,6 +11,13 @@ observation spaces available to compilers.
 .. currentmodule:: compiler_gym.spaces
 
 
+ActionSpace
+-----------
+
+.. autoclass:: ActionSpace
+   :members:
+
+
 Commandline
 -----------
 
