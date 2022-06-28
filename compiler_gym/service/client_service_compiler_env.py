@@ -72,11 +72,11 @@ logger = logging.getLogger(__name__)
 
 
 def _wrapped_step(
-    service: CompilerGymServiceConnection, request: StepRequest
+    service: CompilerGymServiceConnection, request: StepRequest, timeout: float
 ) -> StepReply:
     """Call the Step() RPC endpoint."""
     try:
-        return service(service.stub.Step, request)
+        return service(service.stub.Step, request, timeout=timeout)
     except FileNotFoundError as e:
         if str(e).startswith("Session not found"):
             raise SessionNotFound(str(e))
@@ -143,7 +143,6 @@ class ClientServiceCompilerEnv(CompilerEnv):
         service_message_converters: ServiceMessageConverters = None,
         connection_settings: Optional[ConnectionOpts] = None,
         service_connection: Optional[CompilerGymServiceConnection] = None,
-        timeout: Optional[float] = 300,
     ):
         """Construct and initialize a CompilerGym environment.
 
@@ -199,9 +198,6 @@ class ClientServiceCompilerEnv(CompilerEnv):
         :param service_connection: An existing compiler gym service connection
             to use.
 
-        :param timeout: The maximum number of seconds to wait for an RPC method
-            call to succeed. Accepts a float value. The default is 300 seconds.
-
         :raises FileNotFoundError: If service is a path to a file that is not
             found.
 
@@ -224,8 +220,6 @@ class ClientServiceCompilerEnv(CompilerEnv):
         self._datasets = Datasets(datasets or [])
 
         self.action_space_name = action_space
-
-        self._timeout = timeout
 
         # If no reward space is specified, generate some from numeric observation spaces
         rewards = rewards or [
@@ -510,7 +504,6 @@ class ClientServiceCompilerEnv(CompilerEnv):
             "benchmark": self.benchmark,
             "connection_settings": self._connection_settings,
             "service": self._service_endpoint,
-            "timeout": self._timeout,
         }
 
     def fork(self) -> "ClientServiceCompilerEnv":
@@ -822,9 +815,6 @@ class ClientServiceCompilerEnv(CompilerEnv):
         :param rewards: A list of reward spaces to compute rewards from. These
             are evaluated after the actions are applied.
 
-        :param timeout: The maximum number of seconds to wait for an RPC method
-            call to succeed. Accepts a float value. The default is 300 seconds.
-
         :return: A tuple of observations, rewards, done, and info. Observations
             and rewards are lists.
 
@@ -856,8 +846,6 @@ class ClientServiceCompilerEnv(CompilerEnv):
             for i, observation_space in enumerate(observations_to_compute)
         }
 
-        self._timeout = timeout
-
         # Record the actions.
         self._actions += actions
 
@@ -872,7 +860,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
             ],
         )
         try:
-            reply = _wrapped_step(self.service, request)
+            reply = _wrapped_step(self.service, request, timeout)
         except (
             ServiceError,
             ServiceTransportError,
@@ -996,7 +984,12 @@ class ClientServiceCompilerEnv(CompilerEnv):
                 category=DeprecationWarning,
             )
             reward_spaces = rewards
-        return self.multistep([action], observation_spaces, reward_spaces)
+        return self.multistep(
+            actions=[action],
+            observation_spaces=observation_spaces,
+            reward_spaces=reward_spaces,
+            timeout=timeout,
+        )
 
     def multistep(
         self,
