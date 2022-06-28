@@ -293,7 +293,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
         # Register any derived observation spaces now so that the observation
         # space can be set below.
         for derived_observation_space in derived_observation_spaces or []:
-            self.observation.add_derived_space_internal(**derived_observation_space)
+            self.observation.add_derived_space(**derived_observation_space)
 
         self.action_space: Optional[Space] = None
         self.observation_space: Optional[Space] = None
