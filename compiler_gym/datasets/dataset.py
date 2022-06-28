@@ -22,11 +22,6 @@ from compiler_gym.datasets.uri import BenchmarkUri
 
 logger = logging.getLogger(__name__)
 
-# NOTE(cummins): This is only required to prevent a name conflict with the now
-# deprecated Dataset.logger attribute. This can be removed once the logger
-# attribute is removed, scheduled for release 0.2.3.
-_logger = logger
-
 _DATASET_VERSION_PATTERN = r"[a-zA-z0-9-_]+-v(?P<version>[0-9]+)"
 _DATASET_VERSION_RE = re.compile(_DATASET_VERSION_PATTERN)
 
@@ -130,21 +125,6 @@ class Dataset:
 
     def __repr__(self):
         return self.name
-
-    @property
-    @mark_deprecated(
-        version="0.2.1",
-        reason=(
-            "The `Dataset.logger` attribute is deprecated. All Dataset "
-            "instances share a logger named compiler_gym.datasets"
-        ),
-    )
-    def logger(self) -> logging.Logger:
-        """The logger for this dataset.
-
-        :type: logging.Logger
-        """
-        return _logger
 
     @property
     def name(self) -> str:
