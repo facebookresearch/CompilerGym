@@ -15,7 +15,6 @@ from time import time
 from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
 
 import numpy as np
-from deprecated.sphinx import deprecated
 from gym.spaces import Space
 
 from compiler_gym.compiler_env_state import CompilerEnvState
@@ -69,11 +68,6 @@ from compiler_gym.validation_result import ValidationResult
 from compiler_gym.views import ObservationSpaceSpec, ObservationView, RewardView
 
 logger = logging.getLogger(__name__)
-
-# NOTE(cummins): This is only required to prevent a name conflict with the now
-# deprecated ClientServiceCompilerEnv.logger attribute. This can be removed once the logger
-# attribute is removed, scheduled for release 0.2.3.
-_logger = logger
 
 
 def _wrapped_step(
@@ -148,7 +142,6 @@ class ClientServiceCompilerEnv(CompilerEnv):
         service_message_converters: ServiceMessageConverters = None,
         connection_settings: Optional[ConnectionOpts] = None,
         service_connection: Optional[CompilerGymServiceConnection] = None,
-        logger: Optional[logging.Logger] = None,
         timeout: Optional[float] = 300,
     ):
         """Construct and initialize a CompilerGym environment.
@@ -214,16 +207,6 @@ class ClientServiceCompilerEnv(CompilerEnv):
         :raises TimeoutError: If the compiler service fails to initialize within
             the parameters provided in :code:`connection_settings`.
         """
-        # NOTE(cummins): Logger argument deprecated and scheduled to be removed
-        # in release 0.2.3.
-        if logger:
-            warnings.warn(
-                "The `logger` argument is deprecated on ClientServiceCompilerEnv.__init__() "
-                "and will be removed in a future release. All ClientServiceCompilerEnv "
-                "instances share a logger named compiler_gym.service.client_service_compiler_env",
-                DeprecationWarning,
-            )
-
         self.metadata = {"render.modes": ["human", "ansi"]}
 
         # A compiler service supports multiple simultaneous environments. This
@@ -373,17 +356,6 @@ class ClientServiceCompilerEnv(CompilerEnv):
     @property
     def actions(self) -> List[ActionType]:
         return self._actions
-
-    @property
-    @deprecated(
-        version="0.2.1",
-        reason=(
-            "The `ClientServiceCompilerEnv.logger` attribute is deprecated. All ClientServiceCompilerEnv "
-            "instances share a logger named compiler_gym.service.client_service_compiler_env"
-        ),
-    )
-    def logger(self):
-        return _logger
 
     @property
     def versions(self) -> GetVersionReply:

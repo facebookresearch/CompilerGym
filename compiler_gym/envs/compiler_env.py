@@ -184,14 +184,6 @@ class CompilerEnv(gym.Env, ABC):
 
     @property
     @abstractmethod
-    @deprecated(
-        version="0.2.1",
-    )
-    def logger(self):
-        raise NotImplementedError("abstract method")
-
-    @property
-    @abstractmethod
     def version(self) -> str:
         """The version string of the compiler service."""
         raise NotImplementedError("abstract method")
