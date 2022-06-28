@@ -716,7 +716,7 @@ The 'tutorial' command will give a step by step guide."""
 
     def do_commandline(self, arg):
         """Show the command line equivalent of the actions taken so far"""
-        print("$", self.env.commandline(), flush=True)
+        print("$", self.env.action_space.to_string(self.env.actions), flush=True)
 
     def do_stack(self, arg):
         """Show the environments on the stack. The current environment is the first shown."""

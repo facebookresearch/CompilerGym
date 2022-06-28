@@ -31,7 +31,8 @@ from compiler_gym.errors import (
     ValidationError,
 )
 from compiler_gym.service import CompilerGymServiceConnection, ConnectionOpts
-from compiler_gym.service.proto import ActionSpace, AddBenchmarkRequest
+from compiler_gym.service.proto import ActionSpace as ActionSpaceProto
+from compiler_gym.service.proto import AddBenchmarkRequest
 from compiler_gym.service.proto import Benchmark as BenchmarkProto
 from compiler_gym.service.proto import (
     EndSessionReply,
@@ -49,7 +50,12 @@ from compiler_gym.service.proto import (
     StepRequest,
     py_converters,
 )
-from compiler_gym.spaces import DefaultRewardFromObservation, NamedDiscrete, Reward
+from compiler_gym.spaces import (
+    ActionSpace,
+    DefaultRewardFromObservation,
+    NamedDiscrete,
+    Reward,
+)
 from compiler_gym.util.gym_type_hints import (
     ActionType,
     ObservationType,
@@ -95,17 +101,21 @@ class ServiceMessageConverters:
           :code:`compiler_gym.service.proto.Event`.
     """
 
-    action_space_converter: Callable[[ActionSpace], Space]
+    action_space_converter: Callable[[ActionSpaceProto], ActionSpace]
     action_converter: Callable[[ActionType], Event]
 
     def __init__(
         self,
-        action_space_converter: Optional[Callable[[ActionSpace], Space]] = None,
+        action_space_converter: Optional[
+            Callable[[ActionSpaceProto], ActionSpace]
+        ] = None,
         action_converter: Optional[Callable[[Any], Event]] = None,
     ):
         """Constructor."""
         self.action_space_converter = (
-            py_converters.make_message_default_converter()
+            py_converters.make_action_space_wrapper(
+                py_converters.make_message_default_converter()
+            )
             if action_space_converter is None
             else action_space_converter
         )
@@ -394,20 +404,6 @@ class ClientServiceCompilerEnv(CompilerEnv):
         """The version string of the underlying compiler that this service supports."""
         return self.versions.compiler_version
 
-    def commandline(self) -> str:
-        """Calling this method on a :class:`ClientServiceCompilerEnv
-        <compiler_gym.envs.ClientServiceCompilerEnv>` instance raises
-        :code:`NotImplementedError`.
-        """
-        raise NotImplementedError("abstract method")
-
-    def commandline_to_actions(self, commandline: str) -> List[ActionType]:
-        """Calling this method on a :class:`ClientServiceCompilerEnv
-        <compiler_gym.envs.ClientServiceCompilerEnv>` instance raises
-        :code:`NotImplementedError`.
-        """
-        raise NotImplementedError("abstract method")
-
     @property
     def episode_walltime(self) -> float:
         return time() - self.episode_start_time
@@ -418,7 +414,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
             benchmark=str(self.benchmark) if self.benchmark else None,
             reward=self.episode_reward,
             walltime=self.episode_walltime,
-            commandline=self.commandline(),
+            commandline=self.action_space.to_string(self.actions),
         )
 
     @property
@@ -1169,7 +1165,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
                 f"to environment for benchmark '{self.benchmark}'"
             )
 
-        actions = self.commandline_to_actions(state.commandline)
+        actions = self.action_space.from_string(state.commandline)
         done = False
         for action in actions:
             _, _, done, info = self.step(action)

@@ -36,7 +36,7 @@ class CommandlineWithTerminalAction(CompilerEnvWrapper):
         """
         super().__init__(env)
 
-        if not isinstance(env.action_space, Commandline):
+        if not isinstance(env.action_space.wrapped, Commandline):
             raise TypeError(
                 f"Unsupported action space: {type(env.action_space).__name__}"
             )
@@ -124,10 +124,10 @@ class ConstrainedCommandline(ActionWrapper):
 
         if not flags:
             raise TypeError("No flags provided")
-        if not isinstance(env.action_space, Commandline):
+        if not issubclass(type(env.action_space.wrapped), Commandline):
             raise TypeError(
                 "Can only wrap Commandline action space. "
-                f"Received: {type(env.action_space).__name__}"
+                f"Received: {type(env.action_space.wrapped).__name__}"
             )
 
         self._forward_translation: List[int] = [self.action_space[f] for f in flags]

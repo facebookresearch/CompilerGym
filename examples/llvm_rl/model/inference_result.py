@@ -106,7 +106,7 @@ class InferenceResult(BaseModel):
         return cls(
             benchmark=env.benchmark.uri,
             inference_walltime_seconds=inference_timer.time,
-            commandline=env.commandline(),
+            commandline=env.action_space.to_string(env.actions),
             episode_len=len(env.actions),
             instruction_count_init=instruction_count_init,
             instruction_count_final=instruction_count_final,

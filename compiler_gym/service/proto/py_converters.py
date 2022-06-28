@@ -25,7 +25,9 @@ from google.protobuf.message import Message
 from gym.spaces import Space as GymSpace
 
 from compiler_gym.service.proto.compiler_gym_service_pb2 import (
-    ActionSpace,
+    ActionSpace as ActionSpaceProto,
+)
+from compiler_gym.service.proto.compiler_gym_service_pb2 import (
     BooleanBox,
     BooleanRange,
     BooleanSequenceSpace,
@@ -62,6 +64,7 @@ from compiler_gym.service.proto.compiler_gym_service_pb2 import (
     StringSpace,
     StringTensor,
 )
+from compiler_gym.spaces.action_space import ActionSpace
 from compiler_gym.spaces.box import Box
 from compiler_gym.spaces.commandline import Commandline, CommandlineFlag
 from compiler_gym.spaces.dict import Dict
@@ -442,6 +445,12 @@ class ObservationSpaceMessageConverter:
         return res
 
 
+def make_action_space_wrapper(
+    converter: Callable[[Any], Any]
+) -> Callable[[Any], ActionSpace]:
+    return lambda msg: ActionSpace(space=converter(msg))
+
+
 def make_message_default_converter() -> Callable[[Any], Any]:
     conversion_map = {
         bool: convert_trivial,
@@ -493,7 +502,7 @@ def make_message_default_converter() -> Callable[[Any], Any]:
     conversion_map[ListSpace] = ListSpaceMessageConverter(conversion_map[Space])
     conversion_map[DictSpace] = DictSpaceMessageConverter(conversion_map[Space])
     conversion_map[SpaceSequenceSpace] = SpaceSequenceSpaceMessageConverter(res)
-    conversion_map[ActionSpace] = ActionSpaceMessageConverter(res)
+    conversion_map[ActionSpaceProto] = ActionSpaceMessageConverter(res)
     conversion_map[ObservationSpace] = ObservationSpaceMessageConverter(res)
 
     conversion_map[any_pb2.Any] = ProtobufAnyConverter(

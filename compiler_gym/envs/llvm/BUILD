@@ -16,6 +16,7 @@ py_library(
         ":benchmark_from_command_line",
         ":compute_observation",
         ":llvm_benchmark",
+        ":llvm_command_line",
         ":llvm_env",
         "//compiler_gym/util",
     ],
@@ -55,11 +56,21 @@ py_library(
 )
 
 py_library(
+    name = "llvm_command_line",
+    srcs = ["llvm_command_line.py"],
+    deps = [
+        "//compiler_gym/spaces",
+        "//compiler_gym/util",
+    ],
+)
+
+py_library(
     name = "llvm_env",
     srcs = ["llvm_env.py"],
     deps = [
         ":benchmark_from_command_line",
         ":llvm_benchmark",
+        ":llvm_command_line",
         ":llvm_rewards",
         "//compiler_gym/datasets",
         "//compiler_gym/envs/llvm/datasets",

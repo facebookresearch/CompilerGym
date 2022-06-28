@@ -8,7 +8,6 @@ py_library(
     name = "loop_tool",
     srcs = [
         "__init__.py",
-        "loop_tool_env.py",
     ],
     data = ["//compiler_gym/envs/loop_tool/service"],
     visibility = ["//visibility:public"],

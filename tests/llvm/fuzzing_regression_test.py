@@ -22,7 +22,7 @@ def test_regression_test_const_offset_from_gep(env, tmpwd, llvm_diff, llvm_opt):
     env.write_ir("input.ll")
     # FIXME: Removing the -separate-const-offset-from-gep actions from the below
     # commandline "fixes" the test.
-    actions = env.commandline_to_actions(
+    actions = env.action_space.from_string(
         "opt -objc-arc-apelim -separate-const-offset-from-gep -sancov -indvars -loop-reduce -dse -inferattrs -loop-fusion -dce -break-crit-edges -constmerge -indvars -mem2reg -objc-arc-expand -ee-instrument -loop-reroll -break-crit-edges -separate-const-offset-from-gep -loop-idiom -float2int -dce -float2int -ipconstprop -simple-loop-unswitch -coro-cleanup -early-cse-memssa -strip -functionattrs -objc-arc-contract -sink -loop-distribute -loop-reroll -slsr -separate-const-offset-from-gep input.bc -o output.bc"
     )
 
@@ -32,7 +32,7 @@ def test_regression_test_const_offset_from_gep(env, tmpwd, llvm_diff, llvm_opt):
     env.write_ir("env.ll")
 
     subprocess.check_call(
-        env.commandline(textformat=True),
+        env.action_space.to_string(env.actions) + " -S -o output.ll",
         env={"PATH": str(llvm_opt.parent)},
         shell=True,
         timeout=60,

@@ -9,6 +9,8 @@ import pickle
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
+from deprecated.sphinx import deprecated
+
 from compiler_gym.datasets import Benchmark
 from compiler_gym.envs.gcc.datasets import get_gcc_datasets
 from compiler_gym.envs.gcc.gcc import Gcc, GccSpec
@@ -109,6 +111,10 @@ class GccEnv(ClientServiceCompilerEnv):
             self.send_param("timeout", str(self._timeout))
         return observation
 
+    @deprecated(
+        version="0.2.1",
+        reason="Use `env.observation.command_line()` instead",
+    )
     def commandline(self) -> str:
         """Return a string representing the command line options.
 

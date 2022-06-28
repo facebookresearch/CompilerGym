@@ -11,6 +11,7 @@ cg_py_library(
   SRCS
     "__init__.py"
   DEPS
+    ::action_space
     ::common
     ::box
     ::commandline
@@ -28,8 +29,8 @@ cg_py_library(
 )
 
 cg_py_library(
-  NAME common
-  SRCS "common.py"
+  NAME action_space
+  SRCS action_space.py
 )
 
 cg_py_library(
@@ -45,6 +46,11 @@ cg_py_library(
   DEPS
     ::named_discrete
   PUBLIC
+)
+
+cg_py_library(
+  NAME common
+  SRCS "common.py"
 )
 
 cg_py_library(

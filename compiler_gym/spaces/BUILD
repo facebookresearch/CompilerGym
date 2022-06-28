@@ -11,6 +11,7 @@ py_library(
     srcs = ["__init__.py"],
     visibility = ["//visibility:public"],
     deps = [
+        ":action_space",
         ":box",
         ":commandline",
         ":common",
@@ -28,8 +29,8 @@ py_library(
 )
 
 py_library(
-    name = "common",
-    srcs = ["common.py"],
+    name = "action_space",
+    srcs = ["action_space.py"],
     visibility = ["//compiler_gym:__subpackages__"],
 )
 
@@ -46,6 +47,12 @@ py_library(
     deps = [
         ":named_discrete",
     ],
+)
+
+py_library(
+    name = "common",
+    srcs = ["common.py"],
+    visibility = ["//compiler_gym:__subpackages__"],
 )
 
 py_library(
