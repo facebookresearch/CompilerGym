@@ -245,10 +245,6 @@ class CompilerEnvWrapper(CompilerEnv, Wrapper):
         return self.env.actions
 
     @property
-    def logger(self):
-        return self.env.logger
-
-    @property
     def version(self) -> str:
         return self.env.version
 

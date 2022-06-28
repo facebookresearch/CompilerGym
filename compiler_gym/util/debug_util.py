@@ -62,8 +62,6 @@ def set_debug_level(level: int) -> None:
     time and not throughout their lifetime.
 
     Setting the debug level affects the entire process and is not thread safe.
-    For granular control of logging information, consider instead setting a
-    :code:`logging.Logger` instance on :code:`CompilerEnv.logger`.
 
     :param level: The debugging level to use.
     """
