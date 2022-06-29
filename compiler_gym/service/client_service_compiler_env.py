@@ -49,12 +49,7 @@ from compiler_gym.service.proto import (
     StepRequest,
     py_converters,
 )
-from compiler_gym.spaces import (
-    ActionSpace,
-    DefaultRewardFromObservation,
-    NamedDiscrete,
-    Reward,
-)
+from compiler_gym.spaces import ActionSpace, DefaultRewardFromObservation, Reward
 from compiler_gym.util.decorators import memoized_property
 from compiler_gym.util.gym_type_hints import (
     ActionType,
@@ -378,18 +373,18 @@ class ClientServiceCompilerEnv(CompilerEnv):
         )
 
     @property
-    def action_space(self) -> Space:
+    def action_space(self) -> ActionSpace:
         return self._action_space
 
     @action_space.setter
-    def action_space(self, action_space: Optional[str]):
+    def action_space(self, action_space: Optional[str]) -> None:
         self.action_space_name = action_space
         index = (
             [a.name for a in self.action_spaces].index(action_space)
             if self.action_space_name
             else 0
         )
-        self._action_space: NamedDiscrete = self.action_spaces[index]
+        self._action_space: ActionSpace = self.action_spaces[index]
 
     @property
     def action_spaces(self) -> List[str]:
