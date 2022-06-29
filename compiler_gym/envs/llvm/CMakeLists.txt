@@ -17,11 +17,22 @@ cg_py_library(
   DATA
     compiler_gym::envs::llvm::service::service
   DEPS
+    ::benchmark_from_command_line
     ::compute_observation
     ::llvm_benchmark
     ::llvm_env
     compiler_gym::util::util
   PUBLIC
+)
+
+cg_py_library(
+  NAME benchmark_from_command_line
+  SRCS benchmark_from_command_line.py
+  DEPS
+    compiler_gym::datasets::datasets
+    compiler_gym::service::proto::proto
+    compiler_gym::third_party::gccinvocation::gccinvocation
+    compiler_gym::util::util
 )
 
 cg_py_library(
@@ -59,6 +70,7 @@ cg_py_library(
     compiler_gym::envs::llvm::datasets::datasets
     compiler_gym::spaces::spaces
     compiler_gym::third_party::autophase::autophase
+    compiler_gym::third_party::gccinvocation::gccinvocation
     compiler_gym::third_party::inst2vec::inst2vec
     compiler_gym::third_party::llvm::llvm
     compiler_gym::third_party::llvm::instcount

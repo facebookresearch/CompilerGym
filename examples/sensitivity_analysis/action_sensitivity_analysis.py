@@ -14,19 +14,18 @@ Example Usage
 Evaluate the impact of three passes on the codesize of the cBench-crc32
 benchmark:
 
-    $ bazel run -c opt //compiler_gym/bin:action_sensitivity_analysis -- \
+    $ python -m sensitivity_analysis.action_sensitivity_analysis \
         --env=llvm-v0 --reward=IrInstructionCountO3 \
-        --benchmark=cbench-v1/crc32 --num_trials=100 \
-        --action=AddDiscriminatorsPass,AggressiveDcepass,AggressiveInstCombinerPass
+        --benchmark=cbench-v1/crc32 --num_action_sensitivity_trials=25 \
+        --action=-add-discriminators,-adce,-mem2reg
 
 Evaluate the single-step immediate reward of all actions on LLVM codesize:
 
-    $ bazel run -c opt //compiler_gym/bin:action_ensitivity_analysis -- \
+    $ python -m sensitivity_analysis.action_sensitivity_analysis -- \
         --env=llvm-v0 --reward=IrInstructionCountO3
 """
 import random
 from concurrent.futures import ThreadPoolExecutor
-from multiprocessing import cpu_count
 from pathlib import Path
 from typing import List, Optional
 
@@ -37,6 +36,7 @@ from sensitivity_analysis.sensitivity_analysis_eval import (
     run_sensitivity_analysis,
 )
 
+import compiler_gym.util.flags.nproc  # noqa
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
 from compiler_gym.util.flags.env_from_flags import env_from_flags
@@ -130,7 +130,7 @@ def run_action_sensitivity_analysis(
     reward_space: str,
     num_trials: int,
     max_warmup_steps: int,
-    nproc: int = cpu_count(),
+    nproc: int,
     max_attempts_multiplier: int = 5,
 ):
     """Estimate the immediate reward of a given list of actions."""
@@ -165,11 +165,12 @@ def main(argv):
 
     with env_from_flags() as env:
         action_names = env.action_space.names
+        print(action_names)
 
-    if FLAGS.action:
-        actions = [action_names.index(a) for a in FLAGS.action]
-    else:
-        actions = list(range(len(action_names)))
+        if FLAGS.action:
+            actions = [env.action_space[a] for a in FLAGS.action]
+        else:
+            actions = list(range(len(action_names)))
 
     logs_dir = Path(
         FLAGS.output_dir or create_logging_dir("benchmark_sensitivity_analysis")
@@ -181,7 +182,7 @@ def main(argv):
         rewards_path=rewards_path,
         runtimes_path=runtimes_path,
         actions=actions,
-        reward=FLAGS.reward,
+        reward_space=FLAGS.reward,
         num_trials=FLAGS.num_action_sensitivity_trials,
         max_warmup_steps=FLAGS.max_warmup_steps,
         nproc=FLAGS.nproc,

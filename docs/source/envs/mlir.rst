@@ -1,25 +1,31 @@
 MLIR Environment Reference
 ==========================
 
-Under construction. In its current state as an MVP the environment exposes benchmarks
-and an action space geared towards optimization of matrix multiplication.
+**⚠️ Under construction ⚠️**. In its current state as a MVP, the MLIR
+environment exposes benchmarks and an action space geared towards optimization
+of matrix multiplication. The environment is not yet included in the CompilerGym
+pypi package and must be built from source. See `here
+<https://github.com/facebookresearch/CompilerGym/issues/669>`_ for context.
 
 The MLIR environment exposes configuration of MLIR optimization passes that are
-related to matrix multiplication.
-It compiles and runs MLIR code that computes matrix multiplication.
+related to matrix multiplication. It compiles and runs MLIR code that computes
+matrix multiplication.
 
-... code-block::
+.. code-block::
 
     C = A * B
 
-where `A` is an `MxK` matrix and `B` is an `KxN` matrix.
+where :code:`A` is an :code:`MxK` matrix and :code:`B` is an :code:`KxN` matrix.
 
-Each episode is only 1 step long. All optimization parameters are supplied in a single action.
+Each episode is only 1 step long. All optimization parameters are supplied in a
+single action.
 
 
 Environment Configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-M, N and K are benchmark parameters that initialize the environment and can not be changed.
+
+M, N and K are benchmark parameters that initialize the environment and can not
+be changed.
 
 
 Observation Space
@@ -29,7 +35,7 @@ The observation is the running time of the calculation.
 
 Reward Space
 ~~~~~~~~~~~~
-The reward is -running time.
+The reward is negative running time.
 
 
 Action Space
@@ -99,30 +105,33 @@ Action Space
         ),
     )
 
-Note that not all optimization pass configurations are valid and some will result in an error.
+Note that not all optimization pass configurations are valid and some will
+result in an error.
 
 RL Wrapper
 ~~~~~~~~~~
 
-The environment uses some non OpenAI Gym spaces in the action space.
-To be able to train with off-the-shelf RL frameworks there is a
-`wrapper <compiler_gym.wrappers.mlir.make_mlir_rl_wrapper_env>` that converts
-the action space to use only OpenAI Gym spaces.
+The environment uses some non OpenAI Gym spaces in the action space. To be able
+to train with off-the-shelf RL frameworks there is a wrapper (constructed using
+:func:`compiler_gym.wrappers.mlir.make_mlir_rl_wrapper_env`) that converts the
+action space to use only OpenAI Gym spaces.
 
 
 Installation
 ~~~~~~~~~~~~
-The environment requires LLVM 14 and it can be built only with CMake, not with Bazel.
-It is incompatible with the LLVM environment due to LLVM version conflict.
-To enable the MLIR environment use these CMake variables.
+
+The environment requires LLVM 14 and it can be built only with CMake, not with
+Bazel. It is incompatible with the LLVM environment due to LLVM version
+conflict. To enable the MLIR environment use these CMake variables.
 
 .. code-block::
 
     COMPILER_GYM_ENABLE_MLIR_ENV=ON
     COMPILER_GYM_ENABLE_LLVM_ENV=OFF
 
-This configuration will include the MLIR environment in the `compiler_gym` Python package.
-The package will be available under `${CMAKE_BINARY_DIR}/py_pkg/dist`.
+This configuration will include the MLIR environment in the `compiler_gym`
+Python package. The package will be available under
+`${CMAKE_BINARY_DIR}/py_pkg/dist`.
 
 The build can automatically download and build the LLVM 14 dependency.
 Instead you can build against a prebuilt LLVM.

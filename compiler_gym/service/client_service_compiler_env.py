@@ -139,6 +139,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
         connection_settings: Optional[ConnectionOpts] = None,
         service_connection: Optional[CompilerGymServiceConnection] = None,
         logger: Optional[logging.Logger] = None,
+        timeout: Optional[float] = 300,
     ):
         """Construct and initialize a CompilerGym environment.
 
@@ -194,6 +195,9 @@ class ClientServiceCompilerEnv(CompilerEnv):
         :param service_connection: An existing compiler gym service connection
             to use.
 
+        :param timeout: The maximum number of seconds to wait for an RPC method
+            call to succeed. Accepts a float value. The default is 300 seconds.
+
         :raises FileNotFoundError: If service is a path to a file that is not
             found.
 
@@ -226,6 +230,8 @@ class ClientServiceCompilerEnv(CompilerEnv):
         self._datasets = Datasets(datasets or [])
 
         self.action_space_name = action_space
+
+        self._timeout = timeout
 
         # If no reward space is specified, generate some from numeric observation spaces
         rewards = rewards or [
@@ -542,6 +548,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
             "benchmark": self.benchmark,
             "connection_settings": self._connection_settings,
             "service": self._service_endpoint,
+            "timeout": self._timeout,
         }
 
     def fork(self) -> "ClientServiceCompilerEnv":
@@ -652,12 +659,14 @@ class ClientServiceCompilerEnv(CompilerEnv):
         observation_space: Union[
             OptionalArgumentValue, str, ObservationSpaceSpec
         ] = OptionalArgumentValue.UNCHANGED,
+        timeout: Optional[float] = 300,
     ) -> Optional[ObservationType]:
         return self._reset(
             benchmark=benchmark,
             action_space=action_space,
             observation_space=observation_space,
             reward_space=reward_space,
+            timeout=timeout,
             retry_count=0,
         )
 
@@ -667,6 +676,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
         action_space: Optional[str],
         observation_space: Union[OptionalArgumentValue, str, ObservationSpaceSpec],
         reward_space: Union[OptionalArgumentValue, str, Reward],
+        timeout: Optional[float],
         retry_count: int,
     ) -> Optional[ObservationType]:
         """Private implementation detail. Call `reset()`, not this."""
@@ -713,6 +723,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
                     action_space=action_space,
                     observation_space=observation_space,
                     reward_space=reward_space,
+                    timeout=timeout,
                     retry_count=retry_count + 1,
                 )
 
@@ -814,7 +825,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
 
         # If the action space has changed, update it.
         if reply.HasField("new_action_space"):
-            self.action_space = self.service_message_converters.action_space_converter(
+            self._action_space = self.service_message_converters.action_space_converter(
                 reply.new_action_space
             )
 
@@ -836,6 +847,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
         actions: Iterable[ActionType],
         observation_spaces: List[ObservationSpaceSpec],
         reward_spaces: List[Reward],
+        timeout: Optional[float] = 300,
     ) -> StepType:
         """Take a step.
 
@@ -847,6 +859,9 @@ class ClientServiceCompilerEnv(CompilerEnv):
 
         :param rewards: A list of reward spaces to compute rewards from. These
             are evaluated after the actions are applied.
+
+        :param timeout: The maximum number of seconds to wait for an RPC method
+            call to succeed. Accepts a float value. The default is 300 seconds.
 
         :return: A tuple of observations, rewards, done, and info. Observations
             and rewards are lists.
@@ -878,6 +893,8 @@ class ClientServiceCompilerEnv(CompilerEnv):
             observation_space: i
             for i, observation_space in enumerate(observations_to_compute)
         }
+
+        self._timeout = timeout
 
         # Record the actions.
         self._actions += actions
@@ -931,7 +948,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
 
         # If the action space has changed, update it.
         if reply.HasField("new_action_space"):
-            self.action_space = self.service_message_converters.action_space_converter(
+            self._action_space = self.service_message_converters.action_space_converter(
                 reply.new_action_space
             )
 
@@ -985,6 +1002,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
         reward_spaces: Optional[Iterable[Union[str, Reward]]] = None,
         observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
         rewards: Optional[Iterable[Union[str, Reward]]] = None,
+        timeout: Optional[float] = 300,
     ) -> StepType:
         """:raises SessionNotFound: If :meth:`reset()
         <compiler_gym.envs.ClientServiceCompilerEnv.reset>` has not been called.

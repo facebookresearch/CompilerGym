@@ -45,6 +45,7 @@ research. We aim to act as a catalyst for making compilers faster using ML.
    llvm/index
    envs/gcc
    envs/loop_tool
+   envs/mlir
 
 ..
     .. toctree::
@@ -85,3 +86,6 @@ Indices and tables
 
 * :ref:`genindex`
 * :ref:`modindex`
+
+`Terms of Use <https://opensource.fb.com/legal/terms/>`_.
+`Privacy Policy <https://opensource.fb.com/legal/privacy/>`_.

@@ -3,16 +3,25 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Extensions to the ClientServiceCompilerEnv environment for LLVM."""
+import logging
 import os
+import shlex
 import shutil
+import subprocess
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from typing import Iterable, List, Optional, Union, cast
 
 import numpy as np
 
 from compiler_gym.datasets import Benchmark, Dataset
+from compiler_gym.envs.llvm.benchmark_from_command_line import BenchmarkFromCommandLine
 from compiler_gym.envs.llvm.datasets import get_llvm_datasets
-from compiler_gym.envs.llvm.llvm_benchmark import ClangInvocation, make_benchmark
+from compiler_gym.envs.llvm.llvm_benchmark import (
+    ClangInvocation,
+    get_system_library_flags,
+    make_benchmark,
+)
 from compiler_gym.envs.llvm.llvm_rewards import (
     BaselineImprovementNormalizedReward,
     CostFunctionReward,
@@ -24,14 +33,24 @@ from compiler_gym.spaces import Box, Commandline
 from compiler_gym.spaces import Dict as DictSpace
 from compiler_gym.spaces import Scalar, Sequence
 from compiler_gym.third_party.autophase import AUTOPHASE_FEATURE_NAMES
+from compiler_gym.third_party.gccinvocation.gccinvocation import GccInvocation
 from compiler_gym.third_party.inst2vec import Inst2vecEncoder
-from compiler_gym.third_party.llvm import download_llvm_files
+from compiler_gym.third_party.llvm import (
+    clang_path,
+    download_llvm_files,
+    llvm_link_path,
+)
 from compiler_gym.third_party.llvm.instcount import INST_COUNT_FEATURE_NAMES
+from compiler_gym.util.commands import Popen
+from compiler_gym.util.runfiles_path import transient_cache_path
+from compiler_gym.util.shell_format import join_cmd
 
 _INST2VEC_ENCODER = Inst2vecEncoder()
 
 
 _LLVM_DATASETS: Optional[List[Dataset]] = None
+
+logger = logging.getLogger(__name__)
 
 
 def _get_llvm_datasets(site_data_base: Optional[Path] = None) -> Iterable[Dataset]:
@@ -619,3 +638,192 @@ class LlvmEnv(ClientServiceCompilerEnv):
         if self.runtime_warmup_runs_count is not None:
             fkd.runtime_warmup_runs_count = self.runtime_warmup_runs_count
         return fkd
+
+    def make_benchmark_from_command_line(
+        self,
+        cmd: Union[str, List[str]],
+        replace_driver: bool = True,
+        system_includes: bool = True,
+        timeout: int = 600,
+    ) -> Benchmark:
+        """Create a benchmark for use with this environment.
+
+        This function takes a command line compiler invocation as input,
+        modifies it to produce an unoptimized LLVM-IR bitcode, and then runs the
+        modified command line to produce a bitcode benchmark.
+
+        For example, the command line:
+
+            >>> benchmark = env.make_benchmark_from_command_line(
+            ...     ["gcc", "-DNDEBUG", "a.c", "b.c", "-o", "foo", "-lm"]
+            ... )
+
+        Will compile a.c and b.c to an unoptimized benchmark that can be then
+        passed to :meth:`reset() <compiler_env.envs.CompilerEnv.reset>`.
+
+        The way this works is to change the first argument of the command line
+        invocation to the version of clang shipped with CompilerGym, and to then
+        append command line flags that causes the compiler to produce LLVM-IR
+        with optimizations disabled. For example the input command line:
+
+        .. code-block::
+
+            gcc -DNDEBUG a.c b.c -o foo -lm
+
+        Will be rewritten to be roughly equivalent to:
+
+        .. code-block::
+
+            /path/to/compiler_gym/clang -DNDEG a.c b.c \\
+                -Xclang -disable-llvm-passes -Xclang -disable-llvm-optzns \\ -c
+                -emit-llvm  -o -
+
+        The generated benchmark then has a method :meth:`compile()
+        <compiler_env.envs.llvm.BenchmarkFromCommandLine.compile>` which
+        completes the linking and compilatilion to executable. For the above
+        example, this would be roughly equivalent to:
+
+        .. code-block::
+
+            /path/to/compiler_gym/clang environment-bitcode.bc -o foo -lm
+
+        :param cmd: A command line compiler invocation, either as a list of
+            arguments (e.g. :code:`["clang", "in.c"]`) or as a single shell
+            string (e.g. :code:`"clang in.c"`).
+
+        :param replace_driver: Whether to replace the first argument of the
+            command with the clang driver used by this environment.
+
+        :param system_includes: Whether to include the system standard libraries
+            during compilation jobs. This requires a system toolchain. See
+            :func:`get_system_library_flags`.
+
+        :param timeout: The maximum number of seconds to allow the compilation
+            job to run before terminating.
+
+        :return: A :class:`BenchmarkFromCommandLine
+            <compiler_gym.envs.llvm.BenchmarkFromCommandLine>` instance.
+
+        :raises ValueError: If no command line is provided.
+
+        :raises BenchmarkInitError: If executing the command line fails.
+
+        :raises TimeoutExpired: If a compilation job exceeds :code:`timeout`
+            seconds.
+        """
+        if not cmd:
+            raise ValueError("Input command line is empty")
+
+        # Split the command line if passed a single string.
+        if isinstance(cmd, str):
+            cmd = shlex.split(cmd)
+
+        rewritten_cmd: List[str] = cmd.copy()
+
+        if len(cmd) < 2:
+            raise ValueError(f"Input command line '{join_cmd(cmd)}' is too short")
+
+        # Append include flags for the system headers if requested.
+        if system_includes:
+            rewritten_cmd += get_system_library_flags()
+
+        # Use the CompilerGym clang binary in place of the original driver.
+        if replace_driver:
+            rewritten_cmd[0] = str(clang_path())
+
+        # Strip the -S flag, if present, as that changes the output format.
+        rewritten_cmd = [c for c in rewritten_cmd if c != "-S"]
+
+        invocation = GccInvocation(rewritten_cmd)
+
+        # Strip the output specifier(s). This is not strictly required since we
+        # override it later, but makes the generated command easier to
+        # understand.
+        for i in range(len(rewritten_cmd) - 2, -1, -1):
+            if rewritten_cmd[i] == "-o":
+                del rewritten_cmd[i + 1]
+                del rewritten_cmd[i]
+
+        # Fail early.
+        if "-" in invocation.sources:
+            raise ValueError(
+                "Input command line reads from stdin, "
+                f"which is not supported: '{join_cmd(cmd)}'"
+            )
+
+        # Convert all of the C/C++ sources to bitcodes which can then be linked
+        # into a single bitcode. We must process them individually because the
+        # '-c' flag does not support multiple sources when we are specifying the
+        # output path using '-o'.
+        sources = set(s for s in invocation.sources if not s.endswith(".o"))
+
+        if not sources:
+            raise ValueError(
+                f"Input command line has no source file inputs: '{join_cmd(cmd)}'"
+            )
+
+        bitcodes: List[bytes] = []
+        for source in sources:
+            # Adapt and execute the command line so that it will generate an
+            # unoptimized bitecode file.
+            emit_bitcode_command = rewritten_cmd.copy()
+
+            # Strip the name of other sources:
+            if len(sources) > 1:
+                emit_bitcode_command = [
+                    c for c in emit_bitcode_command if c == source or c not in sources
+                ]
+
+            # Append the flags to emit the bitcode and disable the optimization
+            # passes.
+            emit_bitcode_command += [
+                "-c",
+                "-emit-llvm",
+                "-o",
+                "-",
+                "-Xclang",
+                "-disable-llvm-passes",
+                "-Xclang",
+                "-disable-llvm-optzns",
+            ]
+
+            with Popen(
+                emit_bitcode_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            ) as clang:
+                logger.debug(
+                    f"Generating LLVM bitcode benchmark: {join_cmd(emit_bitcode_command)}"
+                )
+                bitcode, stderr = clang.communicate(timeout=timeout)
+                if clang.returncode:
+                    raise BenchmarkInitError(
+                        f"Failed to generate LLVM bitcode with error:\n"
+                        f"{stderr.decode('utf-8').rstrip()}\n"
+                        f"Running command: {join_cmd(emit_bitcode_command)}\n"
+                        f"From original commandline: {join_cmd(cmd)}"
+                    )
+                bitcodes.append(bitcode)
+
+        # If there were multiple sources then link the bitcodes together.
+        if len(bitcodes) > 1:
+            with TemporaryDirectory(
+                dir=transient_cache_path("."), prefix="llvm-benchmark-"
+            ) as dir:
+                # Write the bitcodes to files.
+                for i, bitcode in enumerate(bitcodes):
+                    with open(os.path.join(dir, f"{i}.bc"), "wb") as f:
+                        f.write(bitcode)
+
+                # Link the bitcode files.
+                llvm_link_cmd = [str(llvm_link_path()), "-o", "-"] + [
+                    os.path.join(dir, f"{i}.bc") for i in range(len(bitcodes))
+                ]
+                with Popen(
+                    llvm_link_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+                ) as llvm_link:
+                    bitcode, stderr = llvm_link.communicate(timeout=timeout)
+                    if llvm_link.returncode:
+                        raise BenchmarkInitError(
+                            f"Failed to link LLVM bitcodes with error: {stderr.decode('utf-8')}"
+                        )
+
+        return BenchmarkFromCommandLine(invocation, bitcode, timeout)

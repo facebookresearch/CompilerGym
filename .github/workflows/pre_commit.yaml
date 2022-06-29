@@ -17,7 +17,7 @@ jobs:
             - uses: actions/checkout@v2
             - name: Install clang-format
               run: |
-                  wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+                  wget --quiet -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
                   sudo apt-get install clang-format-10
                   sudo rm -f /usr/bin/clang-format
                   sudo ln -s /usr/bin/clang-format-10 /usr/bin/clang-format
@@ -40,7 +40,7 @@ jobs:
 
             - name: Install hadolint
               run: |
-                  wget -O hadolint https://github.com/hadolint/hadolint/releases/download/v1.19.0/hadolint-Linux-x86_64
+                  wget --quiet -O hadolint https://github.com/hadolint/hadolint/releases/download/v1.19.0/hadolint-Linux-x86_64
                   chmod +x hadolint
                   sudo mv hadolint /usr/local/bin
 

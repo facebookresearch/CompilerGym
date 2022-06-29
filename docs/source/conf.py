@@ -21,8 +21,8 @@ sphinx.application.ExtensionError = sphinx.errors.ExtensionError
 # -- Project information -----------------------------------------------------
 
 project = "CompilerGym"
-copyright = "Facebook AI Research"
-author = "Facebook AI Research"
+copyright = "Meta Platforms, Inc"
+author = "Meta Platforms, Inc"
 
 # Read the version from the //:VERSION file.
 with open("../../VERSION") as f:

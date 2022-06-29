@@ -14,6 +14,7 @@ Usage:
 
 It is equivalent in behavior to the example.py script in this directory.
 """
+import logging
 import subprocess
 from pathlib import Path
 from typing import Iterable
@@ -24,6 +25,7 @@ from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.envs.llvm.llvm_benchmark import get_system_library_flags
 from compiler_gym.spaces import Reward
 from compiler_gym.third_party import llvm
+from compiler_gym.util.logging import init_logging
 from compiler_gym.util.registration import register
 
 UNROLLING_PY_SERVICE_BINARY: Path = Path(
@@ -93,18 +95,18 @@ class SizeReward(Reward):
 class UnrollingDataset(Dataset):
     def __init__(self, *args, **kwargs):
         super().__init__(
-            name="benchmark://unrolling-v0",
+            name="benchmark://unrolling-v1",
             license="MIT",
             description="Unrolling example dataset",
         )
 
         self._benchmarks = {
             "/offsets1": Benchmark.from_file_contents(
-                "benchmark://unrolling-v0/offsets1",
+                "benchmark://unrolling-v1/offsets1",
                 self.preprocess(BENCHMARKS_PATH / "offsets1.c"),
             ),
             "/conv2d": Benchmark.from_file_contents(
-                "benchmark://unrolling-v0/conv2d",
+                "benchmark://unrolling-v1/conv2d",
                 self.preprocess(BENCHMARKS_PATH / "conv2d.c"),
             ),
         }
@@ -131,7 +133,7 @@ class UnrollingDataset(Dataset):
         )
 
     def benchmark_uris(self) -> Iterable[str]:
-        yield from (f"benchmark://unrolling-v0{k}" for k in self._benchmarks.keys())
+        yield from (f"benchmark://unrolling-v1{k}" for k in self._benchmarks.keys())
 
     def benchmark_from_parsed_uri(self, uri: BenchmarkUri) -> Benchmark:
         if uri.path in self._benchmarks:
@@ -141,10 +143,10 @@ class UnrollingDataset(Dataset):
 
 
 # Register the unrolling example service on module import. After importing this module,
-# the unrolling-py-v0 environment will be available to gym.make(...).
+# the unrolling-py-v1 environment will be available to gym.make(...).
 
 register(
-    id="unrolling-py-v0",
+    id="unrolling-py-v1",
     entry_point="compiler_gym.service.client_service_compiler_env:ClientServiceCompilerEnv",
     kwargs={
         "service": UNROLLING_PY_SERVICE_BINARY,
@@ -153,32 +155,41 @@ register(
     },
 )
 
-with compiler_gym.make(
-    "unrolling-py-v0",
-    benchmark="unrolling-v0/offsets1",
-    observation_space="features",
-    reward_space="runtime",
-) as env:
-    compiler_gym.set_debug_level(4)  # TODO: check why this has no effect
 
-    observation = env.reset()
-    print("observation: ", observation)
+def main():
+    # Use debug verbosity to print out extra logging information.
+    init_logging(level=logging.DEBUG)
 
-    print()
+    with compiler_gym.make(
+        "unrolling-py-v1",
+        benchmark="unrolling-v1/offsets1",
+        observation_space="features",
+        reward_space="runtime",
+    ) as env:
+        compiler_gym.set_debug_level(4)  # TODO: check why this has no effect
 
-    observation, reward, done, info = env.step(env.action_space.sample())
-    print("observation: ", observation)
-    print("reward: ", reward)
-    print("done: ", done)
-    print("info: ", info)
+        observation = env.reset()
+        print("observation: ", observation)
 
-    print()
+        print()
 
-    observation, reward, done, info = env.step(env.action_space.sample())
-    print("observation: ", observation)
-    print("reward: ", reward)
-    print("done: ", done)
-    print("info: ", info)
+        observation, reward, done, info = env.step(env.action_space.sample())
+        print("observation: ", observation)
+        print("reward: ", reward)
+        print("done: ", done)
+        print("info: ", info)
 
-    # TODO: implement write_bitcode(..) or write_ir(..)
-    # env.write_bitcode("/tmp/output.bc")
+        print()
+
+        observation, reward, done, info = env.step(env.action_space.sample())
+        print("observation: ", observation)
+        print("reward: ", reward)
+        print("done: ", done)
+        print("info: ", info)
+
+        # TODO: implement write_bitcode(..) or write_ir(..)
+        # env.write_bitcode("/tmp/output.bc")
+
+
+if __name__ == "__main__":
+    main()

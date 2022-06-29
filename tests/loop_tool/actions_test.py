@@ -14,6 +14,7 @@ from tests.test_main import main
 
 @flaky
 @pytest.mark.parametrize("backend", lt.backends())
+@pytest.mark.timeout(600)
 def test_basic(backend):
     with compiler_gym.make("loop_tool-v0") as env:
         env.observation_space = "flops"
@@ -37,6 +38,7 @@ def test_basic(backend):
 
 @flaky
 @pytest.mark.parametrize("backend", lt.backends())
+@pytest.mark.timeout(600)
 def test_rand(backend):
     with compiler_gym.make("loop_tool-v0") as env:
         env.observation_space = "flops"
@@ -58,6 +60,7 @@ def test_rand(backend):
 
 @flaky
 @pytest.mark.parametrize("backend", lt.backends())
+@pytest.mark.timeout(600)
 def test_induced_remainder(backend):
     with compiler_gym.make("loop_tool-v0") as env:
         env.observation_space = "loop_tree"
@@ -97,6 +100,7 @@ for a in 341 r 1 : L0 {'cpu_parallel ' if backend=='cpu' else ''}[thread]
 
 @flaky
 @pytest.mark.parametrize("backend", lt.backends())
+@pytest.mark.timeout(600)
 def test_thread_removal(backend):
     with compiler_gym.make("loop_tool-v0") as env:
         env.observation_space = "loop_tree"
@@ -128,6 +132,7 @@ for a in 1024 : L0
 
 @flaky
 @pytest.mark.parametrize("backend", lt.backends())
+@pytest.mark.timeout(600)
 def test_thread_addition(backend):
     with compiler_gym.make("loop_tool-v0") as env:
         env.observation_space = "loop_tree"
