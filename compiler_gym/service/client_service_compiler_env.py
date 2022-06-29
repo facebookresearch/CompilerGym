@@ -50,6 +50,7 @@ from compiler_gym.service.proto import (
     py_converters,
 )
 from compiler_gym.spaces import DefaultRewardFromObservation, Reward
+from compiler_gym.util.decorators import memoized_property
 from compiler_gym.util.gym_type_hints import (
     ActionType,
     ObservationType,
@@ -294,9 +295,6 @@ class ClientServiceCompilerEnv(CompilerEnv):
         for derived_observation_space in derived_observation_spaces or []:
             self.observation.add_derived_space_internal(**derived_observation_space)
 
-        # Lazily evaluated version strings.
-        self._versions: Optional[GetVersionReply] = None
-
         self.action_space: Optional[Space] = None
         self.observation_space: Optional[Space] = None
 
@@ -369,14 +367,10 @@ class ClientServiceCompilerEnv(CompilerEnv):
     def logger(self):
         return _logger
 
-    @property
+    @memoized_property
     def versions(self) -> GetVersionReply:
         """Get the version numbers from the compiler service."""
-        if self._versions is None:
-            self._versions = self.service(
-                self.service.stub.GetVersion, GetVersionRequest()
-            )
-        return self._versions
+        return self.service(self.service.stub.GetVersion, GetVersionRequest())
 
     @property
     def version(self) -> str:
