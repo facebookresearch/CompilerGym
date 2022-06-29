@@ -77,6 +77,25 @@ py_library(
 )
 
 py_library(
+    name = "in_process_client_compiler_env",
+    srcs = ["in_process_client_compiler_env.py"],
+    visibility = ["//compiler_gym:__subpackages__"],
+    deps = [
+        ":compilation_session",
+        ":connection",
+        "//compiler_gym:compiler_env_state",
+        "//compiler_gym:validation_result",
+        "//compiler_gym/datasets",
+        "//compiler_gym/envs:compiler_env",
+        "//compiler_gym/errors",
+        "//compiler_gym/service/proto",
+        "//compiler_gym/spaces",
+        "//compiler_gym/util",
+        "//compiler_gym/views",
+    ],
+)
+
+py_library(
     name = "service_cache",
     srcs = ["service_cache.py"],
     visibility = ["//visibility:public"],

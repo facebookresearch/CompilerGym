@@ -15,7 +15,7 @@ import examples.loop_optimizations_service as loop_optimizations_service
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.errors import SessionNotFound
 from compiler_gym.service.client_service_compiler_env import ClientServiceCompilerEnv
-from compiler_gym.spaces import Dict, NamedDiscrete, Scalar, Sequence
+from compiler_gym.spaces import ActionSpace, Dict, NamedDiscrete, Scalar, Sequence
 from compiler_gym.third_party.autophase import AUTOPHASE_FEATURE_NAMES
 from tests.test_main import main
 
@@ -64,20 +64,22 @@ def test_versions(env: ClientServiceCompilerEnv):
 def test_action_space(env: CompilerEnv):
     """Test that the environment reports the service's action spaces."""
     assert env.action_spaces == [
-        NamedDiscrete(
-            name="loop-opt",
-            items=[
-                "--loop-unroll --unroll-count=2",
-                "--loop-unroll --unroll-count=4",
-                "--loop-unroll --unroll-count=8",
-                "--loop-unroll --unroll-count=16",
-                "--loop-unroll --unroll-count=32",
-                "--loop-vectorize -force-vector-width=2",
-                "--loop-vectorize -force-vector-width=4",
-                "--loop-vectorize -force-vector-width=8",
-                "--loop-vectorize -force-vector-width=16",
-                "--loop-vectorize -force-vector-width=32",
-            ],
+        ActionSpace(
+            NamedDiscrete(
+                name="loop-opt",
+                items=[
+                    "--loop-unroll --unroll-count=2",
+                    "--loop-unroll --unroll-count=4",
+                    "--loop-unroll --unroll-count=8",
+                    "--loop-unroll --unroll-count=16",
+                    "--loop-unroll --unroll-count=32",
+                    "--loop-vectorize -force-vector-width=2",
+                    "--loop-vectorize -force-vector-width=4",
+                    "--loop-vectorize -force-vector-width=8",
+                    "--loop-vectorize -force-vector-width=16",
+                    "--loop-vectorize -force-vector-width=32",
+                ],
+            )
         )
     ]
 

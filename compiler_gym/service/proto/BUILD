@@ -18,6 +18,7 @@ py_library(
     deps = [
         ":compiler_gym_service_py",
         ":compiler_gym_service_py_grpc",
+        "//compiler_gym/spaces:action_space",
         "//compiler_gym/spaces:box",
         "//compiler_gym/spaces:commandline",
         "//compiler_gym/spaces:dict",

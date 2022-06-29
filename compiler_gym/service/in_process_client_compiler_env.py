@@ -6,13 +6,15 @@
 interface as a gRPC client service."""
 import logging
 import numbers
+import random
+import shutil
 import warnings
-from collections.abc import Iterable as IterableType
 from copy import deepcopy
+from datetime import datetime
 from math import isclose
 from pathlib import Path
 from time import time
-from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Type, Union
 
 import numpy as np
 from gym.spaces import Space
@@ -21,36 +23,21 @@ from compiler_gym.compiler_env_state import CompilerEnvState
 from compiler_gym.datasets import Benchmark, Dataset, Datasets
 from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.envs.compiler_env import CompilerEnv
-from compiler_gym.errors import (
-    ServiceError,
-    ServiceIsClosed,
-    ServiceOSError,
-    ServiceTransportError,
-    SessionNotFound,
-    ValidationError,
-)
-from compiler_gym.service import CompilerGymServiceConnection, ConnectionOpts
+from compiler_gym.errors import ValidationError
+from compiler_gym.service import CompilationSession
 from compiler_gym.service.proto import ActionSpace as ActionSpaceProto
-from compiler_gym.service.proto import AddBenchmarkRequest
 from compiler_gym.service.proto import Benchmark as BenchmarkProto
-from compiler_gym.service.proto import (
-    EndSessionReply,
-    EndSessionRequest,
-    Event,
-    ForkSessionReply,
-    ForkSessionRequest,
-    GetVersionReply,
-    GetVersionRequest,
-    SendSessionParameterReply,
-    SendSessionParameterRequest,
-    SessionParameter,
-    StartSessionRequest,
-    StepReply,
-    StepRequest,
-    py_converters,
+from compiler_gym.service.proto import Event, GetVersionReply
+from compiler_gym.service.proto import NamedDiscreteSpace as NamedDiscreteSpaceProto
+from compiler_gym.service.proto import ObservationSpace as ObservationSpaceProto
+from compiler_gym.service.proto import Space as SpaceProto
+from compiler_gym.service.proto import py_converters
+from compiler_gym.spaces import (
+    ActionSpace,
+    DefaultRewardFromObservation,
+    NamedDiscrete,
+    Reward,
 )
-from compiler_gym.spaces import ActionSpace, DefaultRewardFromObservation, Reward
-from compiler_gym.util.decorators import memoized_property
 from compiler_gym.util.gym_type_hints import (
     ActionType,
     ObservationType,
@@ -58,30 +45,19 @@ from compiler_gym.util.gym_type_hints import (
     RewardType,
     StepType,
 )
-from compiler_gym.util.shell_format import plural
+from compiler_gym.util.runfiles_path import transient_cache_path
 from compiler_gym.util.timer import Timer
+from compiler_gym.util.version import __version__
 from compiler_gym.validation_result import ValidationResult
 from compiler_gym.views import ObservationSpaceSpec, ObservationView, RewardView
 
 logger = logging.getLogger(__name__)
 
 
-def _wrapped_step(
-    service: CompilerGymServiceConnection, request: StepRequest, timeout: float
-) -> StepReply:
-    """Call the Step() RPC endpoint."""
-    try:
-        return service(service.stub.Step, request, timeout=timeout)
-    except FileNotFoundError as e:
-        if str(e).startswith("Session not found"):
-            raise SessionNotFound(str(e))
-        raise
-
-
 class ServiceMessageConverters:
     """Allows for customization of conversion to/from gRPC messages for the
-    :class:`ClientServiceCompilerEnv
-    <compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv>`.
+    :class:`InProcessClientCompilerEnv
+    <compiler_gym.service.client_service_compiler_env.InProcessClientCompilerEnv>`.
 
     Supports conversion customizations:
 
@@ -116,18 +92,43 @@ class ServiceMessageConverters:
         )
 
 
-class ClientServiceCompilerEnv(CompilerEnv):
+def make_working_directory(session_type: Type[CompilationSession]) -> Path:
+    random_hash = random.getrandbits(16)
+    timestamp = datetime.now().strftime(f"s/%m%dT%H%M%S-%f-{random_hash:04x}")
+    working_directory = transient_cache_path(f"s/{session_type.__name__}-{timestamp}")
+    logger.debug(
+        "Created working directory for compilation session: %s", working_directory
+    )
+    return working_directory
+
+
+def action_space_to_proto(action_space: ActionSpace) -> ActionSpaceProto:
+    # TODO(cummins): This needs to be a true reverse mapping from python to
+    # proto. Currently it's hardcoded to work only for named discrete spaces.
+    return ActionSpaceProto(
+        name=action_space.name,
+        space=SpaceProto(
+            named_discrete=NamedDiscreteSpaceProto(name=action_space.names)
+        ),
+    )
+
+
+class InProcessClientCompilerEnv(CompilerEnv):
     """Implementation of :class:`CompilerEnv <compiler_gym.envs.CompilerEnv>`
-    using gRPC for client-server communication.
+    for Python services that run in the same process.
 
-    :ivar service: A connection to the underlying compiler service.
-
-    :vartype service: compiler_gym.service.CompilerGymServiceConnection
+    This uses the same protocol buffer interface as
+    :class:`InProcessClientCompilerEnv
+    <compiler_gym.service.InProcessClientCompilerEnv>`, but without the overhead
+    of running a gRPC service. The tradeoff is reduced robustness in the face of
+    compiler errors, and the inability to run the service on a different
+    machine.
     """
 
     def __init__(
         self,
-        service: Union[str, Path],
+        session_type: Type[CompilationSession],
+        session: Optional[CompilationSession] = None,
         rewards: Optional[List[Reward]] = None,
         datasets: Optional[Iterable[Dataset]] = None,
         benchmark: Optional[Union[str, Benchmark]] = None,
@@ -136,18 +137,11 @@ class ClientServiceCompilerEnv(CompilerEnv):
         action_space: Optional[str] = None,
         derived_observation_spaces: Optional[List[Dict[str, Any]]] = None,
         service_message_converters: ServiceMessageConverters = None,
-        connection_settings: Optional[ConnectionOpts] = None,
-        service_connection: Optional[CompilerGymServiceConnection] = None,
     ):
         """Construct and initialize a CompilerGym environment.
 
         In normal use you should use :code:`gym.make(...)` rather than calling
         the constructor directly.
-
-        :param service: The hostname and port of a service that implements the
-            CompilerGym service interface, or the path of a binary file which
-            provides the CompilerGym service interface when executed. See
-            :doc:`/compiler_gym/service` for details.
 
         :param rewards: The reward spaces that this environment supports.
             Rewards are typically calculated based on observations generated by
@@ -166,7 +160,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
             <compiler_gym.views.ObservationSpaceSpec>`. If not provided,
             :func:`step()` returns :code:`None` for the observation value. Can
             be set later using :meth:`env.observation_space
-            <compiler_gym.envs.ClientServiceCompilerEnv.observation_space>`. For available
+            <compiler_gym.envs.InProcessClientCompilerEnv.observation_space>`. For available
             spaces, see :class:`env.observation.spaces
             <compiler_gym.views.ObservationView>`.
 
@@ -175,7 +169,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
             <compiler_gym.spaces.Reward>`. If not provided, :func:`step()`
             returns :code:`None` for the reward value. Can be set later using
             :meth:`env.reward_space
-            <compiler_gym.envs.ClientServiceCompilerEnv.reward_space>`. For available spaces,
+            <compiler_gym.envs.InProcessClientCompilerEnv.reward_space>`. For available spaces,
             see :class:`env.reward.spaces <compiler_gym.views.RewardView>`.
 
         :param action_space: The name of the action space to use. If not
@@ -199,19 +193,10 @@ class ClientServiceCompilerEnv(CompilerEnv):
         :raises TimeoutError: If the compiler service fails to initialize within
             the parameters provided in :code:`connection_settings`.
         """
+        self.session_type = session_type
+
         self.metadata = {"render.modes": ["human", "ansi"]}
 
-        # A compiler service supports multiple simultaneous environments. This
-        # session ID is used to identify this environment.
-        self._session_id: Optional[int] = None
-
-        self._service_endpoint: Union[str, Path] = service
-        self._connection_settings = connection_settings or ConnectionOpts()
-
-        self.service = service_connection or CompilerGymServiceConnection(
-            endpoint=self._service_endpoint,
-            opts=self._connection_settings,
-        )
         self._datasets = Datasets(datasets or [])
 
         self.action_space_name = action_space
@@ -219,7 +204,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
         # If no reward space is specified, generate some from numeric observation spaces
         rewards = rewards or [
             DefaultRewardFromObservation(obs.name)
-            for obs in self.service.observation_spaces
+            for obs in self.session_type.observation_spaces
             if obs.default_observation.WhichOneof("value")
             and isinstance(
                 getattr(
@@ -255,7 +240,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
             self._benchmark_in_use = self._next_benchmark
         except StopIteration:
             # StopIteration raised on next(self.datasets.benchmarks()) if there
-            # are no benchmarks available. This is to allow ClientServiceCompilerEnv to be
+            # are no benchmarks available. This is to allow InProcessClientCompilerEnv to be
             # used without any datasets by setting a benchmark before/during the
             # first reset() call.
             pass
@@ -269,19 +254,19 @@ class ClientServiceCompilerEnv(CompilerEnv):
         # Process the available action, observation, and reward spaces.
         self.action_spaces = [
             self.service_message_converters.action_space_converter(space)
-            for space in self.service.action_spaces
+            for space in self.session_type.action_spaces
         ]
 
         self.observation = self._observation_view_type(
-            raw_step=self.raw_step,
-            spaces=self.service.observation_spaces,
+            raw_step=self.multistep,
+            spaces=self.session_type.observation_spaces,
         )
         self.reward = self._reward_view_type(rewards, self.observation)
 
         # Register any derived observation spaces now so that the observation
         # space can be set below.
         for derived_observation_space in derived_observation_spaces or []:
-            self.observation.add_derived_space(**derived_observation_space)
+            self.observation.add_derived_space_internal(**derived_observation_space)
 
         self.action_space: Optional[Space] = None
         self.observation_space: Optional[Space] = None
@@ -297,6 +282,21 @@ class ClientServiceCompilerEnv(CompilerEnv):
         self.reward_space_spec = None
         self.observation_space = observation_space
         self.reward_space = reward_space
+
+        self.working_directory: Optional[Path] = None
+        self.session: Optional[CompilationSession] = session
+
+    def close(self):
+        if self.working_directory:
+            shutil.rmtree(self.working_directory, ignore_errors=True)
+            self.working_directory = None
+
+    def __del__(self):
+        # Don't let the service be orphaned if user forgot to close(), or
+        # if an exception was thrown. The conditional guard is because this
+        # may be called in case of early error.
+        if hasattr(self, "service") and getattr(self, "service"):
+            self.close()
 
     @property
     def observation_space_spec(self) -> ObservationSpaceSpec:
@@ -344,10 +344,13 @@ class ClientServiceCompilerEnv(CompilerEnv):
     def actions(self) -> List[ActionType]:
         return self._actions
 
-    @memoized_property
+    @property
     def versions(self) -> GetVersionReply:
         """Get the version numbers from the compiler service."""
-        return self.service(self.service.stub.GetVersion, GetVersionRequest())
+        return GetVersionReply(
+            service_version=__version__,
+            compiler_version=self.session_type.compiler_version,
+        )
 
     @property
     def version(self) -> str:
@@ -373,18 +376,18 @@ class ClientServiceCompilerEnv(CompilerEnv):
         )
 
     @property
-    def action_space(self) -> ActionSpace:
+    def action_space(self) -> Space:
         return self._action_space
 
     @action_space.setter
-    def action_space(self, action_space: Optional[str]) -> None:
+    def action_space(self, action_space: Optional[str]):
         self.action_space_name = action_space
         index = (
             [a.name for a in self.action_spaces].index(action_space)
             if self.action_space_name
             else 0
         )
-        self._action_space: ActionSpace = self.action_spaces[index]
+        self._action_space: NamedDiscrete = self.action_spaces[index]
 
     @property
     def action_spaces(self) -> List[str]:
@@ -400,10 +403,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
 
     @benchmark.setter
     def benchmark(self, benchmark: Union[str, Benchmark, BenchmarkUri]):
-        if self.in_episode:
-            warnings.warn(
-                "Changing the benchmark has no effect until reset() is called"
-            )
+        warnings.warn("Changing the benchmark has no effect until reset() is called")
         if isinstance(benchmark, str):
             benchmark_object = self.datasets.benchmark(benchmark)
             logger.debug("Setting benchmark by name: %s", benchmark_object)
@@ -442,9 +442,8 @@ class ClientServiceCompilerEnv(CompilerEnv):
                 self.reward_space_spec.min,
                 self.reward_space_spec.max,
             )
-            # Reset any cumulative rewards, if we're in an episode.
-            if self.in_episode:
-                self.episode_reward = 0
+            # Reset any cumulative rewards.
+            self.episode_reward = 0
         else:
             # If no reward space is being used then set the reward range to
             # unbounded.
@@ -462,10 +461,6 @@ class ClientServiceCompilerEnv(CompilerEnv):
     @reward.setter
     def reward(self, reward: RewardView) -> None:
         self._reward = reward
-
-    @property
-    def in_episode(self) -> bool:
-        return self._session_id is not None
 
     @property
     def observation_space(self) -> Optional[Space]:
@@ -495,33 +490,18 @@ class ClientServiceCompilerEnv(CompilerEnv):
         environment.
         """
         return {
+            "session_type": self.session_type,
             "action_space": self.action_space,
             "benchmark": self.benchmark,
             "connection_settings": self._connection_settings,
-            "service": self._service_endpoint,
         }
 
-    def fork(self) -> "ClientServiceCompilerEnv":
-        if not self.in_episode:
-            actions = self.actions.copy()
-            self.reset()
-            if actions:
-                logger.warning("Parent service of fork() has died, replaying state")
-                _, _, done, _ = self.multistep(actions)
-                assert not done, "Failed to replay action sequence"
-
-        request = ForkSessionRequest(session_id=self._session_id)
+    def fork(self) -> "InProcessClientCompilerEnv":
         try:
-            reply: ForkSessionReply = self.service(
-                self.service.stub.ForkSession, request
-            )
+            new_session: CompilationSession = self.session.fork()
 
             # Create a new environment that shares the connection.
-            new_env = type(self)(**self._init_kwargs(), service_connection=self.service)
-
-            # Set the session ID.
-            new_env._session_id = reply.session_id  # pylint: disable=protected-access
-            new_env.observation.session_id = reply.session_id
+            new_env = type(self)(**self._init_kwargs(), session=new_session)
 
             # Now that we have initialized the environment with the current
             # state, set the benchmark so that calls to new_env.reset() will
@@ -562,43 +542,6 @@ class ClientServiceCompilerEnv(CompilerEnv):
 
         return new_env
 
-    def close(self):
-        # Try and close out the episode, but errors are okay.
-        close_service = True
-        if self.in_episode:
-            try:
-                reply: EndSessionReply = self.service(
-                    self.service.stub.EndSession,
-                    EndSessionRequest(session_id=self._session_id),
-                )
-                # The service still has other sessions attached so we should
-                # not kill it.
-                if reply.remaining_sessions:
-                    close_service = False
-            except ServiceIsClosed:
-                # This error can be safely ignored as it means that the service
-                # is already offline.
-                pass
-            except Exception as e:
-                logger.warning(
-                    "Failed to end active compiler session on close(): %s (%s)",
-                    e,
-                    type(e).__name__,
-                )
-            self._session_id = None
-
-        if self.service and close_service:
-            self.service.close()
-
-        self.service = None
-
-    def __del__(self):
-        # Don't let the service be orphaned if user forgot to close(), or
-        # if an exception was thrown. The conditional guard is because this
-        # may be called in case of early error.
-        if hasattr(self, "service") and getattr(self, "service"):
-            self.close()
-
     def reset(
         self,
         benchmark: Optional[Union[str, Benchmark]] = None,
@@ -611,80 +554,14 @@ class ClientServiceCompilerEnv(CompilerEnv):
         ] = OptionalArgumentValue.UNCHANGED,
         timeout: Optional[float] = 300,
     ) -> Optional[ObservationType]:
-        return self._reset(
-            benchmark=benchmark,
-            action_space=action_space,
-            observation_space=observation_space,
-            reward_space=reward_space,
-            timeout=timeout,
-            retry_count=0,
-        )
-
-    def _reset(  # pylint: disable=arguments-differ
-        self,
-        benchmark: Optional[Union[str, Benchmark]],
-        action_space: Optional[str],
-        observation_space: Union[OptionalArgumentValue, str, ObservationSpaceSpec],
-        reward_space: Union[OptionalArgumentValue, str, Reward],
-        timeout: Optional[float],
-        retry_count: int,
-    ) -> Optional[ObservationType]:
-        """Private implementation detail. Call `reset()`, not this."""
+        shutil.rmtree(self.working_directory, ignore_errors=True)
+        self.working_directory = make_working_directory(self.session_type)
 
         if observation_space != OptionalArgumentValue.UNCHANGED:
             self.observation_space = observation_space
 
         if reward_space != OptionalArgumentValue.UNCHANGED:
             self.reward_space = reward_space
-
-        def _retry(error) -> Optional[ObservationType]:
-            """Abort and retry on error."""
-            # Log the error that we are recovering from, but treat
-            # ServiceIsClosed errors as unimportant since we know what causes
-            # them.
-            log_severity = (
-                logger.debug if isinstance(error, ServiceIsClosed) else logger.warning
-            )
-            log_severity("%s during reset(): %s", type(error).__name__, error)
-
-            if self.service:
-                try:
-                    self.service.close()
-                except ServiceError as e:
-                    # close() can raise ServiceError if the service exists with
-                    # a non-zero return code. We swallow the error here as we
-                    # are about to retry.
-                    logger.debug(
-                        "Ignoring service error during reset() attempt: %s (%s)",
-                        e,
-                        type(e).__name__,
-                    )
-            self.service = None
-
-            if retry_count >= self._connection_settings.init_max_attempts:
-                raise OSError(
-                    "Failed to reset environment using benchmark "
-                    f"{self.benchmark} after {retry_count - 1} attempts.\n"
-                    f"Last error ({type(error).__name__}): {error}"
-                ) from error
-            else:
-                return self._reset(
-                    benchmark=benchmark,
-                    action_space=action_space,
-                    observation_space=observation_space,
-                    reward_space=reward_space,
-                    timeout=timeout,
-                    retry_count=retry_count + 1,
-                )
-
-        def _call_with_error(
-            stub_method, *args, **kwargs
-        ) -> Tuple[Optional[Exception], Optional[Any]]:
-            """Call the given stub method. And return an <error, return> tuple."""
-            try:
-                return None, self.service(stub_method, *args, **kwargs)
-            except (ServiceError, ServiceTransportError, TimeoutError) as e:
-                return e, None
 
         if not self._next_benchmark:
             raise TypeError(
@@ -693,297 +570,51 @@ class ClientServiceCompilerEnv(CompilerEnv):
                 "access the available benchmarks."
             )
 
-        # Start a new service if required.
-        if self.service is None:
-            self.service = CompilerGymServiceConnection(
-                self._service_endpoint, self._connection_settings
-            )
-
         self.action_space_name = action_space or self.action_space_name
-
-        # Stop an existing episode.
-        if self.in_episode:
-            logger.debug("Ending session %d", self._session_id)
-            error, _ = _call_with_error(
-                self.service.stub.EndSession,
-                EndSessionRequest(session_id=self._session_id),
-            )
-            if error:
-                logger.warning(
-                    "Failed to stop session %d with %s: %s",
-                    self._session_id,
-                    type(error).__name__,
-                    error,
-                )
-            self._session_id = None
 
         # Update the user requested benchmark, if provided.
         if benchmark:
             self.benchmark = benchmark
         self._benchmark_in_use = self._next_benchmark
+        self._benchmark_in_use_proto = self._benchmark_in_use.proto
 
-        # When always_send_benchmark_on_reset option is enabled, the entire
-        # benchmark program is sent with every StartEpisode request. Otherwise
-        # only the URI of the benchmark is sent. In cases where benchmarks are
-        # reused between calls to reset(), sending the URI is more efficient as
-        # the service can cache the benchmark. In cases where reset() is always
-        # called with a different benchmark, this causes unnecessary roundtrips
-        # as every StartEpisodeRequest receives a FileNotFound response.
-        if self.service.opts.always_send_benchmark_on_reset:
-            self._benchmark_in_use_proto = self._benchmark_in_use.proto
-        else:
-            self._benchmark_in_use_proto.uri = str(self._benchmark_in_use.uri)
-
-        start_session_request = StartSessionRequest(
+        self.session = self.session_type(
+            working_directory=self.working_directory,
+            action_space=action_space_to_proto(self.action_space),
             benchmark=self._benchmark_in_use_proto,
-            action_space=(
-                [a.name for a in self.action_spaces].index(self.action_space_name)
-                if self.action_space_name
-                else 0
-            ),
-            observation_space=(
-                [self.observation_space_spec.index] if self.observation_space else None
-            ),
         )
 
-        try:
-            error, reply = _call_with_error(
-                self.service.stub.StartSession, start_session_request
-            )
-            if error:
-                return _retry(error)
-        except FileNotFoundError:
-            # The benchmark was not found, so try adding it and then repeating
-            # the request.
-            error, _ = _call_with_error(
-                self.service.stub.AddBenchmark,
-                AddBenchmarkRequest(benchmark=[self._benchmark_in_use.proto]),
-            )
-            if error:
-                return _retry(error)
-            error, reply = _call_with_error(
-                self.service.stub.StartSession, start_session_request
-            )
-            if error:
-                return _retry(error)
-
-        self._session_id = reply.session_id
-        self.observation.session_id = reply.session_id
         self.reward.get_cost = self.observation.__getitem__
         self.episode_start_time = time()
         self._actions = []
-
-        # If the action space has changed, update it.
-        if reply.HasField("new_action_space"):
-            self._action_space = self.service_message_converters.action_space_converter(
-                reply.new_action_space
-            )
 
         self.reward.reset(benchmark=self.benchmark, observation_view=self.observation)
         if self.reward_space:
             self.episode_reward = 0.0
 
         if self.observation_space:
-            if len(reply.observation) != 1:
-                raise OSError(
-                    f"Expected one observation from service, received {len(reply.observation)}"
-                )
             return self.observation.spaces[self.observation_space_spec.id].translate(
-                reply.observation[0]
-            )
-
-    def raw_step(
-        self,
-        actions: Iterable[ActionType],
-        observation_spaces: List[ObservationSpaceSpec],
-        reward_spaces: List[Reward],
-        timeout: Optional[float] = 300,
-    ) -> StepType:
-        """Take a step.
-
-        :param actions: A list of actions to be applied.
-
-        :param observations: A list of observations spaces to compute
-            observations from. These are evaluated after the actions are
-            applied.
-
-        :param rewards: A list of reward spaces to compute rewards from. These
-            are evaluated after the actions are applied.
-
-        :return: A tuple of observations, rewards, done, and info. Observations
-            and rewards are lists.
-
-        :raises SessionNotFound: If :meth:`reset()
-            <compiler_gym.envs.ClientServiceCompilerEnv.reset>` has not been called.
-
-        .. warning::
-
-            Don't call this method directly, use :meth:`step()
-            <compiler_gym.envs.ClientServiceCompilerEnv.step>` or :meth:`multistep()
-            <compiler_gym.envs.ClientServiceCompilerEnv.multistep>` instead. The
-            :meth:`raw_step() <compiler_gym.envs.ClientServiceCompilerEnv.step>` method is an
-            implementation detail.
-        """
-        if not self.in_episode:
-            raise SessionNotFound("Must call reset() before step()")
-
-        reward_observation_spaces: List[ObservationSpaceSpec] = []
-        for reward_space in reward_spaces:
-            reward_observation_spaces += [
-                self.observation.spaces[obs] for obs in reward_space.observation_spaces
-            ]
-
-        observations_to_compute: List[ObservationSpaceSpec] = list(
-            set(observation_spaces).union(set(reward_observation_spaces))
-        )
-        observation_space_index_map: Dict[ObservationSpaceSpec, int] = {
-            observation_space: i
-            for i, observation_space in enumerate(observations_to_compute)
-        }
-
-        # Record the actions.
-        self._actions += actions
-
-        # Send the request to the backend service.
-        request = StepRequest(
-            session_id=self._session_id,
-            action=[
-                self.service_message_converters.action_converter(a) for a in actions
-            ],
-            observation_space=[
-                observation_space.index for observation_space in observations_to_compute
-            ],
-        )
-        try:
-            reply = _wrapped_step(self.service, request, timeout)
-        except (
-            ServiceError,
-            ServiceTransportError,
-            ServiceOSError,
-            TimeoutError,
-            SessionNotFound,
-        ) as e:
-            # Gracefully handle "expected" error types. These non-fatal errors
-            # end the current episode and provide some diagnostic information to
-            # the user through the `info` dict.
-            info = {
-                "error_type": type(e).__name__,
-                "error_details": str(e),
-            }
-
-            try:
-                self.close()
-            except ServiceError as e:
-                # close() can raise ServiceError if the service exists with a
-                # non-zero return code. We swallow the error here but propagate
-                # the diagnostic message.
-                info[
-                    "error_details"
-                ] += f". Additional error during environment closing: {e}"
-
-            default_observations = [
-                observation_space.default_value
-                for observation_space in observation_spaces
-            ]
-            default_rewards = [
-                float(reward_space.reward_on_error(self.episode_reward))
-                for reward_space in reward_spaces
-            ]
-            return default_observations, default_rewards, True, info
-
-        # If the action space has changed, update it.
-        if reply.HasField("new_action_space"):
-            self._action_space = self.service_message_converters.action_space_converter(
-                reply.new_action_space
-            )
-
-        # Translate observations to python representations.
-        if len(reply.observation) != len(observations_to_compute):
-            raise ServiceError(
-                f"Requested {len(observations_to_compute)} observations "
-                f"but received {len(reply.observation)}"
-            )
-        computed_observations = [
-            observation_space.translate(value)
-            for observation_space, value in zip(
-                observations_to_compute, reply.observation
-            )
-        ]
-
-        # Get the user-requested observation.
-        observations: List[ObservationType] = [
-            computed_observations[observation_space_index_map[observation_space]]
-            for observation_space in observation_spaces
-        ]
-
-        # Update and compute the rewards.
-        rewards: List[RewardType] = []
-        for reward_space in reward_spaces:
-            reward_observations = [
-                computed_observations[
-                    observation_space_index_map[
-                        self.observation.spaces[observation_space]
-                    ]
-                ]
-                for observation_space in reward_space.observation_spaces
-            ]
-            rewards.append(
-                float(
-                    reward_space.update(actions, reward_observations, self.observation)
+                self.session.get_observation(
+                    ObservationSpaceProto(name=self.observation_space_spec.id)
                 )
             )
 
-        info = {
-            "action_had_no_effect": reply.action_had_no_effect,
-            "new_action_space": reply.HasField("new_action_space"),
-        }
-
-        return observations, rewards, reply.end_of_session, info
+    @property
+    def in_episode(self) -> bool:
+        return self.session is not None
 
     def step(
         self,
         action: ActionType,
         observation_spaces: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
         reward_spaces: Optional[Iterable[Union[str, Reward]]] = None,
-        observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
-        rewards: Optional[Iterable[Union[str, Reward]]] = None,
         timeout: Optional[float] = 300,
     ) -> StepType:
         """:raises SessionNotFound: If :meth:`reset()
-        <compiler_gym.envs.ClientServiceCompilerEnv.reset>` has not been called.
+        <compiler_gym.envs.InProcessClientCompilerEnv.reset>` has not been called.
         """
-        if isinstance(action, IterableType):
-            warnings.warn(
-                "Argument `action` of ClientServiceCompilerEnv.step no longer accepts a list "
-                " of actions. Please use ClientServiceCompilerEnv.multistep instead",
-                category=DeprecationWarning,
-            )
-            return self.multistep(
-                action,
-                observation_spaces=observation_spaces,
-                reward_spaces=reward_spaces,
-                observations=observations,
-                rewards=rewards,
-            )
-        if observations is not None:
-            warnings.warn(
-                "Argument `observations` of ClientServiceCompilerEnv.step has been "
-                "renamed `observation_spaces`. Please update your code",
-                category=DeprecationWarning,
-            )
-            observation_spaces = observations
-        if rewards is not None:
-            warnings.warn(
-                "Argument `rewards` of ClientServiceCompilerEnv.step has been renamed "
-                "`reward_spaces`. Please update your code",
-                category=DeprecationWarning,
-            )
-            reward_spaces = rewards
         return self.multistep(
-            actions=[action],
-            observation_spaces=observation_spaces,
-            reward_spaces=reward_spaces,
-            timeout=timeout,
+            [action], observation_spaces, reward_spaces, timeout=timeout
         )
 
     def multistep(
@@ -991,27 +622,11 @@ class ClientServiceCompilerEnv(CompilerEnv):
         actions: Iterable[ActionType],
         observation_spaces: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
         reward_spaces: Optional[Iterable[Union[str, Reward]]] = None,
-        observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
-        rewards: Optional[Iterable[Union[str, Reward]]] = None,
+        timeout: Optional[float] = 300,
     ):
         """:raises SessionNotFound: If :meth:`reset()
-        <compiler_gym.envs.ClientServiceCompilerEnv.reset>` has not been called.
+        <compiler_gym.envs.InProcessClientCompilerEnv.reset>` has not been called.
         """
-        if observations is not None:
-            warnings.warn(
-                "Argument `observations` of ClientServiceCompilerEnv.multistep has been "
-                "renamed `observation_spaces`. Please update your code",
-                category=DeprecationWarning,
-            )
-            observation_spaces = observations
-        if rewards is not None:
-            warnings.warn(
-                "Argument `rewards` of ClientServiceCompilerEnv.multistep has been renamed "
-                "`reward_spaces`. Please update your code",
-                category=DeprecationWarning,
-            )
-            reward_spaces = rewards
-
         # Coerce observation spaces into a list of ObservationSpaceSpec instances.
         if observation_spaces:
             observation_spaces_to_compute: List[ObservationSpaceSpec] = [
@@ -1024,8 +639,10 @@ class ClientServiceCompilerEnv(CompilerEnv):
             observation_spaces_to_compute: List[ObservationSpaceSpec] = [
                 self.observation_space_spec
             ]
+            observation_spaces = [self.observation_space_spec]
         else:
             observation_spaces_to_compute: List[ObservationSpaceSpec] = []
+            observation_spaces = []
 
         # Coerce reward spaces into a list of Reward instances.
         if reward_spaces:
@@ -1035,29 +652,111 @@ class ClientServiceCompilerEnv(CompilerEnv):
             ]
         elif self.reward_space:
             reward_spaces_to_compute: List[Reward] = [self.reward_space]
+            reward_spaces = [self.reward_space]
         else:
             reward_spaces_to_compute: List[Reward] = []
+            reward_spaces = []
 
-        # Perform the underlying environment step.
-        observation_values, reward_values, done, info = self.raw_step(
-            actions, observation_spaces_to_compute, reward_spaces_to_compute
+        reward_observation_spaces: List[ObservationSpaceSpec] = []
+        for reward_space in reward_spaces:
+            reward_observation_spaces += [
+                self.observation.spaces[obs] for obs in reward_space.observation_spaces
+            ]
+
+        observations_to_compute: List[ObservationSpaceSpec] = list(
+            set(observation_spaces).union(set(reward_observation_spaces))
         )
+
+        # Record the actions.
+        self._actions += actions
+
+        done, new_action_space, action_had_no_effect = False, False, True
+        for action in actions:
+            (
+                done,
+                new_new_action_space,
+                new_action_had_no_effect,
+            ) = self.session.apply_action(
+                self.service_message_converters.action_converter(action)
+            )
+            new_action_space |= new_new_action_space is not None
+            action_had_no_effect &= new_action_had_no_effect
+
+            # If the action space has changed, update it.
+            if new_new_action_space:
+                self._action_space = (
+                    self.service_message_converters.action_space_converter(
+                        new_new_action_space
+                    )
+                )
+
+            if done:
+                default_observations = [
+                    observation_space.default_value
+                    for observation_space in observation_spaces
+                ]
+                default_rewards = [
+                    float(reward_space.reward_on_error(self.episode_reward))
+                    for reward_space in reward_spaces
+                ]
+                return (
+                    default_observations,
+                    default_rewards,
+                    True,
+                    {
+                        "episode_ended_by_environment": True,
+                    },
+                )
+
+        # Translate observations to python representations.
+        computed_observations = {
+            observation_space.id: observation_space.translate(
+                self.session.get_observation(
+                    ObservationSpaceProto(name=observation_space.id)
+                )
+            )
+            for observation_space in observations_to_compute
+        }
+
+        # Get the user-requested observation.
+        observations: List[ObservationType] = [
+            computed_observations[observation_space.id]
+            for observation_space in observation_spaces
+        ]
+
+        # Update and compute the rewards.
+        rewards: List[RewardType] = []
+        for reward_space in reward_spaces:
+            reward_observations = [
+                computed_observations[observation_space]
+                for observation_space in reward_space.observation_spaces
+            ]
+            rewards.append(
+                float(
+                    reward_space.update(actions, reward_observations, self.observation)
+                )
+            )
+
+        info = {
+            "action_had_no_effect": action_had_no_effect,
+            "new_action_space": new_action_space,
+        }
 
         # Translate observations lists back to the appropriate types.
         if observation_spaces is None and self.observation_space_spec:
-            observation_values = observation_values[0]
+            observations = observations[0]
         elif not observation_spaces_to_compute:
-            observation_values = None
+            observations = None
 
         # Translate reward lists back to the appropriate types.
         if reward_spaces is None and self.reward_space:
-            reward_values = reward_values[0]
+            rewards = rewards[0]
             # Update the cumulative episode reward
-            self.episode_reward += reward_values
+            self.episode_reward += rewards
         elif not reward_spaces_to_compute:
-            reward_values = None
+            rewards = None
 
-        return observation_values, reward_values, done, info
+        return observations, rewards, done, info
 
     def render(
         self,
@@ -1065,7 +764,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
     ) -> Optional[str]:
         """Render the environment.
 
-        ClientServiceCompilerEnv instances support two render modes: "human", which prints
+        InProcessClientCompilerEnv instances support two render modes: "human", which prints
         the current environment state to the terminal and return nothing; and
         "ansi", which returns a string representation of the current environment
         state.
@@ -1101,9 +800,6 @@ class ClientServiceCompilerEnv(CompilerEnv):
         return RewardView
 
     def apply(self, state: CompilerEnvState) -> None:  # noqa
-        if not self.in_episode:
-            self.reset(benchmark=state.benchmark)
-
         # TODO(cummins): Does this behavior make sense? Take, for example:
         #
         #     >>> env.apply(state)
@@ -1118,6 +814,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
                 f"Applying state from environment for benchmark '{state.benchmark}' "
                 f"to environment for benchmark '{self.benchmark}'"
             )
+            self.reset(benchmark=state.benchmark)
 
         actions = self.action_space.from_string(state.commandline)
         done = False
@@ -1135,8 +832,6 @@ class ClientServiceCompilerEnv(CompilerEnv):
         else:
             state = self.state
             in_place = True
-
-        assert self.in_episode
 
         errors: ValidationError = []
         validation = {
@@ -1226,8 +921,9 @@ class ClientServiceCompilerEnv(CompilerEnv):
     def send_param(self, key: str, value: str) -> str:
         """Send a single <key, value> parameter to the compiler service.
 
-        See :meth:`send_params() <compiler_gym.envs.ClientServiceCompilerEnv.send_params>`
-        for more information.
+        See :meth:`send_params()
+        <compiler_gym.envs.InProcessClientCompilerEnv.send_params>` for more
+        information.
 
         :param key: The parameter key.
 
@@ -1236,9 +932,9 @@ class ClientServiceCompilerEnv(CompilerEnv):
         :return: The response from the compiler service.
 
         :raises SessionNotFound: If called before :meth:`reset()
-            <compiler_gym.envs.ClientServiceCompilerEnv.reset>`.
+            <compiler_gym.envs.InProcessClientCompilerEnv.reset>`.
         """
-        return self.send_params((key, value))[0]
+        return self.session.handle_session_parameter(key, value)
 
     def send_params(self, *params: Iterable[Tuple[str, str]]) -> List[str]:
         """Send a list of <key, value> parameters to the compiler service.
@@ -1251,8 +947,8 @@ class ClientServiceCompilerEnv(CompilerEnv):
         for a specific compiler service to see what parameters, if any, are
         supported.
 
-        Must have called :meth:`reset() <compiler_gym.envs.ClientServiceCompilerEnv.reset>`
-        first.
+        Must have called :meth:`reset()
+        <compiler_gym.envs.InProcessClientCompilerEnv.reset>` first.
 
         :param params: A list of parameters, where each parameter is a
             :code:`(key, value)` tuple.
@@ -1260,32 +956,17 @@ class ClientServiceCompilerEnv(CompilerEnv):
         :return: A list of string responses, one per parameter.
 
         :raises SessionNotFound: If called before :meth:`reset()
-            <compiler_gym.envs.ClientServiceCompilerEnv.reset>`.
+            <compiler_gym.envs.InProcessClientCompilerEnv.reset>`.
         """
-        if not self.in_episode:
-            raise SessionNotFound("Must call reset() before send_params()")
+        return [
+            self.session.handle_session_parameter(key, value) for key, value in params
+        ]
 
-        request = SendSessionParameterRequest(
-            session_id=self._session_id,
-            parameter=[SessionParameter(key=k, value=v) for (k, v) in params],
-        )
-        reply: SendSessionParameterReply = self.service(
-            self.service.stub.SendSessionParameter, request
-        )
-        if len(params) != len(reply.reply):
-            raise OSError(
-                f"Sent {len(params)} {plural(len(params), 'parameter', 'parameters')} but received "
-                f"{len(reply.reply)} {plural(len(reply.reply), 'response', 'responses')} from the "
-                "service"
-            )
-
-        return list(reply.reply)
-
-    def __copy__(self) -> "ClientServiceCompilerEnv":
+    def __copy__(self) -> "InProcessClientCompilerEnv":
         raise TypeError(
-            "ClientServiceCompilerEnv instances do not support shallow copies. Use deepcopy()"
+            "InProcessClientCompilerEnv instances do not support shallow copies. Use deepcopy()"
         )
 
-    def __deepcopy__(self, memo) -> "ClientServiceCompilerEnv":
+    def __deepcopy__(self, memo) -> "InProcessClientCompilerEnv":
         del memo  # unused
         return self.fork()

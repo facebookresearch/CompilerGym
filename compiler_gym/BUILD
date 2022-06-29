@@ -12,7 +12,6 @@ py_library(
     srcs = ["__init__.py"],
     visibility = ["//visibility:public"],
     deps = [
-        ":random_replay",
         ":random_search",
         ":validate",
         "//compiler_gym/bin",
@@ -34,17 +33,6 @@ py_library(
     visibility = ["//compiler_gym:__subpackages__"],
     deps = [
         "//compiler_gym/datasets:uri",
-        "//compiler_gym/util",
-    ],
-)
-
-py_library(
-    name = "random_replay",
-    srcs = ["random_replay.py"],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":random_search",
-        "//compiler_gym/envs",
         "//compiler_gym/util",
     ],
 )

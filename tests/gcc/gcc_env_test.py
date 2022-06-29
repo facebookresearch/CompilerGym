@@ -319,11 +319,14 @@ def test_choices_observation():
 
 
 @with_docker
-def test_commandline():
+def test_action_space_string():
     """Test observation spaces."""
     with gym.make("gcc-v0") as env:
         env.reset()
-        assert env.commandline() == "docker:gcc:11.2.0 -w -c src.c -o obj.o"
+        assert (
+            env.action_space.to_string(env.actions)
+            == "docker:gcc:11.2.0 -w -c src.c -o obj.o"
+        )
 
 
 @with_docker
@@ -341,9 +344,11 @@ def test_set_choices():
     with gym.make("gcc-v0") as env:
         env.reset()
         env.choices = [-1] * len(env.gcc_spec.options)
-        assert env.commandline().startswith("docker:gcc:11.2.0 -w -c src.c -o obj.o")
+        assert env.action_space.to_string(env.actions).startswith(
+            "docker:gcc:11.2.0 -w -c src.c -o obj.o"
+        )
         env.choices = [0] * len(env.gcc_spec.options)
-        assert env.commandline().startswith(
+        assert env.action_space.to_string(env.actions).startswith(
             "docker:gcc:11.2.0 -O0 -faggressive-loop-optimizations -falign-functions -falign-jumps -falign-labels"
         )
 

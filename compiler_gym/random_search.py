@@ -135,7 +135,7 @@ class RandomAgentWorker(Thread):
                 self.best_returns = total_returns
                 self.best_actions = actions.copy()
                 try:
-                    self.best_commandline = env.commandline()
+                    self.best_commandline = env.action_space.to_string(env.actions)
                 except NotImplementedError:
                     self.best_commandline = ""
                 self.best_found_at_time = time()

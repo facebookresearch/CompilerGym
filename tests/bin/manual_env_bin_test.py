@@ -347,7 +347,7 @@ compiler_gym:cbench-v[0-9]+/adpcm>    Depth | Action   | Effect   | Done   |   R
     )
 
 
-def test_commandline():
+def test_actions_string():
     FLAGS.unparse_flags()
     io_check(
         """set_benchmark cbench-v1/adpcm

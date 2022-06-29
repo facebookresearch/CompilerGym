@@ -281,7 +281,7 @@ def _step(request: StepRequest) -> StepReply:
         )
     )
     return StepReply(
-        commandline=env.commandline(),
+        commandline=env.action_space.to_string(env.actions),
         done=done,
         ir=truncate(ir, max_line_len=250, max_lines=1024),
         states=states,

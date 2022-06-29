@@ -2,7 +2,7 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-from typing import Iterable, List, NamedTuple, Union
+from typing import Iterable, List, NamedTuple
 
 from compiler_gym.spaces.named_discrete import NamedDiscrete
 
@@ -65,22 +65,20 @@ class Commandline(NamedDiscrete):
     def __repr__(self) -> str:
         return f"Commandline([{' '.join(self.flags)}])"
 
-    def commandline(self, values: Union[int, Iterable[int]]) -> str:
+    def to_string(self, values: List[int]) -> str:
         """Produce a commandline invocation from a sequence of values.
 
         :param values: A numeric value from the space, or sequence of values.
         :return: A string commandline invocation.
         """
-        if isinstance(values, int):
-            return self.flags[values]
-        else:
-            return " ".join([self.flags[v] for v in values])
+        return " ".join([self.flags[v] for v in values])
 
-    def from_commandline(self, commandline: str) -> List[int]:
+    def from_string(self, commandline: str) -> List[int]:
         """Produce a sequence of actions from a commandline.
 
         :param commandline: A string commandline invocation, as produced by
-            :func:`commandline() <compiler_gym.spaces.commandline.Commandline.commandline>`.
+            :func:`to_string()
+            <compiler_gym.spaces.commandline.Commandline.to_string>`.
         :return: A list of action values.
         :raises LookupError: If any of the flags in the commandline are not
             recognized.

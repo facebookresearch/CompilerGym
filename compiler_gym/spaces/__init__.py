@@ -2,6 +2,7 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
+from compiler_gym.spaces.action_space import ActionSpace
 from compiler_gym.spaces.box import Box
 from compiler_gym.spaces.commandline import Commandline, CommandlineFlag
 from compiler_gym.spaces.dict import Dict
@@ -16,6 +17,7 @@ from compiler_gym.spaces.space_sequence import SpaceSequence
 from compiler_gym.spaces.tuple import Tuple
 
 __all__ = [
+    "ActionSpace",
     "Box",
     "Commandline",
     "CommandlineFlag",
