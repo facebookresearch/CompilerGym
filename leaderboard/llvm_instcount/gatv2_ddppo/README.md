@@ -24,7 +24,7 @@ Not Available
 
 [Result Table](result.csv)
 
-Codesize Reduction (geomean)  : 1.044
+Codesize Reduction (geomean)  : 1.047
 
 Walltime (mean) : 351.611
 
