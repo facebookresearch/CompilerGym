@@ -2,7 +2,7 @@
 
 **tldr;**
 
-Naive approach for Programl.
+Naive approach for Programl [2].
 
 Transform heterogeneous graph to homogeneous graph,
 
