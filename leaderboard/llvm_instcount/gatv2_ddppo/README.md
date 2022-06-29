@@ -10,6 +10,8 @@ by embedding node/edge types to euclidean space.
 
 And the resulting graph encoded with GATv2 [1]
 
+The optimization algorithm is Decentralized Distributed Proximal Policy Optimization(DD-PPO) [3]
+
 ![img.png](img.png)
 
 **Authors**
@@ -103,7 +105,7 @@ RL model is Actor-Critic,
 
 and the loss is PPOv2(clipped gradient version) with shared/unshared encoder.
 
-Model is updated in asynchronous manner.
+Model is updated in asynchronous manner(DD-PPO).
 
 Each benchmark is an episode, episodes are aligned(rolled out) in parallel, as much as our resource allows.
 
@@ -122,3 +124,5 @@ https://tensorboard.dev/experiment/9xr6KYmjRHqgYOyrF7gZIA/#scalars
 [1] https://arxiv.org/abs/2105.14491
 
 [2] https://arxiv.org/abs/2003.10536
+
+[3] https://arxiv.org/abs/1911.00357
