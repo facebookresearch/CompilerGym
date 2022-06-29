@@ -109,6 +109,10 @@ Each benchmark is an episode, episodes are aligned(rolled out) in parallel, as m
 
 This is to remove temporal correlation(just like what replay memory does)
 
+Action space added with terminal action.
+
+Interestingly in some experiments, agent seemed to learn when to terminate.
+
 Uploaded a training procedure, look at `tune/episode_reward_mean` for learning curve :
 
 https://tensorboard.dev/experiment/9xr6KYmjRHqgYOyrF7gZIA/#scalars
