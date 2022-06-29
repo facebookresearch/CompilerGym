@@ -7,7 +7,6 @@ from abc import ABC, abstractmethod
 from typing import Iterable, List, Optional, Tuple, Union
 
 import gym
-from deprecated.sphinx import deprecated
 from gym.spaces import Space
 
 from compiler_gym.compiler_env_state import CompilerEnvState
@@ -180,14 +179,6 @@ class CompilerEnv(gym.Env, ABC):
     @property
     @abstractmethod
     def actions(self) -> List[ActionType]:
-        raise NotImplementedError("abstract method")
-
-    @property
-    @abstractmethod
-    @deprecated(
-        version="0.2.1",
-    )
-    def logger(self):
         raise NotImplementedError("abstract method")
 
     @property

@@ -19,7 +19,6 @@ cg_py_library(
     "filesystem.py"
     "gym_type_hints.py"
     "logging.py"
-    "logs.py"
     "minimize_trajectory.py"
     "parallelization.py"
     "permutation.py"

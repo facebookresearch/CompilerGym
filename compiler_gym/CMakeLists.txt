@@ -26,7 +26,6 @@ cg_py_library(
   SRCS
     "__init__.py"
   DEPS
-    ::random_replay
     ::random_search
     ::validate
     compiler_gym::bin::bin
@@ -49,18 +48,6 @@ cg_py_library(
     "compiler_env_state.py"
   DEPS
     compiler_gym::datasets::uri
-    compiler_gym::util::util
-  PUBLIC
-)
-
-cg_py_library(
-  NAME
-    random_replay
-  SRCS
-    "random_replay.py"
-  DEPS
-    ::random_search
-    compiler_gym::envs::envs
     compiler_gym::util::util
   PUBLIC
 )

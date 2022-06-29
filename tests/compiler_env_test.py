@@ -74,13 +74,6 @@ def test_observation_space_set_in_reset(env: LlvmEnv, observation_space: str):
     assert env.observation_space_spec == observation_space
 
 
-def test_logger_is_deprecated(env: LlvmEnv):
-    with pytest.deprecated_call(
-        match="The `ClientServiceCompilerEnv.logger` attribute is deprecated"
-    ):
-        env.logger
-
-
 def test_uri_substring_no_match(env: LlvmEnv):
     env.reset(benchmark="benchmark://cbench-v1/crc32")
     assert env.benchmark == "benchmark://cbench-v1/crc32"
