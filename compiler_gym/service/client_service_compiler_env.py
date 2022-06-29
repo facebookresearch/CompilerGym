@@ -652,7 +652,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
         observation_space: Union[
             OptionalArgumentValue, str, ObservationSpaceSpec
         ] = OptionalArgumentValue.UNCHANGED,
-        timeout: Optional[float] = 300,
+        timeout: float = 300,
     ) -> Optional[ObservationType]:
         return self._reset(
             benchmark=benchmark,
@@ -669,7 +669,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
         action_space: Optional[str],
         observation_space: Union[OptionalArgumentValue, str, ObservationSpaceSpec],
         reward_space: Union[OptionalArgumentValue, str, Reward],
-        timeout: Optional[float],
+        timeout: float,
         retry_count: int,
     ) -> Optional[ObservationType]:
         """Private implementation detail. Call `reset()`, not this."""
@@ -840,7 +840,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
         actions: Iterable[ActionType],
         observation_spaces: List[ObservationSpaceSpec],
         reward_spaces: List[Reward],
-        timeout: Optional[float] = 300,
+        timeout: float = 300,
     ) -> StepType:
         """Take a step.
 
@@ -990,7 +990,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
         reward_spaces: Optional[Iterable[Union[str, Reward]]] = None,
         observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
         rewards: Optional[Iterable[Union[str, Reward]]] = None,
-        timeout: Optional[float] = 300,
+        timeout: float = 300,
     ) -> StepType:
         """:raises SessionNotFound: If :meth:`reset()
         <compiler_gym.envs.ClientServiceCompilerEnv.reset>` has not been called.
@@ -1036,6 +1036,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
         reward_spaces: Optional[Iterable[Union[str, Reward]]] = None,
         observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
         rewards: Optional[Iterable[Union[str, Reward]]] = None,
+        timeout: float = 300,
     ):
         """:raises SessionNotFound: If :meth:`reset()
         <compiler_gym.envs.ClientServiceCompilerEnv.reset>` has not been called.
@@ -1083,7 +1084,10 @@ class ClientServiceCompilerEnv(CompilerEnv):
 
         # Perform the underlying environment step.
         observation_values, reward_values, done, info = self.raw_step(
-            actions, observation_spaces_to_compute, reward_spaces_to_compute
+            actions,
+            observation_spaces_to_compute,
+            reward_spaces_to_compute,
+            timeout=timeout,
         )
 
         # Translate observations lists back to the appropriate types.
