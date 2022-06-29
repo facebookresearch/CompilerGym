@@ -40,6 +40,15 @@ ClientServiceCompilerEnv
    .. automethod:: __init__
 
 
+InProcessClientCompilerEnv
+--------------------------
+
+.. autoclass:: compiler_gym.service.client_service_compiler_env.InProcessClientCompilerEnv
+   :members:
+
+   .. automethod:: __init__
+
+
 The connection object
 ---------------------
 

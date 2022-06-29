@@ -9,9 +9,9 @@ py_library(
     srcs = [
         "__init__.py",
     ],
-    data = ["//compiler_gym/envs/loop_tool/service"],
     visibility = ["//visibility:public"],
     deps = [
+        "//compiler_gym/envs/loop_tool/service",
         "//compiler_gym/service",
         "//compiler_gym/service:client_service_compiler_env",
         "//compiler_gym/service/proto",

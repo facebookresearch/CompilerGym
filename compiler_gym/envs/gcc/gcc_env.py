@@ -15,8 +15,11 @@ from compiler_gym.datasets import Benchmark
 from compiler_gym.envs.gcc.datasets import get_gcc_datasets
 from compiler_gym.envs.gcc.gcc import Gcc, GccSpec
 from compiler_gym.envs.gcc.gcc_rewards import AsmSizeReward, ObjSizeReward
+from compiler_gym.envs.gcc.service.gcc_service import make_gcc_compilation_session
 from compiler_gym.service import ConnectionOpts
-from compiler_gym.service.client_service_compiler_env import ClientServiceCompilerEnv
+from compiler_gym.service.in_process_client_compiler_env import (
+    InProcessClientCompilerEnv,
+)
 from compiler_gym.spaces import Reward
 from compiler_gym.util.decorators import memoized_property
 from compiler_gym.util.gym_type_hints import ObservationType, OptionalArgumentValue
@@ -26,7 +29,7 @@ from compiler_gym.views import ObservationSpaceSpec
 DEFAULT_GCC: str = "docker:gcc:11.2.0"
 
 
-class GccEnv(ClientServiceCompilerEnv):
+class GccEnv(InProcessClientCompilerEnv):
     """A specialized ClientServiceCompilerEnv for GCC.
 
     This class exposes the optimization space of GCC's command line flags
@@ -81,6 +84,7 @@ class GccEnv(ClientServiceCompilerEnv):
         super().__init__(
             *args,
             **kwargs,
+            make_session=make_gcc_compilation_session(),
             benchmark=benchmark,
             datasets=get_gcc_datasets(
                 gcc_bin=gcc_bin, site_data_base=datasets_site_path

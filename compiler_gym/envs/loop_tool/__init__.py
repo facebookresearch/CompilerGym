@@ -3,18 +3,15 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Register the loop_tool environment and reward."""
-from pathlib import Path
 from typing import Iterable
 
 from compiler_gym.datasets import Benchmark, Dataset, benchmark
 from compiler_gym.datasets.uri import BenchmarkUri
+from compiler_gym.envs.loop_tool.service.loop_tool_compilation_session import (
+    LoopToolCompilationSession,
+)
 from compiler_gym.spaces import Reward
 from compiler_gym.util.registration import register
-from compiler_gym.util.runfiles_path import runfiles_path
-
-LOOP_TOOL_SERVICE_BINARY: Path = runfiles_path(
-    "compiler_gym/envs/loop_tool/service/compiler_gym-loop_tool-service"
-)
 
 
 class FLOPSReward(Reward):
@@ -83,12 +80,12 @@ class LoopToolCPUDataset(Dataset):
 
 register(
     id="loop_tool-v0",
-    entry_point="compiler_gym.service.client_service_compiler_env:ClientServiceCompilerEnv",
+    entry_point="compiler_gym.service.in_process_client_compiler_env:InProcessClientCompilerEnv",
     kwargs={
+        "session_type": LoopToolCompilationSession,
         "datasets": [LoopToolCPUDataset(), LoopToolCUDADataset()],
         "observation_space": "action_state",
         "reward_space": "flops",
         "rewards": [FLOPSReward()],
-        "service": LOOP_TOOL_SERVICE_BINARY,
     },
 )

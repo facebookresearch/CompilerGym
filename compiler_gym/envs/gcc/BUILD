@@ -19,7 +19,7 @@ py_library(
     deps = [
         "//compiler_gym/envs/gcc/datasets",
         "//compiler_gym/errors",
-        "//compiler_gym/service:client_service_compiler_env",
+        "//compiler_gym/service:in_process_client_compiler_env",
         "//compiler_gym/service/runtime",  # Implicit dependency of service.
         "//compiler_gym/util",
     ],

@@ -55,9 +55,9 @@ class CompilationSession:
 
         :param benchmark: The benchmark to use.
         """
-        del action_space  # Subclasses must use this.
-        del benchmark  # Subclasses must use this.
         self.working_dir = working_dir
+        self.action_space = action_space
+        self.benchmark = benchmark
 
     def apply_action(self, action: Action) -> Tuple[bool, Optional[ActionSpace], bool]:
         """Apply an action.
