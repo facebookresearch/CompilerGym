@@ -71,11 +71,11 @@ _logger = logger
 
 
 def _wrapped_step(
-    service: CompilerGymServiceConnection, request: StepRequest
+    service: CompilerGymServiceConnection, request: StepRequest, timeout: float
 ) -> StepReply:
     """Call the Step() RPC endpoint."""
     try:
-        return service(service.stub.Step, request)
+        return service(service.stub.Step, request, timeout=timeout)
     except FileNotFoundError as e:
         if str(e).startswith("Session not found"):
             raise SessionNotFound(str(e))
@@ -139,7 +139,6 @@ class ClientServiceCompilerEnv(CompilerEnv):
         connection_settings: Optional[ConnectionOpts] = None,
         service_connection: Optional[CompilerGymServiceConnection] = None,
         logger: Optional[logging.Logger] = None,
-        timeout: Optional[float] = 300,
     ):
         """Construct and initialize a CompilerGym environment.
 
@@ -195,9 +194,6 @@ class ClientServiceCompilerEnv(CompilerEnv):
         :param service_connection: An existing compiler gym service connection
             to use.
 
-        :param timeout: The maximum number of seconds to wait for an RPC method
-            call to succeed. Accepts a float value. The default is 300 seconds.
-
         :raises FileNotFoundError: If service is a path to a file that is not
             found.
 
@@ -230,8 +226,6 @@ class ClientServiceCompilerEnv(CompilerEnv):
         self._datasets = Datasets(datasets or [])
 
         self.action_space_name = action_space
-
-        self._timeout = timeout
 
         # If no reward space is specified, generate some from numeric observation spaces
         rewards = rewards or [
@@ -548,7 +542,6 @@ class ClientServiceCompilerEnv(CompilerEnv):
             "benchmark": self.benchmark,
             "connection_settings": self._connection_settings,
             "service": self._service_endpoint,
-            "timeout": self._timeout,
         }
 
     def fork(self) -> "ClientServiceCompilerEnv":
@@ -659,7 +652,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
         observation_space: Union[
             OptionalArgumentValue, str, ObservationSpaceSpec
         ] = OptionalArgumentValue.UNCHANGED,
-        timeout: Optional[float] = 300,
+        timeout: float = 300,
     ) -> Optional[ObservationType]:
         return self._reset(
             benchmark=benchmark,
@@ -676,7 +669,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
         action_space: Optional[str],
         observation_space: Union[OptionalArgumentValue, str, ObservationSpaceSpec],
         reward_space: Union[OptionalArgumentValue, str, Reward],
-        timeout: Optional[float],
+        timeout: float,
         retry_count: int,
     ) -> Optional[ObservationType]:
         """Private implementation detail. Call `reset()`, not this."""
@@ -847,7 +840,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
         actions: Iterable[ActionType],
         observation_spaces: List[ObservationSpaceSpec],
         reward_spaces: List[Reward],
-        timeout: Optional[float] = 300,
+        timeout: float = 300,
     ) -> StepType:
         """Take a step.
 
@@ -859,9 +852,6 @@ class ClientServiceCompilerEnv(CompilerEnv):
 
         :param rewards: A list of reward spaces to compute rewards from. These
             are evaluated after the actions are applied.
-
-        :param timeout: The maximum number of seconds to wait for an RPC method
-            call to succeed. Accepts a float value. The default is 300 seconds.
 
         :return: A tuple of observations, rewards, done, and info. Observations
             and rewards are lists.
@@ -894,8 +884,6 @@ class ClientServiceCompilerEnv(CompilerEnv):
             for i, observation_space in enumerate(observations_to_compute)
         }
 
-        self._timeout = timeout
-
         # Record the actions.
         self._actions += actions
 
@@ -910,7 +898,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
             ],
         )
         try:
-            reply = _wrapped_step(self.service, request)
+            reply = _wrapped_step(self.service, request, timeout)
         except (
             ServiceError,
             ServiceTransportError,
@@ -1002,7 +990,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
         reward_spaces: Optional[Iterable[Union[str, Reward]]] = None,
         observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
         rewards: Optional[Iterable[Union[str, Reward]]] = None,
-        timeout: Optional[float] = 300,
+        timeout: float = 300,
     ) -> StepType:
         """:raises SessionNotFound: If :meth:`reset()
         <compiler_gym.envs.ClientServiceCompilerEnv.reset>` has not been called.
@@ -1034,7 +1022,12 @@ class ClientServiceCompilerEnv(CompilerEnv):
                 category=DeprecationWarning,
             )
             reward_spaces = rewards
-        return self.multistep([action], observation_spaces, reward_spaces)
+        return self.multistep(
+            actions=[action],
+            observation_spaces=observation_spaces,
+            reward_spaces=reward_spaces,
+            timeout=timeout,
+        )
 
     def multistep(
         self,
@@ -1043,6 +1036,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
         reward_spaces: Optional[Iterable[Union[str, Reward]]] = None,
         observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
         rewards: Optional[Iterable[Union[str, Reward]]] = None,
+        timeout: float = 300,
     ):
         """:raises SessionNotFound: If :meth:`reset()
         <compiler_gym.envs.ClientServiceCompilerEnv.reset>` has not been called.
@@ -1090,7 +1084,10 @@ class ClientServiceCompilerEnv(CompilerEnv):
 
         # Perform the underlying environment step.
         observation_values, reward_values, done, info = self.raw_step(
-            actions, observation_spaces_to_compute, reward_spaces_to_compute
+            actions,
+            observation_spaces_to_compute,
+            reward_spaces_to_compute,
+            timeout=timeout,
         )
 
         # Translate observations lists back to the appropriate types.
