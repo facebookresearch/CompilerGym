@@ -52,7 +52,6 @@ py_test(
     srcs = ["random_search_test.py"],
     deps = [
         "//compiler_gym",
-        "//compiler_gym:random_replay",
         "//compiler_gym:random_search",
         "//tests:test_main",
         "//tests/pytest_plugins:common",
