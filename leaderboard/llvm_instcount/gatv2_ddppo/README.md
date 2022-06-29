@@ -1,4 +1,4 @@
-# [Graph Attention Network with DDPPO]
+# [Graph Attention Network with DD-PPO]
 
 **tldr;**
 
