@@ -42,13 +42,13 @@ https://github.com/kc-ml2/ml-compiler-optimization
 
 **Did you modify the CompilerGym source code?**
 
-I excluded `ghostscript` from the evaluation, couldn't fit it in our resource, we're trying to find a way to handle it. 
+I excluded `ghostscript` from the evaluation, couldn't fit it in our resource, we're trying to find a way to handle it.
 
 **What parameters does the approach have?**
 
 **What range of values were considered for the above parameters?**
 
-Features are encoded with `torch.nn.Embedding`, which is continuous, dense represenation of categorical variables. 
+Features are encoded with `torch.nn.Embedding`, which is continuous, dense represenation of categorical variables.
 
 ---
 
