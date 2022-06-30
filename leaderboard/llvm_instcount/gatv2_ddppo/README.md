@@ -26,7 +26,7 @@ Not Available
 
 [Result Table](result.csv)
 
-Codesize Reduction (geomean)  : 1.047
+Codesize Reduction (geomean) : 1.047
 
 Walltime (mean) : 351.611
 
@@ -36,7 +36,7 @@ Walltime (mean) : 351.611
 
 **Is the approach Open Source?**
 
-Yes, 
+Yes,
 
 https://github.com/kc-ml2/ml-compiler-optimization
 
