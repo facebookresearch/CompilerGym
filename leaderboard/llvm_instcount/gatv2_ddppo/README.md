@@ -70,12 +70,11 @@ for `Edge Encoder`
 
 Rough guess for for encoding thousands of positions.
 
-Most datasets(source codes) seemed to have less than ~5000 positions, but this is too naive a number. 
+Most datasets(source codes) seemed to have less than ~5000 positions, but this is too naive a number.
 
 `Edge Type Embedding` size 64,
 
 Similar to Node Type
-
 
 ---
 
