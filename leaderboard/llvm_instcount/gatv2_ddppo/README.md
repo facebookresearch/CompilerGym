@@ -101,7 +101,7 @@ The policy is sampled from `torch.distribution.Categorical`
 
 With the encoded features as described above, search state space with RL.
 
-RL model is Actor-Critic, 
+RL model is Actor-Critic,
 
 and the loss is PPOv2(clipped gradient version) with shared/unshared encoder.
 
