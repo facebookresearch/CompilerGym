@@ -28,7 +28,7 @@ Not Available
 
 Codesize Reduction (geomean) : 1.047
 
-Walltime (mean) : 351.611
+Walltime (mean) : 258.149
 
 **CompilerGym version:**
 
