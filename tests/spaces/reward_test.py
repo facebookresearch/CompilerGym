@@ -5,22 +5,8 @@
 """Unit tests for compiler_gym.spaces.Reward."""
 from copy import deepcopy
 
-import pytest
-
 from compiler_gym.spaces import Reward
 from tests.test_main import main
-
-
-def test_reward_id_backwards_compatibility():
-    """Test that Reward.id is backwards compatible with Reward.name.
-
-    See: github.com/facebookresearch/CompilerGym/issues/381
-    """
-    with pytest.warns(DeprecationWarning, match="renamed `name`"):
-        reward = Reward(id="foo")
-
-    assert reward.id == "foo"
-    assert reward.name == "foo"
 
 
 def test_equal():
