@@ -18,7 +18,6 @@ from absl import app, flags
 
 import compiler_gym.util.flags.output_dir  # noqa Flag definition.
 from compiler_gym.random_search import replay_actions_from_logs
-from compiler_gym.util import logs
 from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
 from compiler_gym.util.flags.env_from_flags import env_from_flags
 
@@ -33,7 +32,7 @@ def main(argv):
 
     output_dir = Path(FLAGS.output_dir).expanduser().resolve().absolute()
     assert (
-        output_dir / logs.METADATA_NAME
+        output_dir / "random_search.json"
     ).is_file(), f"Invalid --output_dir: {output_dir}"
 
     with env_from_flags() as env:

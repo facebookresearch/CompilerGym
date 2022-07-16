@@ -12,7 +12,6 @@ from absl import app, flags
 
 import compiler_gym.util.flags.output_dir  # noqa Flag definition.
 from compiler_gym.random_search import RandomSearchProgressLogEntry
-from compiler_gym.util import logs
 from compiler_gym.util.statistics import geometric_mean
 from compiler_gym.util.tabulate import tabulate
 
@@ -32,8 +31,8 @@ def eval_logs(outdir: Path) -> None:
 
     for results_dir in sorted(outdir.iterdir()):
         benchmark = results_dir.name
-        progress_path = results_dir / logs.PROGRESS_LOG_NAME
-        meta_path = results_dir / logs.METADATA_NAME
+        progress_path = results_dir / "random_search_progress.csv"
+        meta_path = results_dir / "random_search.json"
 
         if (
             not results_dir.is_dir()

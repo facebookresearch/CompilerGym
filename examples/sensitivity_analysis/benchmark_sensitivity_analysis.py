@@ -41,7 +41,7 @@ from compiler_gym.envs import CompilerEnv
 from compiler_gym.service.proto import Benchmark
 from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
 from compiler_gym.util.flags.env_from_flags import env_from_flags
-from compiler_gym.util.logs import create_logging_dir
+from compiler_gym.util.runfiles_path import create_user_logs_dir
 from compiler_gym.util.timer import Timer
 
 flags.DEFINE_integer(
@@ -169,7 +169,7 @@ def main(argv):
             benchmarks = islice(env.benchmarks, 100)
 
     logs_dir = Path(
-        FLAGS.output_dir or create_logging_dir("benchmark_sensitivity_analysis")
+        FLAGS.output_dir or create_user_logs_dir("benchmark_sensitivity_analysis")
     )
     rewards_path = logs_dir / f"benchmarks_{FLAGS.reward}.csv"
     runtimes_path = logs_dir / f"benchmarks_{FLAGS.reward}_runtimes.csv"

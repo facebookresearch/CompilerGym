@@ -16,9 +16,8 @@ import humanize
 from compiler_gym import config
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.errors import ServiceError
-from compiler_gym.util import logs
 from compiler_gym.util.gym_type_hints import ActionType
-from compiler_gym.util.logs import create_logging_dir
+from compiler_gym.util.runfiles_path import create_user_logs_dir
 from compiler_gym.util.tabulate import tabulate
 
 if config.enable_llvm_env:
@@ -160,7 +159,7 @@ def random_search(
 
         benchmark_uri = env.benchmark.uri
         if not outdir:
-            outdir = create_logging_dir(
+            outdir = create_user_logs_dir(
                 os.path.normpath(f"random/{benchmark_uri.scheme}/{benchmark_uri.path}")
             )
         outdir = Path(outdir)
@@ -171,10 +170,10 @@ def random_search(
 
         action_space_names = list(env.action_space.names)
 
-        metadata_path = outdir / logs.METADATA_NAME
-        progress_path = outdir / logs.PROGRESS_LOG_NAME
-        best_actions_path = outdir / logs.BEST_ACTIONS_NAME
-        best_commandline_path = outdir / logs.BEST_COMMANDLINE_NAME
+        metadata_path = outdir / "random_search.json"
+        progress_path = outdir / "random_search_progress.csv"
+        best_actions_path = outdir / "random_search_best_actions.txt"
+        best_commandline_path = outdir / "random_search_best_actions_commandline.txt"
 
         if skip_done and metadata_path.is_file():
             # TODO(cummins): Return best reward.
@@ -300,7 +299,7 @@ def random_search(
 
 
 def replay_actions(env: CompilerEnv, action_names: List[str], outdir: Path):
-    logs_path = outdir / logs.BEST_ACTIONS_PROGRESS_NAME
+    logs_path = outdir / "random_search_best_actions_progress.csv"
     start_time = time()
 
     if config.enable_llvm_env:
@@ -351,8 +350,8 @@ def replay_actions(env: CompilerEnv, action_names: List[str], outdir: Path):
 
 
 def replay_actions_from_logs(env: CompilerEnv, logdir: Path, benchmark=None) -> None:
-    best_actions_path = logdir / logs.BEST_ACTIONS_NAME
-    meta_path = logdir / logs.METADATA_NAME
+    best_actions_path = logdir / "random_search_best_actions.txt"
+    meta_path = logdir / "random_search.json"
 
     assert best_actions_path.is_file(), f"File not found: {best_actions_path}"
     assert meta_path.is_file(), f"File not found: {meta_path}"
