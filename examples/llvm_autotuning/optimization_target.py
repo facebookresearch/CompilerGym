@@ -15,6 +15,7 @@ import compiler_gym
 from compiler_gym.datasets import Benchmark
 from compiler_gym.envs import LlvmEnv
 from compiler_gym.wrappers import RuntimePointEstimateReward
+from compiler_gym.wrappers import RuntimeSeriesEstimateReward
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +26,7 @@ class OptimizationTarget(str, Enum):
     CODESIZE = "codesize"
     BINSIZE = "binsize"
     RUNTIME = "runtime"
+    RUNTIME_SERIES = "runtimeseries"
 
     @property
     def optimization_space_enum_name(self) -> str:
@@ -32,6 +34,7 @@ class OptimizationTarget(str, Enum):
             OptimizationTarget.CODESIZE: "IrInstructionCount",
             OptimizationTarget.BINSIZE: "ObjectTextSizeBytes",
             OptimizationTarget.RUNTIME: "Runtime",
+            OptimizationTarget.RUNTIME_SERIES: "RuntimeSeries",
         }[self.value]
 
     def make_env(self, benchmark: Union[str, Benchmark]) -> LlvmEnv:
@@ -50,6 +53,8 @@ class OptimizationTarget(str, Enum):
             env.reward_space = "ObjectTextSizeOz"
         elif self.value == OptimizationTarget.RUNTIME:
             env = RuntimePointEstimateReward(env, warmup_count=0, runtime_count=3)
+        elif self.value == OptimizationTarget.RUNTIME_SERIES:
+            env = RuntimeSeriesEstimateReward(env, warmup_count=5, runtime_count=30)
         else:
             assert False, f"Unknown OptimizationTarget: {self.value}"
 

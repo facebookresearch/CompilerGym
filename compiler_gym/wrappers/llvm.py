@@ -9,6 +9,7 @@ import numpy as np
 
 from compiler_gym.envs.llvm import LlvmEnv
 from compiler_gym.spaces import RuntimeReward
+from compiler_gym.spaces import RuntimeSeriesReward
 from compiler_gym.wrappers import CompilerEnvWrapper
 
 
@@ -66,4 +67,46 @@ class RuntimePointEstimateReward(CompilerEnvWrapper):
             runtime_count=self.reward.spaces["runtime"].runtime_count,
             warmup_count=self.reward.spaces["runtime"].warmup_count,
             estimator=self.reward.spaces["runtime"].estimator,
+        )
+
+class RuntimeSeriesEstimateReward(CompilerEnvWrapper):
+    """TODO: documentation
+    """
+
+    def __init__(
+        self,
+        env: LlvmEnv,
+        runtime_count: int = 30,
+        warmup_count: int = 0,
+    ):
+        """Constructor.
+        :param env: The environment to wrap.
+        :param runtime_count: The number of times to execute the binary when
+            estimating the runtime.
+        :param warmup_count: The number of warmup runs of the binary to perform
+            before measuring the runtime.
+        """
+        super().__init__(env)
+
+        self.env.unwrapped.reward.add_space(
+            RuntimeSeriesReward(
+                runtime_count=runtime_count,
+                warmup_count=warmup_count,
+            )
+        )
+        self.env.unwrapped.reward_space = "runtime"
+
+        self.env.unwrapped.runtime_observation_count = runtime_count
+        self.env.unwrapped.runtime_warmup_runs_count = warmup_count
+
+    def fork(self) -> "RuntimeSeriesEstimateReward":
+        fkd = self.env.fork()
+        # Remove the original "runtime" space so that we that new
+        # RuntimeSeriesEstimateReward wrapper instance does not attempt to
+        # redefine, raising a warning.
+        del fkd.unwrapped.reward.spaces["runtime"]
+        return RuntimeSeriesEstimateReward(
+            env=fkd,
+            runtime_count=self.reward.spaces["runtime"].runtime_count,
+            warmup_count=self.reward.spaces["runtime"].warmup_count,
         )
