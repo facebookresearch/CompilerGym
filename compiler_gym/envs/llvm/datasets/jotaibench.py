@@ -40,7 +40,7 @@ class JotaiBenchDataset(TarDatasetWithManifest):
     Installation
     ------------
 
-    The AnghaBench dataset consists of C functions that are compiled to LLVM-IR
+    The JotaiBench dataset consists of C functions that are compiled to LLVM-IR
     on-demand and cached. The first time each benchmark is used there is an
     overhead of compiling it from C to bitcode. This is a one-off cost.
     """
@@ -56,8 +56,8 @@ class JotaiBenchDataset(TarDatasetWithManifest):
     ):
         manifest_url_, manifest_sha256_ = {
             "linux": (
-                "http://cuda.dcc.ufmg.br/Jotai/src/Jotai_printRetVal.tar.bz2",
-                "7d2c6326036d87a02318e81a29560f9bb4ead3dc33ffbd43e4fb2e95e09dd621",
+                "https://github.com/lac-dcc/jotai-benchmarks/raw/main/benchmarks/programs_no-ub_printableRetVal.bz2",
+                "3657a36b129d462c11d451a5bc9365e73f404a814e8726b383a2d7e64faa3d73",
             ),
         }[sys.platform]
         super().__init__(
@@ -67,15 +67,15 @@ class JotaiBenchDataset(TarDatasetWithManifest):
                 "Paper": "https://homepages.dcc.ufmg.br/~fernando/publications/papers/FaustinoCGO21.pdf",
                 "Homepage": "http://cuda.dcc.ufmg.br/angha/",
             },
-            license="Unknown. See: https://github.com/brenocfg/AnghaBench/issues/1",
+            license="GNU General Public License v3.0 (GPLv3)",
             site_data_base=site_data_base,
             manifest_urls=[manifest_url or manifest_url_],
             manifest_sha256=manifest_sha256 or manifest_sha256_,
             tar_urls=[
-                "http://cuda.dcc.ufmg.br/Jotai/src/Jotai_printRetVal.tar.bz2"
+                "https://github.com/lac-dcc/jotai-benchmarks/raw/main/benchmarks/programs_no-ub_printableRetVal.bz2"
             ],
-            tar_sha256="7d2c6326036d87a02318e81a29560f9bb4ead3dc33ffbd43e4fb2e95e09dd621",
-            strip_prefix="programs_no-ub_printableRetVal",
+            tar_sha256="3657a36b129d462c11d451a5bc9365e73f404a814e8726b383a2d7e64faa3d73",
+            strip_prefix="",
             tar_compression="bz2",
             benchmark_file_suffix=".bc",
             sort_order=sort_order,
@@ -145,13 +145,13 @@ class JotaiBenchRunnableDataset(TarDataset):
                 "Paper": "https://homepages.dcc.ufmg.br/~fernando/publications/papers/FaustinoCGO21.pdf",
                 "Homepage": "http://cuda.dcc.ufmg.br/angha/",
             },
-            license="",  
+            license="GNU General Public License v3.0 (GPLv3)",  
             site_data_base=site_data_base,
             tar_urls=[
-                "http://cuda.dcc.ufmg.br/Jotai/src/Jotai_printRetVal.tar.bz2"
+                "https://github.com/lac-dcc/jotai-benchmarks/raw/main/benchmarks/programs_no-ub_printableRetVal.bz2"
             ],
-            tar_sha256="7d2c6326036d87a02318e81a29560f9bb4ead3dc33ffbd43e4fb2e95e09dd621",  
-            strip_prefix="programs_no-ub_printableRetVal",  
+            tar_sha256="3657a36b129d462c11d451a5bc9365e73f404a814e8726b383a2d7e64faa3d73",  
+            strip_prefix="",  
             tar_compression="bz2",
             benchmark_file_suffix=".c",
         )
