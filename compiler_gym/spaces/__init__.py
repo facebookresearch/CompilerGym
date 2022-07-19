@@ -10,6 +10,7 @@ from compiler_gym.spaces.named_discrete import NamedDiscrete
 from compiler_gym.spaces.permutation import Permutation
 from compiler_gym.spaces.reward import DefaultRewardFromObservation, Reward
 from compiler_gym.spaces.runtime_reward import RuntimeReward
+from compiler_gym.spaces.runtime_series_reward import RuntimeSeriesReward
 from compiler_gym.spaces.scalar import Scalar
 from compiler_gym.spaces.sequence import Sequence
 from compiler_gym.spaces.space_sequence import SpaceSequence
@@ -26,6 +27,7 @@ __all__ = [
     "Permutation",
     "Reward",
     "RuntimeReward",
+    "RuntimeSeriesReward",
     "Scalar",
     "Sequence",
     "SpaceSequence",
