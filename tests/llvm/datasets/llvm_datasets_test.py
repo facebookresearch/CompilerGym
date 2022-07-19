@@ -12,6 +12,7 @@ from tests.test_main import main
 def test_default_dataset_list():
     with gym.make("llvm-v0") as env:
         assert list(d.name for d in env.datasets) == [
+            "benchmark://jotaibench-v1",
             "benchmark://cbench-v1",
             "benchmark://anghabench-v1",
             "benchmark://blas-v0",

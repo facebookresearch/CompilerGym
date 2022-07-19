@@ -61,7 +61,7 @@ class JotaiBenchDataset(TarDatasetWithManifest):
             ),
         }[sys.platform]
         super().__init__(
-            name=name or "benchmark://jotai-v1",
+            name=name or "benchmark://jotaibench-v1",
             description="Compile-only C/C++ functions extracted from GitHub",
             references={
                 "Paper": "https://homepages.dcc.ufmg.br/~fernando/publications/papers/FaustinoCGO21.pdf",
