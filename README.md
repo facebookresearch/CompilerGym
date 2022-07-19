@@ -69,10 +69,6 @@ roadmap](https://github.com/facebookresearch/CompilerGym/projects/1).
 
 ## News & Events
 
-- April 2022: 🏆 We are running the first **code optimization competition** at
-  [MLArchSys'22](https://sites.google.com/view/mlarchsys/isca-2022/compiler-optimization-competition)!
-  All are welcome to participate. Details
-  [here](https://sites.google.com/view/mlarchsys/isca-2022/compiler-optimization-competition).
 - April 2022: ⭐️ CompilerGym wins the **distinguished paper award** at
   [CGO'22](https://conf.researchr.org/home/cgo-2022)! You can read our work
   [here](https://arxiv.org/pdf/2109.08267.pdf).
@@ -150,8 +146,9 @@ environment on the 23 benchmarks in the `cbench-v1` dataset.
 | Facebook                                         | Random search (t=10800) | [write-up](leaderboard/llvm_instcount/random_search/README.md), [results](leaderboard/llvm_instcount/random_search/results_p125_t10800.csv) | 2021-03 | 10,512.356s     | 1.062×                       |
 | Facebook                                         | Random search (t=3600) | [write-up](leaderboard/llvm_instcount/random_search/README.md), [results](leaderboard/llvm_instcount/random_search/results_p125_t3600.csv) | 2021-03 | 3,630.821s      | 1.061×                       |
 | Facebook                                         | Greedy search | [write-up](leaderboard/llvm_instcount/e_greedy/README.md), [results](leaderboard/llvm_instcount/e_greedy/results_e0.csv) | 2021-03 | 169.237s        | 1.055×                       |
+| Anthony. W. Jung                                 | GATv2 + DD-PPO | [write-up](leaderboard/llvm_instcount/gatv2_ddppo/README.md), [results](leaderboard/llvm_instcount/gatv2_ddppo/result.csv) | 2022-06 | 258.149s        | 1.047×                       |
 | Facebook                                         | Random search (t=60) | [write-up](leaderboard/llvm_instcount/random_search/README.md), [results](leaderboard/llvm_instcount/random_search/results_p125_t60.csv) | 2021-03 | 91.215s         | 1.045×                       |
-| Facebook                                         | e-Greedy search (e=0.1) | [write-up](leaderboard/llvm_instcount/e_greedy/README.md), [results](leaderboard/llvm_instcount/e_greedy/results_e10.csv) | 2021-03 | 152.579s        | 1.041×                       |
+| Facebook                                         | e-Greedy search (e=0.1) | [write-up](leaderboard/llvm_instcount/e_greedy/README.md), [results](leaderboard/llvm_instcount/e_greedy/results_e10.csv) | 2021-03 | 351.611s        | 1.041×                       |
 | Jiadong Guo                                      | Tabular Q (N=5000, H=10) | [write-up](leaderboard/llvm_instcount/tabular_q/README.md), [results](leaderboard/llvm_instcount/tabular_q/results-H10-N5000.csv) | 2021-04 | 2534.305        | 1.036×                       |
 | Facebook                                         | Random search (t=10) | [write-up](leaderboard/llvm_instcount/random_search/README.md), [results](leaderboard/llvm_instcount/random_search/results_p125_t10.csv) | 2021-03 | 42.939s         | 1.031×                       |
 | Patrick Hesse                                    | DQN (N=4000, H=10) | [write-up](leaderboard/llvm_instcount/dqn/README.md), [results](leaderboard/llvm_instcount/dqn/results-instcountnorm-H10-N4000.csv) | 2021-06 | 91.018s         | 1.029×                       |

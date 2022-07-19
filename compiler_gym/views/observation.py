@@ -4,8 +4,6 @@
 # LICENSE file in the root directory of this source tree.
 from typing import Callable, Dict, List
 
-from deprecated.sphinx import deprecated
-
 from compiler_gym.errors import ServiceError
 from compiler_gym.service.proto import ObservationSpace
 from compiler_gym.util.gym_type_hints import (
@@ -95,50 +93,7 @@ class ObservationView:
         # env.observation.FooBar().
         setattr(self, space.id, lambda: self[space.id])
 
-    @deprecated(
-        version="0.2.1",
-        reason=(
-            "Use the derived_observation_spaces argument to CompilerEnv constructor. "
-            "See <https://github.com/facebookresearch/CompilerGym/issues/461>."
-        ),
-    )
     def add_derived_space(
-        self,
-        id: str,
-        base_id: str,
-        **kwargs,
-    ) -> None:
-        """Alias to :func:`ObservationSpaceSpec.make_derived_space()
-        <compiler_gym.views.ObservationSpaceSpec.make_derived_space>` that adds
-        the derived space to the observation view.
-
-        Example usage:
-
-            >>> env.observation.add_derived_space(
-                id="src_len",
-                base_id="src",
-                translate=lambda src: np.array([len(src)], dtype=np.int32),
-                shape=Box(shape=(1,), dtype=np.int32),
-            )
-            >>> env.observation["src_len"]
-            1029
-
-        :param id: The name of the new observation space.
-
-        :param base_id: The name of the observation space that this is derived
-            from.
-
-        :param \\**kwargs: Arguments passed to
-            :func:`ObservationSpaceSpec.make_derived_space
-            <compiler_gym.views.ObservationSpaceSpec.make_derived_space>`.
-        """
-        base_space = self.spaces[base_id]
-        self._add_space(base_space.make_derived_space(id=id, **kwargs))
-
-    # NOTE(github.com/facebookresearch/CompilerGym/issues/461): This method will
-    # be renamed to add_derived_space() once the current method with that name
-    # is removed.
-    def add_derived_space_internal(
         self,
         id: str,
         base_id: str,

@@ -1421,15 +1421,12 @@ def test_is_buildable_observation_space_not_buildable(env: LlvmEnv):
 
 def test_add_derived_space(env: LlvmEnv):
     env.reset()
-    with pytest.deprecated_call(
-        match="Use the derived_observation_spaces argument to CompilerEnv constructor."
-    ):
-        env.observation.add_derived_space(
-            id="IrLen",
-            base_id="Ir",
-            space=Box(name="IrLen", low=0, high=float("inf"), shape=(1,), dtype=int),
-            translate=lambda base: [15],
-        )
+    env.observation.add_derived_space(
+        id="IrLen",
+        base_id="Ir",
+        space=Box(name="IrLen", low=0, high=float("inf"), shape=(1,), dtype=int),
+        translate=lambda base: [15],
+    )
 
     value = env.observation["IrLen"]
     assert isinstance(value, list)

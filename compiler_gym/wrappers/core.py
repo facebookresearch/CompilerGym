@@ -58,6 +58,7 @@ class CompilerEnvWrapper(CompilerEnv, Wrapper):
         reward_spaces: Optional[Iterable[Union[str, Reward]]] = None,
         observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
         rewards: Optional[Iterable[Union[str, Reward]]] = None,
+        timeout: Optional[float] = 300,
     ):
         if isinstance(action, IterableType):
             warnings.warn(
@@ -99,6 +100,7 @@ class CompilerEnvWrapper(CompilerEnv, Wrapper):
         reward_spaces: Optional[Iterable[Union[str, Reward]]] = None,
         observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
         rewards: Optional[Iterable[Union[str, Reward]]] = None,
+        timeout: Optional[float] = 300,
     ):
         if observations is not None:
             warnings.warn(
@@ -243,10 +245,6 @@ class CompilerEnvWrapper(CompilerEnv, Wrapper):
         return self.env.actions
 
     @property
-    def logger(self):
-        return self.env.logger
-
-    @property
     def version(self) -> str:
         return self.env.version
 
@@ -283,6 +281,7 @@ class ActionWrapper(CompilerEnvWrapper):
         reward_spaces: Optional[Iterable[Reward]] = None,
         observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
         rewards: Optional[Iterable[Union[str, Reward]]] = None,
+        timeout: Optional[float] = 300,
     ):
         return self.env.multistep(
             [self.action(a) for a in actions],
@@ -317,6 +316,7 @@ class ObservationWrapper(CompilerEnvWrapper, ABC):
         reward_spaces: Optional[Iterable[Union[str, Reward]]] = None,
         observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
         rewards: Optional[Iterable[Union[str, Reward]]] = None,
+        timeout: Optional[float] = 300,
     ):
         observation, reward, done, info = self.env.multistep(
             actions,
@@ -349,6 +349,7 @@ class RewardWrapper(CompilerEnvWrapper, ABC):
         reward_spaces: Optional[Iterable[Union[str, Reward]]] = None,
         observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
         rewards: Optional[Iterable[Union[str, Reward]]] = None,
+        timeout: Optional[float] = 300,
     ):
         observation, reward, done, info = self.env.multistep(
             actions,

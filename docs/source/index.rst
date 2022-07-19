@@ -86,3 +86,6 @@ Indices and tables
 
 * :ref:`genindex`
 * :ref:`modindex`
+
+`Terms of Use <https://opensource.fb.com/legal/terms/>`_.
+`Privacy Policy <https://opensource.fb.com/legal/privacy/>`_.

@@ -63,7 +63,6 @@ if(COMPILER_GYM_ENABLE_LLVM_ENV)
         "random_search_test.py"
       DEPS
         compiler_gym::compiler_gym
-        compiler_gym::random_replay
         compiler_gym::random_search
         tests::pytest_plugins::common
         tests::test_main

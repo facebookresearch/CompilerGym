@@ -43,7 +43,7 @@ from compiler_gym.envs import CompilerEnv
 from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
 from compiler_gym.util.flags.env_from_flags import env_from_flags
 from compiler_gym.util.gym_type_hints import ActionType
-from compiler_gym.util.logs import create_logging_dir
+from compiler_gym.util.runfiles_path import create_user_logs_dir
 
 flags.DEFINE_list(
     "brute_force_action_list",
@@ -311,7 +311,7 @@ def main(argv):
         env.reset()
         logs_dir = Path(
             FLAGS.output_dir
-            or create_logging_dir(
+            or create_user_logs_dir(
                 f'brute_force/{os.path.normpath(f"random/{env.benchmark.uri.scheme}/{env.benchmark.uri.path}")}'
             )
         )
