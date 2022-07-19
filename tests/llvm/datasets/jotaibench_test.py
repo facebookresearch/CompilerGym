@@ -10,7 +10,6 @@ from pathlib import Path
 import gym
 import pytest
 
-
 import compiler_gym.envs.llvm  # noqa register environments
 from compiler_gym.envs.llvm import LlvmEnv
 from compiler_gym.envs.llvm.datasets import JotaiBenchDataset

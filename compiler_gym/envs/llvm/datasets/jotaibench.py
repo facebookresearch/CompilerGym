@@ -20,7 +20,6 @@ from compiler_gym.util import thread_pool
 from compiler_gym.util.filesystem import atomic_file_write
 
 
-
 class JotaiBenchDataset(TarDatasetWithManifest):
     """A dataset of C programs curated from GitHub source code.
 
@@ -145,13 +144,13 @@ class JotaiBenchRunnableDataset(TarDataset):
                 "Paper": "https://homepages.dcc.ufmg.br/~fernando/publications/papers/FaustinoCGO21.pdf",
                 "Homepage": "http://cuda.dcc.ufmg.br/angha/",
             },
-            license="GNU General Public License v3.0 (GPLv3)",  
+            license="GNU General Public License v3.0 (GPLv3)",
             site_data_base=site_data_base,
             tar_urls=[
                 "https://github.com/lac-dcc/jotai-benchmarks/raw/main/benchmarks/programs_no-ub_printableRetVal.bz2"
             ],
-            tar_sha256="3657a36b129d462c11d451a5bc9365e73f404a814e8726b383a2d7e64faa3d73",  
-            strip_prefix="programs_no-ub_printableRetVal",  
+            tar_sha256="3657a36b129d462c11d451a5bc9365e73f404a814e8726b383a2d7e64faa3d73",
+            strip_prefix="programs_no-ub_printableRetVal",
             tar_compression="bz2",
             benchmark_file_suffix=".c",
         )

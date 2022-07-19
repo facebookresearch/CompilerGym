@@ -8,7 +8,6 @@ from typing import Iterable, Optional
 
 from compiler_gym.datasets import Dataset, TarDatasetWithManifest
 from compiler_gym.envs.llvm.datasets.anghabench import AnghaBenchDataset
-from compiler_gym.envs.llvm.datasets.jotaibench import JotaiBenchDataset
 from compiler_gym.envs.llvm.datasets.cbench import (
     CBenchDataset,
     CBenchLegacyDataset,
@@ -17,6 +16,7 @@ from compiler_gym.envs.llvm.datasets.cbench import (
 from compiler_gym.envs.llvm.datasets.chstone import CHStoneDataset
 from compiler_gym.envs.llvm.datasets.clgen import CLgenDataset
 from compiler_gym.envs.llvm.datasets.csmith import CsmithBenchmark, CsmithDataset
+from compiler_gym.envs.llvm.datasets.jotaibench import JotaiBenchDataset
 from compiler_gym.envs.llvm.datasets.llvm_stress import LlvmStressDataset
 from compiler_gym.envs.llvm.datasets.poj104 import POJ104Dataset, POJ104LegacyDataset
 from compiler_gym.util.runfiles_path import site_data_path
@@ -311,8 +311,7 @@ def get_llvm_datasets(site_data_base: Optional[Path] = None) -> Iterable[Dataset
 
 __all__ = [
     "AnghaBenchDataset",
-    "JotaiBenchDataset"
-    "BlasDataset",
+    "JotaiBenchDataset" "BlasDataset",
     "CBenchDataset",
     "CBenchLegacyDataset",
     "CLgenDataset",
