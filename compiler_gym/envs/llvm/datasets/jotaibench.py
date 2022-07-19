@@ -75,7 +75,7 @@ class JotaiBenchDataset(TarDatasetWithManifest):
                 "https://github.com/lac-dcc/jotai-benchmarks/raw/main/benchmarks/programs_no-ub_printableRetVal.bz2"
             ],
             tar_sha256="3657a36b129d462c11d451a5bc9365e73f404a814e8726b383a2d7e64faa3d73",
-            strip_prefix="",
+            strip_prefix="programs_no-ub_printableRetVal",
             tar_compression="bz2",
             benchmark_file_suffix=".bc",
             sort_order=sort_order,
@@ -151,7 +151,7 @@ class JotaiBenchRunnableDataset(TarDataset):
                 "https://github.com/lac-dcc/jotai-benchmarks/raw/main/benchmarks/programs_no-ub_printableRetVal.bz2"
             ],
             tar_sha256="3657a36b129d462c11d451a5bc9365e73f404a814e8726b383a2d7e64faa3d73",  
-            strip_prefix="",  
+            strip_prefix="programs_no-ub_printableRetVal",  
             tar_compression="bz2",
             benchmark_file_suffix=".c",
         )
