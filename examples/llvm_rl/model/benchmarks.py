@@ -95,7 +95,7 @@ class Benchmarks(BaseModel):
         start = self.benchmarks_start_at
         n = len(self.uris)
         if self.max_benchmarks:
-            n = min(len(self.max_benchmarks), n)
+            n = min(self.max_benchmarks, n)
 
         if uris:
             # Shortcut in case we already have a list of URIs that we can slice
