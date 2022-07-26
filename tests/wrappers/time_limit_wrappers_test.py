@@ -4,7 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 """Unit tests for //compiler_gym/wrappers."""
 from compiler_gym.envs.llvm import LlvmEnv
-from compiler_gym.wrappers import TimeLimit
+from compiler_gym.wrappers import CycleOverBenchmarks, TimeLimit
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.llvm"]
@@ -79,6 +79,22 @@ def test_time_limit_fork(env: LlvmEnv):
         assert done, info
     finally:
         fkd.close()
+
+
+# @pytest.mark.xfail(strict=True, reason="https://github.com/facebookresearch/CompilerGym/issues/648")
+def test_time_limit(env: LlvmEnv):
+    """Check CycleOverBenchmarks does not break TimeLimit"""
+    env = TimeLimit(env, max_episode_steps=1)
+    env = CycleOverBenchmarks(
+        env,
+        benchmarks=[
+            "benchmark://cbench-v1/crc32",
+        ],
+    )
+    env.reset()
+    _, _, done, _ = env.step(0)
+
+    assert done
 
 
 if __name__ == "__main__":
