@@ -81,10 +81,9 @@ def test_time_limit_fork(env: LlvmEnv):
         fkd.close()
 
 
-# @pytest.mark.xfail(strict=True, reason="https://github.com/facebookresearch/CompilerGym/issues/648")
 def test_time_limit(env: LlvmEnv):
     """Check CycleOverBenchmarks does not break TimeLimit"""
-    env = TimeLimit(env, max_episode_steps=1)
+    env = TimeLimit(env, max_episode_steps=3)
     env = CycleOverBenchmarks(
         env,
         benchmarks=[
@@ -92,9 +91,16 @@ def test_time_limit(env: LlvmEnv):
         ],
     )
     env.reset()
-    _, _, done, _ = env.step(0)
 
+    _, _, done, info = env.step(0)
+    assert not done, info
+
+    _, _, done, info = env.step(0)
+    assert not done, info
+
+    _, _, done, info = env.step(0)
     assert done
+    assert info["TimeLimit.truncated"], info
 
 
 if __name__ == "__main__":

@@ -32,18 +32,8 @@ class TimeLimit(CompilerEnvWrapper):
         self._max_episode_steps = max_episode_steps
         self._elapsed_steps = None
 
-    # def step(self, action: ActionType, **kwargs):
-    #     assert (
-    #         self._elapsed_steps is not None
-    #     ), "Cannot call env.step() before calling reset()"
-    #     observation, reward, done, info = self.env.step(action, **kwargs)
-    #     self._elapsed_steps += 1
-    #     if self._elapsed_steps >= self._max_episode_steps:
-    #         info["TimeLimit.truncated"] = not done
-    #         done = True
-    #     return observation, reward, done, info
-
     def multistep(self, actions: Iterable[ActionType], **kwargs):
+        actions = list(actions)
         assert (
             self._elapsed_steps is not None
         ), "Cannot call env.step() before calling reset()"
