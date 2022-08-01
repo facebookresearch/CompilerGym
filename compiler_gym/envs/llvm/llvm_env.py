@@ -309,6 +309,17 @@ class LlvmEnv(ClientServiceCompilerEnv):
                         for name, val in zip(AUTOPHASE_FEATURE_NAMES, base_observation)
                     },
                 },
+                # {
+                #     "id": "LLVMLexerClass",
+                #     "base_id" : "LLVMLexer",
+                #     "space": Sequence(
+                #         name="LLVMToken", size_range=(0, None), dtype=myClass,
+                #     ),
+                #     "translate" : lambda base_observation {
+                #         myClass(token_id, token_cat, token...) for 
+                #         a,b,c,d in zip(x['token_category'], x['token_...'], x['token_...']
+                #     },
+                # }
             ],
         )
 
