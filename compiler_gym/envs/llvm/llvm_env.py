@@ -14,6 +14,7 @@ from typing import Iterable, List, Optional, Union, cast
 
 import numpy as np
 
+from compiler_gym.envs.llvm.lexed_ir import LexedToken
 from compiler_gym.datasets import Benchmark, Dataset
 from compiler_gym.envs.llvm.benchmark_from_command_line import BenchmarkFromCommandLine
 from compiler_gym.envs.llvm.datasets import get_llvm_datasets
@@ -309,17 +310,24 @@ class LlvmEnv(ClientServiceCompilerEnv):
                         for name, val in zip(AUTOPHASE_FEATURE_NAMES, base_observation)
                     },
                 },
-                # {
-                #     "id": "LLVMLexerClass",
-                #     "base_id" : "LLVMLexer",
-                #     "space": Sequence(
-                #         name="LLVMToken", size_range=(0, None), dtype=myClass,
-                #     ),
-                #     "translate" : lambda base_observation {
-                #         myClass(token_id, token_cat, token...) for 
-                #         a,b,c,d in zip(x['token_category'], x['token_...'], x['token_...']
-                #     },
-                # }
+                {
+                    "id"      : "LexedirTuple",
+                    "base_id" : "Lexedir",
+                    "space"   : Sequence(
+                        name = "LexedToken", size_range=(0, None), dtype = LexedToken,
+                    ),
+                    "translate" : lambda base_observation: [
+                        LexedToken(tid, kind, cat, val)
+                        for        tid, kind, cat, val
+                        in zip(
+                            base_observation['token_id'],
+                            base_observation['token_kind'],
+                            base_observation['token_category'],
+                            base_observation['token_value'],
+                        )
+                    ],
+                    "default_value": {'token_id': [], 'token_kind': [], 'token_category': [], 'token_value': []}
+                }
             ],
         )
 
