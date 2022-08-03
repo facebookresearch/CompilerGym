@@ -19,7 +19,7 @@ cg_cc_library(
       LLToken.h
       llvm_lexer_token_info.h
       llvm_lexer.h
-      LLVMLexer.h
+      LexedIR.h
     ABS_DEPS
       ${_LLVM_LIBS}
   INCLUDES
