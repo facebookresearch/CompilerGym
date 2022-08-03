@@ -61,7 +61,6 @@ cg_py_library(
     lexed_ir
   SRCS
     "lexed_ir.py"
-  DEPS
   PUBLIC
 )
 
