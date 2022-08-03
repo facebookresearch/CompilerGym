@@ -57,7 +57,6 @@ py_library(
 py_library(
     name = "lexed_ir",
     srcs = ["lexed_ir.py"],
-    deps = [],
 )
 
 py_library(
