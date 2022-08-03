@@ -27,7 +27,7 @@
 using namespace llvm;
 using TokensVector = std::pair<std::pair<std::vector<int>, std::vector<std::string>>, std::pair<std::vector<std::string>, std::vector<std::string>>>;
 
-namespace LexedIR {
+namespace LexedIr {
 
   /// Create one token from the lexer
   llvm_lexer_token LexOne(LLLexer& lexer) {

@@ -9,7 +9,7 @@ llvm_map_components_to_libnames(_LLVM_LIBS
   core support bitwriter
 )
 cg_cc_library(
-    NAME LLVMLexer
+    NAME LexedIr
     SRCS
       LLLexer.cc
       llvm_lexer_token_info.cc
@@ -19,7 +19,7 @@ cg_cc_library(
       LLToken.h
       llvm_lexer_token_info.h
       llvm_lexer.h
-      LexedIR.h
+      lexed_ir.h
     ABS_DEPS
       ${_LLVM_LIBS}
   INCLUDES

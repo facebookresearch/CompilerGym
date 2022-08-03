@@ -6,7 +6,7 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 
 cc_library(
-    name = "LexedIR",
+    name = "LexedIr",
     srcs = [
         "LLLexer.cc",
         "llvm_lexer_token_info.cc"
@@ -17,7 +17,7 @@ cc_library(
         "LLToken.h",
         "llvm_lexer_token_info.h",
         "llvm_lexer.h",
-        "LexedIR.h",
+        "lexed_ir.h",
     ],
     copts = [
         "-DGOOGLE_PROTOBUF_NO_RTTI",
