@@ -38,7 +38,7 @@ class observation_spaces(Enum):
     InstCountNorm = "InstCountNorm"
     InstCountNormDict = "InstCountNormDict"
     AutophaseDict = "AutophaseDict"
-    LexedIR = "LexedIR"
+    LexedIr = "LexedIr"
 
 
 class reward_spaces(Enum):
