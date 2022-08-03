@@ -17,7 +17,7 @@
 #include "compiler_gym/envs/llvm/service/ObservationSpaces.h"
 #include "compiler_gym/third_party/autophase/InstCount.h"
 #include "compiler_gym/third_party/llvm/InstCount.h"
-#include "compiler_gym/third_party/LexedIR/LexedIR.h"
+#include "compiler_gym/third_party/LexedIr/lexed_ir.h"
 #include "compiler_gym/util/GrpcStatusMacros.h"
 #include "llvm/Bitcode/BitcodeWriter.h"
 // #include "llvm/IR/Metadata.h"
@@ -229,14 +229,14 @@ Status setObservation(LlvmObservationSpace space, const fs::path& workingDirecto
     case LlvmObservationSpace::BUILDTIME: {
       return benchmark.computeBuildtime(reply);
     }
-    case LlvmObservationSpace::LEXEDIR: {
+    case LlvmObservationSpace::LEXED_IR: {
       // Serialize the LLVM module to an IR string.
       std::string ir;
       llvm::raw_string_ostream rso(ir);
       benchmark.module().print(rso, /*AAW=*/nullptr);
       rso.flush();
 
-      const auto lexed        = LexedIR::LexIR(ir);
+      const auto lexed        = LexedIr::LexIR(ir);
       const auto token_id     = lexed.first.first;
       const auto token_kind   = lexed.first.second;
       const auto token_cat    = lexed.second.first;

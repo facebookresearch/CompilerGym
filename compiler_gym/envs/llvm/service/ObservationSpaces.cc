@@ -203,7 +203,7 @@ std::vector<ObservationSpace> getLlvmObservationSpaceList() {
         observationSpace.mutable_default_observation()->set_int64_value(0);
         break;
       }
-      case LlvmObservationSpace::LEXEDIR: {
+      case LlvmObservationSpace::LEXED_IR: {
         space.mutable_string_value()->mutable_length_range()->set_min(0);
         observationSpace.set_deterministic(true);
         observationSpace.set_platform_dependent(false);

@@ -311,8 +311,8 @@ class LlvmEnv(ClientServiceCompilerEnv):
                     },
                 },
                 {
-                    "id"      : "LexedirTuple",
-                    "base_id" : "Lexedir",
+                    "id"      : "LexedIrTuple",
+                    "base_id" : "LexedIr",
                     "space"   : Sequence(
                         name = "LexedToken", size_range=(0, None), dtype = LexedToken,
                     ),

@@ -115,7 +115,7 @@ enum class LlvmObservationSpace {
   * Returns a dictionary of aligned lists (token_idx, token_kind,token_category, str_token_value)
   * one list element for every tokenized word in the IR.
   */
-  LEXEDIR,
+  LEXED_IR,
 };
 
 /** Return the list of available observation spaces. */
