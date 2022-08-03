@@ -111,10 +111,10 @@ enum class LlvmObservationSpace {
    */
   BUILDTIME,
   /** The LLVM-lexer token IDs of the input IR.
-  *
-  * Returns a dictionary of aligned lists (token_idx, token_kind,token_category, str_token_value)
-  * one list element for every tokenized word in the IR.
-  */
+   *
+   * Returns a dictionary of aligned lists (token_idx, token_kind,token_category, str_token_value)
+   * one list element for every tokenized word in the IR.
+   */
   LEXED_IR,
 };
 

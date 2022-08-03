@@ -11,15 +11,7 @@ using llvm::lltok::Kind;
 static int next_kind = 0;
 
 const std::vector<std::string> llvm_lexer_token_category_names = {
-    "unknown",
-    "marker",
-    "keyword",
-    "uintval",
-    "strval",
-    "type",
-    "apfloat",
-    "apsint"
-};
+    "unknown", "marker", "keyword", "uintval", "strval", "type", "apfloat", "apsint"};
 
 const std::vector<llvm_lexer_token_info> llvm_lexer_tokens = {
     // Markers
@@ -29,7 +21,7 @@ const std::vector<llvm_lexer_token_info> llvm_lexer_tokens = {
     // Tokens with no info.
     {Kind(next_kind++), keyword, "dotdotdot", "..."},
     {Kind(next_kind++), keyword, "equal", "="},
-    {Kind(next_kind++), keyword, "comma", ","}, 
+    {Kind(next_kind++), keyword, "comma", ","},
     {Kind(next_kind++), keyword, "star", "*"},
     {Kind(next_kind++), keyword, "lsquare", "["},
     {Kind(next_kind++), keyword, "rsquare", "]"},
@@ -39,7 +31,7 @@ const std::vector<llvm_lexer_token_info> llvm_lexer_tokens = {
     {Kind(next_kind++), keyword, "greater", ">"},
     {Kind(next_kind++), keyword, "lparen", "("},
     {Kind(next_kind++), keyword, "rparen", ")"},
-    {Kind(next_kind++), keyword, "exclaim", "!"}, 
+    {Kind(next_kind++), keyword, "exclaim", "!"},
     {Kind(next_kind++), keyword, "bar", "|"},
     {Kind(next_kind++), keyword, "colon", ":"},
 
@@ -59,7 +51,8 @@ const std::vector<llvm_lexer_token_info> llvm_lexer_tokens = {
     {Kind(next_kind++), keyword, "kw_internal", "internal"},
     {Kind(next_kind++), keyword, "kw_linkonce", "linkonce"},
     {Kind(next_kind++), keyword, "kw_linkonce_odr", "linkonce_odr"},
-    {Kind(next_kind++), keyword, "kw_weak", "weak"}, // Used as a linkage, and a modifier for "cmpxchg".
+    {Kind(next_kind++), keyword, "kw_weak",
+     "weak"},  // Used as a linkage, and a modifier for "cmpxchg".
     {Kind(next_kind++), keyword, "kw_weak_odr", "weak_odr"},
     {Kind(next_kind++), keyword, "kw_appending", "appending"},
     {Kind(next_kind++), keyword, "kw_dllimport", "dllimport"},
@@ -93,7 +86,7 @@ const std::vector<llvm_lexer_token_info> llvm_lexer_tokens = {
     {Kind(next_kind++), keyword, "kw_triple", "triple"},
     {Kind(next_kind++), keyword, "kw_source_filename", "source_filename"},
     {Kind(next_kind++), keyword, "kw_unwind", "unwind"},
-    {Kind(next_kind++), keyword, "kw_deplibs", "deplibs"}, // FIXME: Remove in 4.0
+    {Kind(next_kind++), keyword, "kw_deplibs", "deplibs"},  // FIXME: Remove in 4.0
     {Kind(next_kind++), keyword, "kw_datalayout", "datalayout"},
     {Kind(next_kind++), keyword, "kw_volatile", "volatile"},
     {Kind(next_kind++), keyword, "kw_atomic", "atomic"},
@@ -194,7 +187,8 @@ const std::vector<llvm_lexer_token_info> llvm_lexer_tokens = {
     {Kind(next_kind++), keyword, "kw_dereferenceable", "dereferenceable"},
     {Kind(next_kind++), keyword, "kw_dereferenceable_or_null", "dereferenceable_or_null"},
     {Kind(next_kind++), keyword, "kw_inaccessiblememonly", "inaccessiblememonly"},
-    {Kind(next_kind++), keyword, "kw_inaccessiblemem_or_argmemonly", "inaccessiblemem_or_argmemonly"},
+    {Kind(next_kind++), keyword, "kw_inaccessiblemem_or_argmemonly",
+     "inaccessiblemem_or_argmemonly"},
     {Kind(next_kind++), keyword, "kw_inlinehint", "inlinehint"},
     {Kind(next_kind++), keyword, "kw_inreg", "inreg"},
     {Kind(next_kind++), keyword, "kw_jumptable", "jumptable"},
@@ -247,14 +241,14 @@ const std::vector<llvm_lexer_token_info> llvm_lexer_tokens = {
     {Kind(next_kind++), keyword, "kw_opaque", "opaque"},
 
     {Kind(next_kind++), keyword, "kw_comdat", "comdat"},
-    
+
     // Comdat_types
     {Kind(next_kind++), keyword, "kw_any", "any"},
     {Kind(next_kind++), keyword, "kw_exactmatch", "exactmatch"},
     {Kind(next_kind++), keyword, "kw_largest", "largest"},
     {Kind(next_kind++), keyword, "kw_noduplicates", "noduplicates"},
     {Kind(next_kind++), keyword, "kw_samesize", "samesize"},
-    
+
     {Kind(next_kind++), keyword, "kw_eq", "eq"},
     {Kind(next_kind++), keyword, "kw_ne", "ne"},
     {Kind(next_kind++), keyword, "kw_slt", "slt"},
@@ -275,7 +269,7 @@ const std::vector<llvm_lexer_token_info> llvm_lexer_tokens = {
     {Kind(next_kind++), keyword, "kw_uno", "uno"},
     {Kind(next_kind++), keyword, "kw_ueq", "ueq"},
     {Kind(next_kind++), keyword, "kw_une", "une"},
-    
+
     // atomicrmw_operations_that_arent_also_instruction_keywords
     {Kind(next_kind++), keyword, "kw_xchg", "xchg"},
     {Kind(next_kind++), keyword, "kw_nand", "nand"},
@@ -368,7 +362,7 @@ const std::vector<llvm_lexer_token_info> llvm_lexer_tokens = {
     // Use_list_order_directives
     {Kind(next_kind++), keyword, "kw_uselistorder", "uselistorder"},
     {Kind(next_kind++), keyword, "kw_uselistorder_bb", "uselistorder_bb"},
-    
+
     // Summary_index_keywords
     {Kind(next_kind++), keyword, "kw_path", "path"},
     {Kind(next_kind++), keyword, "kw_hash", "hash"},
@@ -444,11 +438,11 @@ const std::vector<llvm_lexer_token_info> llvm_lexer_tokens = {
     {Kind(next_kind++), keyword, "kw_varFlags", "varFlags"},
 
     // Unsigned Valued tokens (UIntVal).
-    {Kind(next_kind++), uintval, "LabelID", ":"},    // 42:
-    {Kind(next_kind++), uintval, "GlobalID", "@"},   // @42
-    {Kind(next_kind++), uintval, "LocalVarID", "%"}, // %42
-    {Kind(next_kind++), uintval, "AttrGrpID", "#"},  // #42
-    {Kind(next_kind++), uintval, "SummaryID", "^"},  // ^42
+    {Kind(next_kind++), uintval, "LabelID", ":"},     // 42:
+    {Kind(next_kind++), uintval, "GlobalID", "@"},    // @42
+    {Kind(next_kind++), uintval, "LocalVarID", "%"},  // %42
+    {Kind(next_kind++), uintval, "AttrGrpID", "#"},   // #42
+    {Kind(next_kind++), uintval, "SummaryID", "^"},   // ^42
 
     // String valued tokens (StrVal).
     {Kind(next_kind++), strval, "LabelStr", ":"},                      // foo:
@@ -463,7 +457,7 @@ const std::vector<llvm_lexer_token_info> llvm_lexer_tokens = {
     {Kind(next_kind++), strval, "DwarfLang", "DW_LANG_"},              // DW_LANG_foo
     {Kind(next_kind++), strval, "DwarfCC", "DW_CC_"},                  // DW_CC_foo
     {Kind(next_kind++), strval, "EmissionKind", "<Emission>"},         // lineTablesOnly
-    {Kind(next_kind++), strval, "NameTableKind", "<NameTable>"},               // GNU
+    {Kind(next_kind++), strval, "NameTableKind", "<NameTable>"},       // GNU
     {Kind(next_kind++), strval, "DwarfOp", "DW_OP_"},                  // DW_OP_foo
     {Kind(next_kind++), strval, "DIFlag", "DIFlag"},                   // DIFlagFoo
     {Kind(next_kind++), strval, "DISPFlag", "DISPFlag"},               // DISPFlagFoo
@@ -473,6 +467,6 @@ const std::vector<llvm_lexer_token_info> llvm_lexer_tokens = {
     // Type valued tokens (TyVal).
     {Kind(next_kind++), type, "Type", "type"},
 
-    {Kind(next_kind++), apfloat, "APFloat", "APFloat"},                // APFloatVal
-    {Kind(next_kind++), apsint, "APSInt", "APSInt"},                   // APSInt
+    {Kind(next_kind++), apfloat, "APFloat", "APFloat"},  // APFloatVal
+    {Kind(next_kind++), apsint, "APSInt", "APSInt"},     // APSInt
 };

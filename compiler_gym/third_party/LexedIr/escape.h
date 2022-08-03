@@ -11,8 +11,10 @@
 
 /// Get the hex value of a character
 static int char_to_hex(int c) {
-    if (c >= '0' and c <= '9') return c - '0';
-    else return c - 'A' + 10;
+  if (c >= '0' and c <= '9')
+    return c - '0';
+  else
+    return c - 'A' + 10;
 }
 
 /// Escape a string
@@ -20,12 +22,12 @@ std::string escape(const std::string& s, bool escape_quote = false) {
   std::string t;
   t.reserve(s.size());
   char const* const hexdig = "0123456789ABCDEF";
-  for (unsigned char c: s) {
+  for (unsigned char c : s) {
     if (isprint(c) and c != '\\' and (!escape_quote or c != '"')) {
       t.push_back(c);
     } else {
       t.push_back('\\');
-      switch(c) {
+      switch (c) {
         default: {
           t.push_back(hexdig[c >> 4]);
           t.push_back(hexdig[c & 0xF]);

@@ -5,8 +5,9 @@
 """Utilities for LexedIRTuple derived observation space."""
 import typing
 
+
 class LexedToken(typing.NamedTuple):
-    ID       : int
-    kind     : str
-    category : str
-    value    : str
+    ID: int
+    kind: str
+    category: str
+    value: str

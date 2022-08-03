@@ -19,21 +19,21 @@ enum Kind {
   Error,
 
   // Tokens with no info.
-  dotdotdot, // ...
+  dotdotdot,  // ...
   equal,
-  comma, // =  ,
-  star,  // *
+  comma,  // =  ,
+  star,   // *
   lsquare,
-  rsquare, // [  ]
+  rsquare,  // [  ]
   lbrace,
-  rbrace, // {  }
+  rbrace,  // {  }
   less,
-  greater, // <  >
+  greater,  // <  >
   lparen,
-  rparen,  // (  )
-  exclaim, // !
-  bar,     // |
-  colon,   // :
+  rparen,   // (  )
+  exclaim,  // !
+  bar,      // |
+  colon,    // :
 
   kw_vscale,
   kw_x,
@@ -51,7 +51,7 @@ enum Kind {
   kw_internal,
   kw_linkonce,
   kw_linkonce_odr,
-  kw_weak, // Used as a linkage, and a modifier for "cmpxchg".
+  kw_weak,  // Used as a linkage, and a modifier for "cmpxchg".
   kw_weak_odr,
   kw_appending,
   kw_dllimport,
@@ -85,7 +85,7 @@ enum Kind {
   kw_triple,
   kw_source_filename,
   kw_unwind,
-  kw_deplibs, // FIXME: Remove in 4.0
+  kw_deplibs,  // FIXME: Remove in 4.0
   kw_datalayout,
   kw_volatile,
   kw_atomic,
@@ -436,37 +436,37 @@ enum Kind {
   kw_varFlags,
 
   // Unsigned Valued tokens (UIntVal).
-  LabelID,    // 42:
-  GlobalID,   // @42
-  LocalVarID, // %42
-  AttrGrpID,  // #42
-  SummaryID,  // ^42
+  LabelID,     // 42:
+  GlobalID,    // @42
+  LocalVarID,  // %42
+  AttrGrpID,   // #42
+  SummaryID,   // ^42
 
   // String valued tokens (StrVal).
-  LabelStr,         // foo:
-  GlobalVar,        // @foo @"foo"
-  ComdatVar,        // $foo
-  LocalVar,         // %foo %"foo"
-  MetadataVar,      // !foo
-  StringConstant,   // "foo"
-  DwarfTag,         // DW_TAG_foo
-  DwarfAttEncoding, // DW_ATE_foo
-  DwarfVirtuality,  // DW_VIRTUALITY_foo
-  DwarfLang,        // DW_LANG_foo
-  DwarfCC,          // DW_CC_foo
-  EmissionKind,     // lineTablesOnly
-  NameTableKind,    // GNU
-  DwarfOp,          // DW_OP_foo
-  DIFlag,           // DIFlagFoo
-  DISPFlag,         // DISPFlagFoo
-  DwarfMacinfo,     // DW_MACINFO_foo
-  ChecksumKind,     // CSK_foo
+  LabelStr,          // foo:
+  GlobalVar,         // @foo @"foo"
+  ComdatVar,         // $foo
+  LocalVar,          // %foo %"foo"
+  MetadataVar,       // !foo
+  StringConstant,    // "foo"
+  DwarfTag,          // DW_TAG_foo
+  DwarfAttEncoding,  // DW_ATE_foo
+  DwarfVirtuality,   // DW_VIRTUALITY_foo
+  DwarfLang,         // DW_LANG_foo
+  DwarfCC,           // DW_CC_foo
+  EmissionKind,      // lineTablesOnly
+  NameTableKind,     // GNU
+  DwarfOp,           // DW_OP_foo
+  DIFlag,            // DIFlagFoo
+  DISPFlag,          // DISPFlagFoo
+  DwarfMacinfo,      // DW_MACINFO_foo
+  ChecksumKind,      // CSK_foo
 
   // Type valued tokens (TyVal).
   Type,
 
-  APFloat, // APFloatVal
-  APSInt   // APSInt
+  APFloat,  // APFloatVal
+  APSInt    // APSInt
 };
-} // end namespace lltok
-} // end namespace llvm
+}  // end namespace lltok
+}  // end namespace llvm
