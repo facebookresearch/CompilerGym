@@ -64,9 +64,9 @@ py_library(
     srcs = ["llvm_env.py"],
     deps = [
         ":benchmark_from_command_line",
+        ":lexed_ir",
         ":llvm_benchmark",
         ":llvm_rewards",
-        ":lexed_ir",
         "//compiler_gym/datasets",
         "//compiler_gym/envs/llvm/datasets",
         "//compiler_gym/errors",

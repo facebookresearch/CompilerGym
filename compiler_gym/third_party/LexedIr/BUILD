@@ -9,15 +9,15 @@ cc_library(
     name = "LexedIr",
     srcs = [
         "LLLexer.cc",
-        "llvm_lexer_token_info.cc"
+        "llvm_lexer_token_info.cc",
     ],
     hdrs = [
-        "escape.h",
         "LLLexer.h",
         "LLToken.h",
-        "llvm_lexer_token_info.h",
-        "llvm_lexer.h",
+        "escape.h",
         "lexed_ir.h",
+        "llvm_lexer.h",
+        "llvm_lexer_token_info.h",
     ],
     copts = [
         "-DGOOGLE_PROTOBUF_NO_RTTI",
