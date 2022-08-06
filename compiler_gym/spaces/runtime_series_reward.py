@@ -69,7 +69,6 @@ class RuntimeSeriesReward(Reward):
         # difference between the two medians. Otherwise, set the reward as 0.
         # https://en.wikipedia.org/wiki/Kruskal%E2%80%93Wallis_one-way_analysis_of_variance
         _, pval = scipy.stats.kruskal(runtimes, self.previous_runtimes)
-        diff = np.median(runtimes) - np.median(self.previous_runtimes)
-        reward = 2 * diff if pval < 0.05 else diff
+        reward = np.median(self.previous_runtimes) - np.median(runtimes) if pval < 0.05 else 0
         self.previous_runtimes = runtimes
         return reward
