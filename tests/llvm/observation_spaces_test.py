@@ -416,7 +416,9 @@ def test_lexed_ir_observation_space(env: LlvmEnv):
     env.reset("cbench-v1/crc32")
     key = "LexedIr"
     space = env.observation.spaces[key]
-    assert isinstance(space.space, DictSpace)
+    print(type(space.space))
+    print(space.space)
+    assert isinstance(space.space, Sequence)
     value: Dict[str, np.array] = env.observation[key]
     print(value)  # For debugging in case of error
     assert len(value) == 4
