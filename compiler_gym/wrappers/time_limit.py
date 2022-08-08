@@ -2,7 +2,7 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-from typing import Optional
+from typing import Iterable, Optional
 
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.util.gym_type_hints import ActionType
@@ -32,12 +32,13 @@ class TimeLimit(CompilerEnvWrapper):
         self._max_episode_steps = max_episode_steps
         self._elapsed_steps = None
 
-    def step(self, action: ActionType, **kwargs):
+    def multistep(self, actions: Iterable[ActionType], **kwargs):
+        actions = list(actions)
         assert (
             self._elapsed_steps is not None
         ), "Cannot call env.step() before calling reset()"
-        observation, reward, done, info = self.env.step(action, **kwargs)
-        self._elapsed_steps += 1
+        observation, reward, done, info = self.env.multistep(actions, **kwargs)
+        self._elapsed_steps += len(actions)
         if self._elapsed_steps >= self._max_episode_steps:
             info["TimeLimit.truncated"] = not done
             done = True

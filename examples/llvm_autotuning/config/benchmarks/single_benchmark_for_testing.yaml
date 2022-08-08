@@ -1,0 +1,5 @@
+---
+# A single benchmark for
+benchmarks:
+    - uris:
+          - benchmark://cbench-v1/crc32

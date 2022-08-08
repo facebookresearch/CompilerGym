@@ -113,7 +113,7 @@ directory. Specify one or more different directories as command line arguments,
 e.g.:
 
 ```
-python -m llvm_autotuning.info /path/to/logs/dir/a ~/logs_dir_b
+python -m llvm_autotuning.info --log-dirs /path/to/logs/dir/a ~/logs_dir_b
 ```
 
 
