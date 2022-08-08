@@ -9,11 +9,11 @@ py_library(
     srcs = [
         "__init__.py",
         "anghabench.py",
-        "jotaibench.py",
         "cbench.py",
         "chstone.py",
         "clgen.py",
         "csmith.py",
+        "jotaibench.py",
         "llvm_stress.py",
         "poj104.py",
     ],
