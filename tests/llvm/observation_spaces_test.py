@@ -5,7 +5,7 @@
 """Integrations tests for the LLVM CompilerGym environments."""
 import os
 import sys
-from typing import Any, Dict, List
+from typing import Any, Dict, List, NamedTuple
 
 import gym
 import networkx as nx
@@ -62,6 +62,8 @@ def test_observation_spaces(env: LlvmEnv):
         "IrSha1",
         "IsBuildable",
         "IsRunnable",
+        "LexedIr",
+        "LexedIrTuple",
         "ObjectTextSizeBytes",
         "ObjectTextSizeO0",
         "ObjectTextSizeO3",
@@ -405,6 +407,33 @@ def test_autophase_dict_observation_space(env: LlvmEnv):
     value: Dict[str, int] = env.observation[key]
     print(value)  # For debugging in case of error.
     assert len(value) == 56
+
+    assert space.deterministic
+    assert not space.platform_dependent
+
+
+def test_lexed_ir_observation_space(env: LlvmEnv):
+    env.reset("cbench-v1/crc32")
+    key = "LexedIr"
+    space = env.observation.spaces[key]
+    print(type(space.space))
+    print(space.space)
+    assert isinstance(space.space, Sequence)
+    value: Dict[str, np.array] = env.observation[key]
+    print(value)  # For debugging in case of error
+    assert len(value) == 4
+
+    assert space.deterministic
+    assert not space.platform_dependent
+
+
+def test_lexed_ir_tuple_observation_space(env: LlvmEnv):
+    env.reset("cbench-v1/crc32")
+    key = "LexedIrTuple"
+    space = env.observation.spaces[key]
+    assert isinstance(space.space, Sequence)
+    value: List[NamedTuple] = env.observation[key]
+    print(value)  # For debugging in case of error
 
     assert space.deterministic
     assert not space.platform_dependent

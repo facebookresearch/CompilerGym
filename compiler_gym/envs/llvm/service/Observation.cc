@@ -15,6 +15,7 @@
 #include "compiler_gym/envs/llvm/service/Benchmark.h"
 #include "compiler_gym/envs/llvm/service/Cost.h"
 #include "compiler_gym/envs/llvm/service/ObservationSpaces.h"
+#include "compiler_gym/third_party/LexedIr/lexed_ir.h"
 #include "compiler_gym/third_party/autophase/InstCount.h"
 #include "compiler_gym/third_party/llvm/InstCount.h"
 #include "compiler_gym/util/GrpcStatusMacros.h"
@@ -227,6 +228,40 @@ Status setObservation(LlvmObservationSpace space, const fs::path& workingDirecto
     }
     case LlvmObservationSpace::BUILDTIME: {
       return benchmark.computeBuildtime(reply);
+    }
+    case LlvmObservationSpace::LEXED_IR: {
+      // Serialize the LLVM module to an IR string.
+      std::string ir;
+      llvm::raw_string_ostream rso(ir);
+      benchmark.module().print(rso, /*AAW=*/nullptr);
+      rso.flush();
+
+      const auto lexed = LexedIr::LexIR(ir);
+      const auto token_id = lexed.first.first;
+      const auto token_kind = lexed.first.second;
+      const auto token_cat = lexed.second.first;
+      const auto token_values = lexed.second.second;
+
+      Event token_id_ev, token_kind_ev, token_cat_ev, token_values_ev;
+      token_id_ev.mutable_int64_tensor()->add_shape(token_id.size());
+      *token_id_ev.mutable_int64_tensor()->mutable_value() = {token_id.begin(), token_id.end()};
+
+      token_kind_ev.mutable_string_tensor()->add_shape(token_kind.size());
+      *token_kind_ev.mutable_string_tensor()->mutable_value() = {token_kind.begin(),
+                                                                 token_kind.end()};
+
+      token_cat_ev.mutable_string_tensor()->add_shape(token_cat.size());
+      *token_cat_ev.mutable_string_tensor()->mutable_value() = {token_cat.begin(), token_cat.end()};
+
+      token_values_ev.mutable_string_tensor()->add_shape(token_values.size());
+      *token_values_ev.mutable_string_tensor()->mutable_value() = {token_values.begin(),
+                                                                   token_values.end()};
+
+      (*reply.mutable_event_dict()->mutable_event())["token_id"] = token_id_ev;
+      (*reply.mutable_event_dict()->mutable_event())["token_kind"] = token_kind_ev;
+      (*reply.mutable_event_dict()->mutable_event())["token_category"] = token_cat_ev;
+      (*reply.mutable_event_dict()->mutable_event())["token_value"] = token_values_ev;
+      break;
     }
   }
 

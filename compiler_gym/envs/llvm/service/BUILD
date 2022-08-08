@@ -254,6 +254,7 @@ cc_library(
         ":Cost",
         ":ObservationSpaces",
         "//compiler_gym/service/proto:compiler_gym_service_cc_grpc",
+        "//compiler_gym/third_party/LexedIr",
         "//compiler_gym/third_party/autophase:InstCount",
         "//compiler_gym/third_party/cpuinfo",
         "//compiler_gym/util:GrpcStatusMacros",
