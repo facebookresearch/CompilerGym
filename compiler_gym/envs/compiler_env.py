@@ -385,7 +385,9 @@ class CompilerEnv(gym.Env, ABC):
 
         :return: The initial observation.
 
-        :raises BenchmarkInitError: If the benchmark is invalid. In this case,
+        :raises BenchmarkInitError: If the benchmark is invalid. This can happen
+            if the benchmark contains code that the compiler does not support,
+            or because of some internal error within the compiler. In this case,
             another benchmark must be used.
 
         :raises TypeError: If no benchmark has been set, and the environment
