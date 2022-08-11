@@ -41,6 +41,28 @@ class ForkRegressionTest(NamedTuple):
             pre_fork="-bdce -loop-guard-widening -loop-reduce -globaldce -sroa -partially-inline-libcalls -loop-deletion -forceattrs -flattencfg -simple-loop-unswitch",
             post_fork="-mergefunc -dse -load-store-vectorizer -sroa -mldst-motion -hotcoldsplit -loop-versioning-licm -loop-rotate",
         ),
+        ForkRegressionTest(
+            benchmark="benchmark://cbench-v1/qsort",
+            pre_fork="-lower-constant-intrinsics -deadargelim -loop-fusion -mem2reg",
+            post_fork="-forceattrs ",
+        ),
+        ForkRegressionTest(
+            # for this test case, the rewards are also different
+            benchmark="benchmark://cbench-v1/qsort",
+            pre_fork="-loop-versioning -barrier -deadargelim -loop-guard-widening -elim-avail-extern -elim-avail-extern -lowerinvoke -strip-debug-declare -name-anon-globals -strip-nondebug -rewrite-statepoints-for-gc -redundant-dbg-inst-elim -correlated-propagation -adce -deadargelim -globalopt -div-rem-pairs -elim-avail-extern -nary-reassociate -lowerinvoke -canonicalize-aliases -sancov -inferattrs -loop-reroll -loop-deletion -dse -name-anon-globals -inferattrs -callsite-splitting -alignment-from-assumptions -inferattrs -early-cse -functionattrs -jump-threading -loop-instsimplify -reassociate -flattencfg -memcpyopt -canonicalize-aliases -post-inline-ee-instrument -tailcallelim -lower-matrix-intrinsics -argpromotion -early-cse -inline -lower-constant-intrinsics -die -prune-eh -mergeicmps -pgo-memop-opt -simplifycfg -called-value-propagation -simplifycfg -loop-data-prefetch -loop-reroll -simplifycfg -div-rem-pairs -sccp -slp-vectorizer -ipsccp -separate-const-offset-from-gep -loop-vectorize -sroa -loop-simplifycfg -loop-load-elim -reassociate -loop-distribute -canonicalize-aliases -strip-dead-prototypes -attributor -callsite-splitting -mergereturn -mldst-motion -strip -rpo-functionattrs -dse -loop-idiom -guard-widening -hotcoldsplit -lcssa -loweratomic -prune-eh -newgvn -tailcallelim -prune-eh -rpo-functionattrs -slp-vectorizer -inferattrs -always-inline -float2int -lower-guard-intrinsic -lower-constant-intrinsics -simple-loop-unswitch -loop-versioning -instcombine -loweratomic -add-discriminators -inline -loop-deletion -slp-vectorizer -flattencfg -loop-unroll-and-jam -dse -dse -lower-widenable-condition -loop-rotate -hotcoldsplit -early-cse -mem2reg -tailcallelim -slp-vectorizer -cross-dso-cfi -coro-split -dce -memcpyopt -alignment-from-assumptions -coro-early -sink -loop-versioning -attributor -partially-inline-libcalls -coro-early -instcombine -lower-expect -constprop -loop-unswitch -loop-versioning -rpo-functionattrs -nary-reassociate -gvn -lower-guard-intrinsic -loop-unroll-and-jam -attributor -loop-idiom -lcssa -loop-load-elim -speculative-execution -float2int -mergefunc -lowerswitch -elim-avail-extern -coro-cleanup -scalarizer -redundant-dbg-inst-elim -load-store-vectorizer -instnamer -mem2reg -lower-matrix-intrinsics -insert-gcov-profiling -hotcoldsplit -loop-instsimplify -lowerinvoke -coro-early -coro-early -slp-vectorizer -coro-split -deadargelim -break-crit-edges -pgo-memop-opt -gvn-hoist -loop-instsimplify -loop-data-prefetch -gvn -newgvn -ee-instrument -strip-nondebug -alignment-from-assumptions -inline -mergefunc -adce -coro-cleanup -prune-eh",
+            post_fork="-lcssa ",
+        ),
+        ForkRegressionTest(
+            benchmark="benchmark://poj104-v1/101/859",
+            pre_fork="-attributor -inject-tli-mappings -canonicalize-aliases -slsr -ipsccp -mem2reg",
+            post_fork="-nary-reassociate ",
+        ),
+        ForkRegressionTest(
+            # for this test case, the rewards are also different
+            benchmark="benchmark://poj104-v1/101/859",
+            pre_fork="-bdce -ipconstprop -forceattrs -reg2mem -deadargelim -adce -lower-expect -instsimplify -sink -loop-simplifycfg -inline -loop-unroll-and-jam -sroa -loop-predication -bdce -loop-fusion -sink -float2int -alignment-from-assumptions -licm -stri p-debug-declare -dce -sroa -aggressive-instcombine -loop-distribute -rewrite-statepoints-for-gc -slsr -bdce -prune-eh -forceattrs -constprop -name-anon-globals -canonicalize-aliases -deadargelim -loop-simplifycfg -partially-inline-libcalls -di e -libcalls-shrinkwrap -called-value-propagation -coro-split -loop-idiom -loop-idiom -mergeicmps -elim-avail-extern -jump-threading -constmerge -canonicalize-aliases -loop-simplifycfg -licm",
+            post_fork="-loop-rotate ",
+        ),
     ],
 )
 def test_fork_regression_test(env: LlvmEnv, test: ForkRegressionTest):
