@@ -61,31 +61,31 @@ Then clone the CompilerGym source code using:
     git clone https://github.com/facebookresearch/CompilerGym.git
     cd CompilerGym
 
-There are two primary git branches: `stable` tracks the latest release;
-`development` is for bleeding edge features that may not yet be mature. Checkout
-your preferred branch and install the python development dependencies using:
+If you plan to contribute to CompilerGym, install the development environment
+requirements using:
 
-    git checkout stable
-    make init
+    make dev-init
 
-The `make init` target only needs to be run on initial setup and after pulling
-remote changes to the CompilerGym repository.
 
-## Building from source with Bazel
-
-It is recomended to build with Bazel.
-
-Run the test suite to confirm that everything is working:
-
-    make test
+### Building from source with Bazel
 
 To build and install the `compiler_gym` python package, run:
 
     make install
 
+Once this has completed, run the test suite on the installed package using:
+
+    make test
+
+This may take a while. There are a number of options to `make test`, see `make
+help` for more information.
+
+Each time you modify the sources it is necessary to rerun `make install` before
+`make test`.
+
 **NOTE:** To use the `compiler_gym` package that is installed by `make install`
 you must leave the root directory of this repository. Attempting to import
-`compiler_gym` while in the root of this repository will cause import errors.
+`compiler_gym` while in the root of this repository will cause an import error.
 
 When you are finished, you can deactivate and delete the conda
 environment using:

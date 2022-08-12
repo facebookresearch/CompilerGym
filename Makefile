@@ -1,101 +1,37 @@
 define HELP
 CompilerGym $(VERSION). Available targets:
 
-Setting up
-----------
+Basic Commands
+--------------
 
-    make init
-        Install the build and runtime python dependencies. This should be run
-        once before any other targets.
-
-
-Testing
--------
+    make install
+        Build the CompilerGym python package and install it.
 
     make test
-        Run the test suite. Test results are cached so that incremental test
-        runs are minimal and fast. Use this as your go-to target for testing
-        modifications to the codebase.
+        Run the unit tests against the installed version of CompilerGym. Must
+        run `make install` first. Note the full test suite is large and may take
+        many minutes to run. You can select only one file or directory to test
+        using the TEST_TARGET variable. For example, to only run the tests in
+        the 'tests/compiler_env_test.py' file, use:
 
-    make itest
-        Run the test suite continuously on change. This is equivalent to
-        manually running `make test` when a source file is modified. Note that
-        `make install-test` tests are not run. This requires bazel-watcher.
-        See: https://github.com/bazelbuild/bazel-watcher#installation
+            make test TEST_TARGET=tests/compiler_env_test.py
 
+        Additional arguments may be passed to pytest using the PYTEST_ARGS
+        variable, for example:
 
-Post-installation Tests
------------------------
-
-    make install-test
-        Run the full test suite against an installed CompilerGym package. This
-        requires that the CompilerGym package has been installed (`make
-        install`). This is useful for checking the package contents but is
-        usually not needed for interactive development since `make test` runs
-        the same tests without having to install anything.
-
-    make install-test-cov
-        The same as `make install-test`, but with python test coverage
-        reporting. A summary of test coverage is printed at the end of execution
-        and the full details are recorded in a coverage.xml file in the project
-        root directory. To print a report of file coverage to stdout at the end
-        of testing, use argument `PYTEST_ARGS="--cov-report=term"`.
-
-    make install-fuzz
-        Run the fuzz testing suite against an installed CompilerGym package.
-        Fuzz tests are tests that generate their own inputs and run in a loop
-        until an error has been found, or until a minimum number of seconds have
-        elapsed. This minimum time is controlled using a FUZZ_SECONDS variable.
-        The default is 300 seconds (5 minutes). Override this value at the
-        command line, for example `FUZZ_SECONDS=60 make install-fuzz` will run
-        the fuzz tests for a minimum of one minute. This requires that the
-        CompilerGym package has been installed (`make install`).
-
-
-Documentation
--------------
+            make test PYTEST_ARGS="--ignore tests/llvm"
 
     make docs
         Build the HTML documentation using Sphinx. This is the documentation
         site that is hosted at <https://facebookresearch.github.io/CompilerGym>.
-        The generated HTML files are in docs/build/html.
+        The generated HTML files are in docs/build/html. See also
+        'make livedocs' below for building and serving a live version of the
+        documentation.
 
-    make livedocs
-        Build the HTML documentation and serve them on localhost:8000. Changes
-        to the documentation will automatically trigger incremental rebuilds
-        and reload the changes.  To change the host and port, set the SPHINXOPTS
-        env variable: `SPHINXOPTS="--port 1234 --host 0.0.0.0" make livedocs`
+    make www
+        Run a local instance of the web visualization service. See www/README.md
+        for details.
 
-
-Deployment
-----------
-
-    make bdist_wheel
-        Build an optimized python wheel. The generated file is in
-        dist/compiler_gym-<version>-<platform_tags>.whl
-
-    make install
-        Build and install the python wheel.
-
-    make bdist_wheel-linux
-        Use a docker container to build a python wheel for linux. This is only
-        used for making release builds. This requires docker.
-
-    make bdist_wheel-docker
-        Build a docker image containing CompilerGym.
-
-    bdist_wheel-linux-shell
-        Drop into a bash terminal in the docker container that is used for
-        linux builds. This may be useful for debugging bdist_wheel-linux
-        builds.
-
-    make bdist_wheel-linux-test
-        Run the `make install-test` suite against the build artifact generated
-        by `make bdist_wheel-linux`.
-
-	make www
-		Run a local instance of the web visualization service. See www/README.md
-		for details.
 
 Tidying up
 -----------
@@ -113,6 +49,56 @@ Tidying up
         Uninstall the python package and completely remove all datasets, logs,
         and cached files. Any experimental data or generated logs will be
         irreversibly deleted!
+
+
+Advanced Usage
+--------------
+
+    make install-pre-commit
+        Install the pre-commit hooks. Run this if you plan to contribute code.
+
+    make livedocs
+        Build the HTML documentation and serve them on localhost:8000. Changes
+        to the documentation will automatically trigger incremental rebuilds
+        and reload the changes.  To change the host and port, set the SPHINXOPTS
+        env variable: `SPHINXOPTS="--port 1234 --host 0.0.0.0" make livedocs`
+
+    make bdist_wheel
+        Build an optimized python wheel but do not install it. The generated
+        file is in dist/compiler_gym-<version>-<platform_tags>.whl
+
+    make bdist_wheel-linux
+        Use a docker container to build a python wheel for linux. This is only
+        used for making release builds. This requires docker.
+
+    make bdist_wheel-docker
+        Build a docker image containing CompilerGym.
+
+    bdist_wheel-linux-shell
+        Drop into a bash terminal in the docker container that is used for
+        linux builds. This may be useful for debugging bdist_wheel-linux
+        builds.
+
+    make bdist_wheel-linux-test
+        Run the `make test` suite against the build artifact generated by
+        `make bdist_wheel-linux`.
+
+    make test-cov
+        The same as `make test`, but with python test coverage reporting. A
+        summary of test coverage is printed at the end of execution and the full
+        details are recorded in a coverage.xml file in the project root
+        directory. To print a report of file coverage to stdout at the end
+        of testing, use argument `PYTEST_ARGS="--cov-report=term"`.
+
+    make fuzz
+        Run the fuzz testing suite against an installed CompilerGym package.
+        Fuzz tests are tests that generate their own inputs and run in a loop
+        until an error has been found, or until a minimum number of seconds have
+        elapsed. This minimum time is controlled using a FUZZ_SECONDS variable.
+        The default is 300 seconds (5 minutes). Override this value at the
+        command line, for example `FUZZ_SECONDS=60 make fuzz` will run
+        the fuzz tests for a minimum of one minute. This requires that the
+        CompilerGym package has been installed (`make install`).
 endef
 export HELP
 
@@ -149,12 +135,16 @@ OS := $(shell uname)
 help:
 	@echo "$$HELP"
 
-init:
-	$(PYTHON) -m pip install -r requirements.txt
+dev-init:
+	$(PYTHON) -m pip install -r requirements_pre_commit.txt
 	pre-commit install
 
-init-runtime-requirements:
-	$(PYTHON) -m pip install -r compiler_gym/requirements.txt
+# DEPRECATED(v0.2.5): To be removed no earlier than v0.2.6.
+init: dev-init
+	@echo
+	@echo "Warning: 'make init' is deprecated, and will be removed in a future release."
+	@echo "Use 'make dev-init' instead."
+
 
 ############
 # Building #
@@ -208,7 +198,7 @@ bdist_wheel-linux-shell:
 	docker run -v $(ROOT):/CompilerGym --workdir /CompilerGym --rm --shm-size=8g -it --entrypoint "/bin/bash" "$(MANYLINUX_DOCKER_IMAGE)"
 
 bdist_wheel-linux-test:
-	docker run -v $(ROOT):/CompilerGym --workdir /CompilerGym --rm --shm-size=8g "$(MANYLINUX_DOCKER_IMAGE)" /bin/sh -c 'cd /CompilerGym && pip3 install -U pip && pip3 install dist/compiler_gym-$(VERSION)-py3-none-manylinux2014_x86_64.whl && pip install -r tests/requirements.txt && make install-test'
+	docker run -v $(ROOT):/CompilerGym --workdir /CompilerGym --rm --shm-size=8g "$(MANYLINUX_DOCKER_IMAGE)" /bin/sh -c 'cd /CompilerGym && pip3 install -U pip && pip3 install dist/compiler_gym-$(VERSION)-py3-none-manylinux2014_x86_64.whl && pip install -r tests/requirements.txt && make test'
 
 bdist_wheel-docker: bdist_wheel-linux
 	cp dist/compiler_gym-$(VERSION)-py3-none-manylinux2014_x86_64.whl packaging/compiler_gym-local-wheel
@@ -236,6 +226,7 @@ www: www-build
 	cd www && $(PYTHON) www.py
 
 www-build:
+	$(PYTHON) -m pip install -r www/requirements.txt
 	cd www/frontends/compiler_gym && npm ci && npm run build
 
 www-image: www-build
@@ -271,13 +262,12 @@ doxygen-rst:
 	cd docs && $(PYTHON) generate_cc_rst.py
 
 docs: gendocs bazel-build doxygen
+	$(PYTHON) -m pip install -r docs/requirements.txt
 	cd docs/source && PYTHONPATH=$(ROOT)/bazel-bin/package.runfiles/CompilerGym sphinx-build -M html . ../build $(SPHINXOPTS)
 
 livedocs: gendocs doxygen
+	$(PYTHON) -m pip install -r docs/requirements.txt
 	cd docs/source && PYTHONPATH=$(ROOT)/bazel-bin/package.runfiles/CompilerGym sphinx-autobuild . ../build $(SPHINXOPTS) --pre-build 'make -C ../.. gendocs bazel-build doxygen' --watch ../../compiler_gym
-
-
-.PHONY: doxygen doxygen-rst
 
 
 ###########
@@ -293,27 +283,28 @@ INSTALL_TEST_ROOT ?= /tmp/compiler_gym_$(USER)/install_tests
 
 # The target to use. If not provided, all tests will be run. For `make test` and
 # related, this is a bazel target pattern, with default value '//...'. For `make
-# install-test` and related, this is a relative file path of the directory or
-# file to test, with default value 'tests'.
+# test` and related, this is a relative file path of the directory or file to
+# test, with default value 'tests'.
 TEST_TARGET ?=
 
 # Extra command line arguments for pytest.
 PYTEST_ARGS ?=
 
 # The path of the XML pytest coverage report to generate when running the
-# install-test-cov target.
+# test-cov target.
 COV_REPORT ?= $(ROOT)/coverage.xml
 
-test: bazel-fetch
+bazel-test: bazel-fetch
 	$(BAZEL) $(BAZEL_OPTS) test $(BAZEL_TEST_OPTS) $(if $(TEST_TARGET),$(TEST_TARGET),//...)
 
-itest: bazel-fetch
+bazel-itest: bazel-fetch
 	$(IBAZEL) $(BAZEL_OPTS) test $(BAZEL_TEST_OPTS) $(if $(TEST_TARGET),$(TEST_TARGET),//...)
 
 # Since we can't run compiler_gym from the project root we need to jump through
 # some hoops to run pytest "out of tree" by creating an empty directory and
 # symlinking the test directory into it so that pytest can be invoked.
 install-test-setup:
+	$(PYTHON) -m pip install -r tests/requirements.txt
 	mkdir -p "$(INSTALL_TEST_ROOT)"
 	rm -f "$(INSTALL_TEST_ROOT)/tests" "$(INSTALL_TEST_ROOT)/tox.ini"
 	ln -s "$(ROOT)/tests" "$(INSTALL_TEST_ROOT)"
@@ -323,39 +314,41 @@ define pytest
 	cd "$(INSTALL_TEST_ROOT)" && pytest $(if $(TEST_TARGET),$(TEST_TARGET),tests) $(1) $(PYTEST_ARGS)
 endef
 
-install-test: | install-test-setup
+# DEPRECATED(v0.2.5): To be removed no earlier than v0.2.6.
+install-test: test
+	@echo
+	@echo "Warning: 'make install-test' is deprecated, and will be removed in a future release."
+	@echo "Use 'make test' instead."
+
+test: | install-test-setup
 	$(call pytest,--no-success-flaky-report --benchmark-disable -n auto -k "not fuzz" --durations=5)
 
 # Note we export $CI=1 so that the tests always run as if within the CI
 # environement. This is to ensure that the reported coverage matches that of
 # the value on: https://codecov.io/gh/facebookresearch/CompilerGym
-install-test-cov: install-test-setup
+test-cov: install-test-setup
 	export CI=1; $(call pytest,--no-success-flaky-report --benchmark-disable -n auto -k "not fuzz" --durations=5 --cov=compiler_gym --cov-report=xml:$(COV_REPORT))
 
 # The minimum number of seconds to run the fuzz tests in a loop for. Override
 # this at the commandline, e.g. `FUZZ_SECONDS=1800 make fuzz`.
 FUZZ_SECONDS ?= 300
 
-install-fuzz: install-test-setup
+fuzz: install-test-setup
 	$(call pytest,--no-success-flaky-report -p no:sugar -x -vv -k fuzz --seconds=$(FUZZ_SECONDS))
 
-.PHONY: test post-install-test
+.PHONY: test test-cov fuzz
 
 
 ################
 # Installation #
 ################
 
-# We run uninstall as a dependency of install to prevent conflicting
-# CompilerGym versions co-existing in the same Python environment.
 
-pip-install: uninstall
-	$(PYTHON) setup.py install
+install: | bazel-build
+	$(PYTHON) -m pip install -r compiler_gym/requirements.txt -r compiler_gym/requirements_build.txt
+	$(PYTHON) -m pip install . --force-reinstall --no-deps
 
-install: |  init-runtime-requirements bazel-build pip-install
-	$(MAKE) -C examples install
-
-.PHONY: pip-install install
+.PHONY: install
 
 
 ##############

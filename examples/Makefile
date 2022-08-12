@@ -28,7 +28,7 @@ PYTHON ?= python3
 PYTEST_ARGS ?=
 
 # The path of the XML pytest coverage report to generate when running the
-# install-test-cov target.
+# test-cov target.
 COV_REPORT ?= $(ROOT)/coverage.xml
 
 DISTTOOLS_OUTS := \
