@@ -236,7 +236,7 @@ class Datasets:
 
     def benchmarks_from_distrib(
         self,
-        datasets: List[Dataset] = None,
+        datasets: List[str] = None,
         weights: List[float] = None,
         dataset_size: int = -1,
     ) -> Iterable[Benchmark]:
@@ -245,7 +245,7 @@ class Datasets:
         Select a dataset to sample from with some weight probability.
         If weights is None, select among `datasets` uniformly.
         """
-        datasets = datasets or self.datasets
+        datasets = datasets or self._datasets.values()
         if weights is None:
             weights = [1 / len(datasets)] * len(datasets)
         if len(weights) != len(datasets):
@@ -256,8 +256,11 @@ class Datasets:
             )
         idx = 0
         while dataset_size == -1 or idx < dataset_size:
-            sampled = np.random.choice(datasets, p=weights)
-            yield sampled.sample()
+            sampled_key = np.random.choice(datasets, p=weights)
+            if sampled_key not in self._datasets:
+                raise LookupError(f"Dataset not found: {sampled_key}")
+            dataset = self._datasets[sampled_key]
+            return round_robin_iterables((dataset,))
         return
 
     def benchmark_uris(self, with_deprecated: bool = False) -> Iterable[str]:
