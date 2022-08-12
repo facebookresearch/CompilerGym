@@ -177,6 +177,7 @@ bazel-fetch:
 	done
 
 bazel-build: bazel-fetch
+	$(PYTHON) -m pip install -r compiler_gym/requirements.txt -r compiler_gym/requirements_build.txt
 	$(BAZEL) $(BAZEL_OPTS) build $(BAZEL_BUILD_OPTS) $(BUILD_TARGET)
 
 bdist_wheel: bazel-build
@@ -345,7 +346,6 @@ fuzz: install-test-setup
 
 
 install: | bazel-build
-	$(PYTHON) -m pip install -r compiler_gym/requirements.txt -r compiler_gym/requirements_build.txt
 	$(PYTHON) -m pip install . --force-reinstall --no-deps
 
 .PHONY: install
