@@ -55,10 +55,16 @@ py_library(
 )
 
 py_library(
+    name = "lexed_ir",
+    srcs = ["lexed_ir.py"],
+)
+
+py_library(
     name = "llvm_env",
     srcs = ["llvm_env.py"],
     deps = [
         ":benchmark_from_command_line",
+        ":lexed_ir",
         ":llvm_benchmark",
         ":llvm_rewards",
         "//compiler_gym/datasets",

@@ -17,6 +17,7 @@ import numpy as np
 from compiler_gym.datasets import Benchmark, Dataset
 from compiler_gym.envs.llvm.benchmark_from_command_line import BenchmarkFromCommandLine
 from compiler_gym.envs.llvm.datasets import get_llvm_datasets
+from compiler_gym.envs.llvm.lexed_ir import LexedToken
 from compiler_gym.envs.llvm.llvm_benchmark import (
     ClangInvocation,
     get_system_library_flags,
@@ -307,6 +308,30 @@ class LlvmEnv(ClientServiceCompilerEnv):
                     "translate": lambda base_observation: {
                         name: val
                         for name, val in zip(AUTOPHASE_FEATURE_NAMES, base_observation)
+                    },
+                },
+                {
+                    "id": "LexedIrTuple",
+                    "base_id": "LexedIr",
+                    "space": Sequence(
+                        name="LexedToken",
+                        size_range=(0, None),
+                        dtype=LexedToken,
+                    ),
+                    "translate": lambda base_observation: [
+                        LexedToken(tid, kind, cat, val)
+                        for tid, kind, cat, val in zip(
+                            base_observation["token_id"],
+                            base_observation["token_kind"],
+                            base_observation["token_category"],
+                            base_observation["token_value"],
+                        )
+                    ],
+                    "default_value": {
+                        "token_id": [],
+                        "token_kind": [],
+                        "token_category": [],
+                        "token_value": [],
                     },
                 },
             ],
