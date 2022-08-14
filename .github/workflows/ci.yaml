@@ -52,10 +52,6 @@ jobs:
             - name: Install build dependencies
               uses: ./.github/actions/install-cmake-build-dependencies
 
-            - name: Install Python dependencies
-              run: |
-                  python -m pip install -r compiler_gym/requirements_build.txt -r compiler_gym/requirements.txt
-
             - name: Download LLVM 10.0.0 release
               run: |
                   if [ "$(uname)" = "Darwin" ]; then
@@ -127,10 +123,6 @@ jobs:
 
             - name: Install build dependencies
               uses: ./.github/actions/install-cmake-build-dependencies
-
-            - name: Install Python dependencies
-              run: |
-                  python -m pip install -r compiler_gym/requirements_build.txt -r compiler_gym/requirements.txt
 
             - name: Download LLVM 14.0.0 release
               run: |
