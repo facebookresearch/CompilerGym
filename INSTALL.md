@@ -93,27 +93,26 @@ environment using:
     conda deactivate
     conda env remove -n compiler_gym
 
-## Building from source with CMake
+### Building from source with CMake
 
-Building with CMake is still experimental. Darwin is not supported with CMake.
+Building with CMake is experimental and supports only Linux.
 
-### Dependency instructions for Ubuntu
+Install the dependencies using:
 
-```bash
+```sh
 sudo apt-get install g++ lld \
   autoconf libtool ninja-build ccache git \
 ```
 
 Requires CMake (>=3.20).
 
-```bash
+```sh
 wget https://github.com/Kitware/CMake/releases/download/v3.20.5/cmake-3.20.5-linux-x86_64.sh -O cmake.sh
 bash cmake.sh --prefix=$HOME/.local --exclude-subdir --skip-license
 rm cmake.sh
 export PATH=$HOME/.local/bin:$PATH
 ```
 
-### Dependency Arguments
 By default most dependencies are built together with Compiler Gym. To search for a dependency instead use:
 
 ```
@@ -129,7 +128,7 @@ By default most dependencies are built together with Compiler Gym. To search for
 * `COMPILER_GYM_NLOHMANN_JSON_PROVIDER`
 * `COMPILER_GYM_PROTOBUF_PROVIDER`
 
-```bash
+```sh
 cmake \
   -DCMAKE_C_COMPILER=clang \
   -DCMAKE_CXX_COMPILER=clang++ \
@@ -145,30 +144,30 @@ Additional optional configuration arguments:
 
 * Enables testing.
 
-    ```bash
-    -DCOMPILER_GYM_BUILD_TESTS=ON
-    ```
+```sh
+-DCOMPILER_GYM_BUILD_TESTS=ON
+```
 
 * Builds additional tools required by some examples.
 
-    ```bash
-    -DCOMPILER_GYM_BUILD_EXAMPLES=ON
-    ```
+```sh
+-DCOMPILER_GYM_BUILD_EXAMPLES=ON
+```
 
 * For faster rebuilds.
 
-    ```bash
-    -DCMAKE_C_COMPILER_LAUNCHER=ccache
-    -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
-    ```
+```sh
+-DCMAKE_C_COMPILER_LAUNCHER=ccache
+-DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+```
 
 * For faster linking.
 
-    ```bash
-    -DCMAKE_EXE_LINKER_FLAGS_INIT="-fuse-ld=lld"
-    -DCMAKE_MODULE_LINKER_FLAGS_INIT="-fuse-ld=lld"
-    -DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=lld"
-    ```
+```sh
+-DCMAKE_EXE_LINKER_FLAGS_INIT="-fuse-ld=lld"
+-DCMAKE_MODULE_LINKER_FLAGS_INIT="-fuse-ld=lld"
+-DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=lld"
+```
 
 By default, CompilerGym builds LLVM from source. This takes a long time and a
 lot of compute resources. To prevent this, download a pre-compiled clang+llvm
@@ -177,7 +176,7 @@ page](https://github.com/llvm/llvm-project/releases/tag/llvmorg-10.0.0), unpack
 it, and pass path of the `lib/cmake/llvm` subdirectory in the archive you just
 extracted to `LLVM_DIR`:
 
-```
+```sh
 $ cmake ... \
     -DCOMPILER_GYM_LLVM_PROVIDER=external \
     -DLLVM_DIR=/path/to/llvm/lib/cmake/llvm
