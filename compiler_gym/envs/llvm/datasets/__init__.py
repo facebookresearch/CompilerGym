@@ -265,9 +265,13 @@ def get_llvm_datasets(site_data_base: Optional[Path] = None) -> Iterable[Dataset
     yield JotaiBenchDataset(site_data_base=site_data_base, sort_order=0)
     # Add legacy version of Jotaibench using an old manifest.
     jotaibench_v0_manifest_url, jotaibench_v0_manifest_sha256 = {
+        "darwin": (
+            "https://github.com/lac-dcc/jotai-benchmarks/blob/main/benchmarks/jotaibench.bz2",
+            "39464256405aacefdb7550a7f990c9c578264c132804eec3daac091fa3c21bd1",
+        ),
         "linux": (
-            "https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-anghabench-v0-linux-manifest.bz2",
-            "a038d25d39ee9472662a9704dfff19c9e3512ff6a70f1067af85c5cb3784b477",
+            "https://github.com/lac-dcc/jotai-benchmarks/blob/main/benchmarks/jotaibench.bz2",
+            "3657a36b129d462c11d451a5bc9365e73f404a814e8726b383a2d7e64faa3d73",
         ),
     }[sys.platform]
     yield JotaiBenchDataset(
@@ -311,7 +315,7 @@ def get_llvm_datasets(site_data_base: Optional[Path] = None) -> Iterable[Dataset
 
 __all__ = [
     "AnghaBenchDataset",
-    "JotaiBenchDataset" "BlasDataset",
+    "BlasDataset",
     "CBenchDataset",
     "CBenchLegacyDataset",
     "CLgenDataset",
@@ -319,6 +323,7 @@ __all__ = [
     "CsmithDataset",
     "get_llvm_datasets",
     "GitHubDataset",
+    "JotaiBenchDataset",
     "LinuxDataset",
     "LlvmStressDataset",
     "MibenchDataset",

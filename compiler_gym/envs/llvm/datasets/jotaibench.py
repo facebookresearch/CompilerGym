@@ -55,7 +55,7 @@ class JotaiBenchDataset(TarDatasetWithManifest):
     ):
         manifest_url_, manifest_sha256_ = {
             "linux": (
-                "https://github.com/lac-dcc/jotai-benchmarks/raw/main/benchmarks/programs_no-ub_printableRetVal.bz2",
+                "https://github.com/lac-dcc/jotai-benchmarks/blob/main/benchmarks/jotaibench.bz2",
                 "3657a36b129d462c11d451a5bc9365e73f404a814e8726b383a2d7e64faa3d73",
             ),
         }[sys.platform]
@@ -71,12 +71,12 @@ class JotaiBenchDataset(TarDatasetWithManifest):
             manifest_urls=[manifest_url or manifest_url_],
             manifest_sha256=manifest_sha256 or manifest_sha256_,
             tar_urls=[
-                "https://github.com/lac-dcc/jotai-benchmarks/raw/main/benchmarks/programs_no-ub_printableRetVal.bz2"
+                "https://github.com/lac-dcc/jotai-benchmarks/blob/main/benchmarks/jotaibench.bz2"
             ],
             tar_sha256="3657a36b129d462c11d451a5bc9365e73f404a814e8726b383a2d7e64faa3d73",
-            strip_prefix="programs_no-ub_printableRetVal",
+            strip_prefix="jotaibench-v1",
             tar_compression="bz2",
-            benchmark_file_suffix=".bc",
+            benchmark_file_suffix=".c",
             sort_order=sort_order,
             deprecated=deprecated,
         )
@@ -138,7 +138,7 @@ class JotaiBenchRunnableDataset(TarDataset):
         site_data_base: Path,
     ):
         super().__init__(
-            name="benchmark://jotai-runnable-v0",
+            name="benchmark://jotai-runnable-v1",
             description="Runnable C/C++ functions extracted from GitHub",
             references={
                 "Paper": "https://homepages.dcc.ufmg.br/~fernando/publications/papers/FaustinoCGO21.pdf",
@@ -147,10 +147,10 @@ class JotaiBenchRunnableDataset(TarDataset):
             license="GNU General Public License v3.0 (GPLv3)",
             site_data_base=site_data_base,
             tar_urls=[
-                "https://github.com/lac-dcc/jotai-benchmarks/raw/main/benchmarks/programs_no-ub_printableRetVal.bz2"
+                "https://github.com/lac-dcc/jotai-benchmarks/blob/main/benchmarks/jotaibench.bz2"
             ],
             tar_sha256="3657a36b129d462c11d451a5bc9365e73f404a814e8726b383a2d7e64faa3d73",
-            strip_prefix="programs_no-ub_printableRetVal",
+            strip_prefix="jotaibench-v1",
             tar_compression="bz2",
             benchmark_file_suffix=".c",
         )
@@ -194,12 +194,12 @@ class JotaiBenchRunnableDataset(TarDataset):
             BenchmarkDynamicConfig(
                 build_cmd=Command(
                     argument=["$CC", "$IN"] + get_system_library_flags(),
-                    timeout_seconds=60,
+                    timeout_seconds=30,
                     outfile=["a.out"],
                 ),
                 run_cmd=Command(
                     argument=["./a.out 0"],
-                    timeout_seconds=60,
+                    timeout_seconds=30,
                     infile=[],
                     outfile=[],
                 ),

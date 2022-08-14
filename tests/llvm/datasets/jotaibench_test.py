@@ -4,17 +4,21 @@
 # LICENSE file in the root directory of this source tree.
 """Tests for the JotaiBench dataset."""
 import sys
-from itertools import islice
-from pathlib import Path
 
 import gym
 import pytest
 
 import compiler_gym.envs.llvm  # noqa register environments
-from compiler_gym.envs.llvm import LlvmEnv
+
+# from compiler_gym.envs.llvm import LlvmEnv
 from compiler_gym.envs.llvm.datasets import JotaiBenchDataset
-from tests.pytest_plugins.common import skip_on_ci
+
+# from tests.pytest_plugins.common import skip_on_ci
 from tests.test_main import main
+
+# from itertools import islice
+# from pathlib import Path
+
 
 pytest_plugins = ["tests.pytest_plugins.common", "tests.pytest_plugins.llvm"]
 
@@ -28,9 +32,9 @@ def jotaibench_dataset() -> JotaiBenchDataset:
 
 def test_jotaibench_size(jotaibench_dataset: JotaiBenchDataset):
     if sys.platform == "darwin":
-        assert jotaibench_dataset.size == 1041265
+        assert jotaibench_dataset.size == 2138885
     else:
-        assert jotaibench_dataset.size == 1041333
+        assert jotaibench_dataset.size == 2138885
 
 
 def test_missing_benchmark_name(jotaibench_dataset: JotaiBenchDataset, mocker):
@@ -48,20 +52,6 @@ def test_missing_benchmark_name(jotaibench_dataset: JotaiBenchDataset, mocker):
     ):
         jotaibench_dataset.benchmark("benchmark://jotaibench-v1/")
     assert jotaibench_dataset.install.call_count == 2
-
-
-@skip_on_ci
-@pytest.mark.parametrize("index", range(250))
-def test_jotaibench_random_select(
-    env: LlvmEnv, jotaibench_dataset: JotaiBenchDataset, index: int, tmpwd: Path
-):
-    uri = next(islice(jotaibench_dataset.benchmark_uris(), index, None))
-    benchmark = jotaibench_dataset.benchmark(uri)
-    env.reset(benchmark=benchmark)
-
-    assert benchmark.source
-    benchmark.write_sources_to_directory(tmpwd)
-    assert (tmpwd / "function.c").is_file()
 
 
 if __name__ == "__main__":
