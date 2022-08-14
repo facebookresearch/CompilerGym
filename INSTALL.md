@@ -73,7 +73,7 @@ remote changes to the CompilerGym repository.
 
 ## Building from source with Bazel
 
-It is recomended to build with Bazel.
+It is recommended to build with Bazel.
 
 Run the test suite to confirm that everything is working:
 
