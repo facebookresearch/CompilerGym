@@ -8,9 +8,6 @@ import subprocess
 import sys
 from concurrent.futures import as_completed
 from pathlib import Path
-from typing import Optional
-
-import numpy as np
 
 from compiler_gym.datasets import Benchmark, TarDatasetWithManifest
 from compiler_gym.datasets.benchmark import BenchmarkWithSource
@@ -139,12 +136,6 @@ class POJ104Dataset(TarDatasetWithManifest):
                 )
 
         return BenchmarkWithSource.create(uri, bitcode_path, "source.cc", cc_file_path)
-
-    def random_benchmark(
-        self, random_state: Optional[np.random.Generator] = None
-    ) -> Benchmark:
-        random_state = random_state or np.random.default_rng()
-        return self._get_benchmark_by_index(random_state.integers(self.size))
 
     @staticmethod
     def preprocess_poj104_source(src: str) -> str:
