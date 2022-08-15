@@ -22,6 +22,7 @@ import os
 import pickle
 import re
 import subprocess
+import warnings
 from functools import lru_cache
 from pathlib import Path
 from typing import Dict, List, NamedTuple, Optional, Union
@@ -222,15 +223,18 @@ class GccParamIntOption(Option):
 @lru_cache(maxsize=2)
 def get_docker_client():
     """Fetch the docker client singleton."""
-    try:
-        return docker.from_env()
-    except docker.errors.DockerException as e:
-        raise EnvironmentNotSupported(
-            f"Failed to initialize docker client needed by GCC environment: {e}.\n"
-            "Have you installed the runtime dependencies?\n See "
-            "<https://facebookresearch.github.io/CompilerGym/envs/gcc.html#installation> "
-            "for details."
-        ) from e
+    # Ignore deprecation warnings from docker.from_env().
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=DeprecationWarning)
+        try:
+            return docker.from_env()
+        except docker.errors.DockerException as e:
+            raise EnvironmentNotSupported(
+                f"Failed to initialize docker client needed by GCC environment: {e}.\n"
+                "Have you installed the runtime dependencies?\n See "
+                "<https://facebookresearch.github.io/CompilerGym/envs/gcc.html#installation> "
+                "for details."
+            ) from e
 
 
 # We only need to run this function once per image.
