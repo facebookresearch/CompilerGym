@@ -270,5 +270,10 @@ class SynchronousSqliteLogger(CompilerEnvWrapper):
         self.flush()
         self.env.close()
 
-    def fork(self):
-        raise NotImplementedError
+    def fork(self) -> "SynchronousSqliteLogger":
+        return SynchronousSqliteLogger(
+            env=LlvmEnv,
+            db_path=Path,
+            commit_frequency_in_seconds=300,
+            max_step_buffer_length=5000,
+        )
