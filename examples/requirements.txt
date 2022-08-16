@@ -1,8 +1,9 @@
 aioredis<2.0.0  # Pin version for ray.
-dgl==0.6.1
+dgl==0.9.0
 geneticalgorithm>=1.0.2
 hydra-core==1.1.0
-keras==2.6.0
+keras==2.6.0;python_version<"3.7"
+keras==2.8.0;python_version>="3.7"
 matplotlib>=3.3.4
 nevergrad>=0.4.3
 # NOTE(github.com/facebookresearch/CompilerGym/issues/750) Pin numpy version back
@@ -10,9 +11,10 @@ nevergrad>=0.4.3
 numpy>=1.19.3,<1.20.0
 opentuner>=0.8.5
 pandas>=1.1.5
-ray[default,rllib]==1.9.0
+ray[default,rllib]==1.13.0
 submitit>=1.2.0
 submitit>=1.2.0
-tensorflow==2.6.1
+tensorflow==2.6.2;python_version<"3.7"
+tensorflow==2.8.0;python_version>="3.7"
 torch>=1.6.0
 typer[all]>=0.3.2
