@@ -245,7 +245,7 @@ class Datasets:
         Select a dataset to sample from with some weight probability.
         If weights is None, select among `datasets` uniformly.
         """
-        datasets = datasets or self._datasets.values()
+        datasets = datasets or list(self._datasets.values())
         if weights is None:
             weights = [1 / len(datasets)] * len(datasets)
         if len(weights) != len(datasets):
