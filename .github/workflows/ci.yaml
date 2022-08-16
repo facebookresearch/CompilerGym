@@ -222,7 +222,7 @@ jobs:
 
             - name: Run the test suite
               run: |
-                  make install-test-cov \
+                  make test-cov \
                   PYTEST_ARGS="--ignore tests/llvm --ignore tests/gcc --ignore tests/loop_tool --ignore tests/mlir"
 
             - name: Upload coverage report to Codecov
@@ -286,7 +286,7 @@ jobs:
               shell: bash
 
             - name: Run the test suite
-              run: make install-test CI=1 PYTEST_ARGS="--ignore tests/mlir"
+              run: make test CI=1 PYTEST_ARGS="--ignore tests/mlir"
 
     test-mlir-env-linux-cmake:
         needs: build-mlir-env-linux-cmake
@@ -318,7 +318,7 @@ jobs:
               run: python -m pip install -r tests/requirements.txt
 
             - name: Run the test suite
-              run: make install-test-cov CI=1 TEST_TARGET="tests/mlir"
+              run: make test-cov CI=1 TEST_TARGET="tests/mlir"
 
     test-macos:
         needs: build-macos
@@ -351,7 +351,7 @@ jobs:
 
             - name: Run the test suite
               run: |
-                  make install-test-cov \
+                  make test-cov \
                   CI=1 \
                   PYTEST_ARGS="--ignore tests/llvm --ignore tests/gcc --ignore tests/loop_tool --ignore tests/mlir"
 
@@ -387,7 +387,7 @@ jobs:
               run: python -m pip install -r tests/requirements.txt
 
             - name: Run the test suite
-              run: make install-test-cov CI=1 TEST_TARGET="tests/llvm"
+              run: make test-cov CI=1 TEST_TARGET="tests/llvm"
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
@@ -421,7 +421,7 @@ jobs:
               run: python -m pip install -r tests/requirements.txt
 
             - name: Run the test suite
-              run: make install-test-cov CI=1 TEST_TARGET="tests/llvm"
+              run: make test-cov CI=1 TEST_TARGET="tests/llvm"
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
@@ -455,7 +455,7 @@ jobs:
               run: python -m pip install -r tests/requirements.txt
 
             - name: Run the test suite
-              run: make install-test-cov CI=1 TEST_TARGET="tests/gcc"
+              run: make test-cov CI=1 TEST_TARGET="tests/gcc"
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
@@ -491,7 +491,7 @@ jobs:
               run: python -m pip install -r tests/requirements.txt
 
             - name: Run the test suite
-              run: make install-test-cov CI=1 TEST_TARGET="tests/gcc"
+              run: make test-cov CI=1 TEST_TARGET="tests/gcc"
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
@@ -522,7 +522,7 @@ jobs:
               run: python -m pip install -r tests/requirements.txt
 
             - name: Run the test suite
-              run: make install-test-cov CI=1 TEST_TARGET="tests/gcc"
+              run: make test-cov CI=1 TEST_TARGET="tests/gcc"
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
@@ -553,7 +553,7 @@ jobs:
               run: python -m pip install -r tests/requirements.txt
 
             - name: Run the test suite
-              run: make install-test-cov CI=1 TEST_TARGET="tests/loop_tool"
+              run: make test-cov CI=1 TEST_TARGET="tests/loop_tool"
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
@@ -584,7 +584,7 @@ jobs:
               run: python -m pip install -r tests/requirements.txt
 
             - name: Run the test suite
-              run: make install-test-cov CI=1 TEST_TARGET="tests/loop_tool"
+              run: make test-cov CI=1 TEST_TARGET="tests/loop_tool"
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
@@ -735,7 +735,7 @@ jobs:
               run: python -m pip install -r tests/requirements.txt
 
             - name: Test
-              run: make install-test CI=1 TEST_TARGET=tests/llvm
+              run: make test CI=1 TEST_TARGET=tests/llvm
               env:
                   ASAN_OPTIONS: detect_leaks=1
                   CC: clang
