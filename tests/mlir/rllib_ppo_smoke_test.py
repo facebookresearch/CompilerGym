@@ -54,7 +54,10 @@ def test_rllib_ppo_smoke():
         "rollout_fragment_length": 2,
     }
     trainer = PPOTrainer(config=config)
-    trainer.train()
+    with warnings.catch_warnings():
+        # Ignore deprecation warnings from internal rllib implementation.
+        warnings.filterwarnings("ignore", category=DeprecationWarning)
+        trainer.train()
     ray.shutdown()
 
 
