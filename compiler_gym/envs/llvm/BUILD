@@ -57,6 +57,7 @@ py_library(
 py_library(
     name = "lexed_ir",
     srcs = ["lexed_ir.py"],
+    data = ["//compiler_gym/third_party/LexedIr:unlex-files"],
 )
 
 py_library(
