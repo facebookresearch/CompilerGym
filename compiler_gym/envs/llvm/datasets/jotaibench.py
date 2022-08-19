@@ -54,6 +54,10 @@ class JotaiBenchDataset(TarDatasetWithManifest):
         name: Optional[str] = None,
     ):
         manifest_url_, manifest_sha256_ = {
+            "darwin": (
+                "https://github.com/lac-dcc/jotai-benchmarks/blob/main/benchmarks/jotaibench.bz2?raw=true",
+                "202d14b0f3f78210c7472b7d4ef7c33d828174c30a3bced6950fc1ca88773983",
+            ),
             "linux": (
                 "https://github.com/lac-dcc/jotai-benchmarks/blob/main/benchmarks/jotaibench.bz2?raw=true",
                 "202d14b0f3f78210c7472b7d4ef7c33d828174c30a3bced6950fc1ca88773983",
