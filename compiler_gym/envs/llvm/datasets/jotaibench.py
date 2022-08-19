@@ -55,8 +55,8 @@ class JotaiBenchDataset(TarDatasetWithManifest):
     ):
         manifest_url_, manifest_sha256_ = {
             "linux": (
-                "https://github.com/lac-dcc/jotai-benchmarks/blob/main/benchmarks/jotaibench.bz2",
-                "3657a36b129d462c11d451a5bc9365e73f404a814e8726b383a2d7e64faa3d73",
+                "https://github.com/lac-dcc/jotai-benchmarks/blob/main/benchmarks/jotaibench.bz2?raw=true",
+                "202d14b0f3f78210c7472b7d4ef7c33d828174c30a3bced6950fc1ca88773983",
             ),
         }[sys.platform]
         super().__init__(
@@ -71,9 +71,9 @@ class JotaiBenchDataset(TarDatasetWithManifest):
             manifest_urls=[manifest_url or manifest_url_],
             manifest_sha256=manifest_sha256 or manifest_sha256_,
             tar_urls=[
-                "https://github.com/lac-dcc/jotai-benchmarks/blob/main/benchmarks/jotaibench.bz2"
+                "https://github.com/lac-dcc/jotai-benchmarks/blob/main/benchmarks/jotaibench.bz2?raw=true"
             ],
-            tar_sha256="3657a36b129d462c11d451a5bc9365e73f404a814e8726b383a2d7e64faa3d73",
+            tar_sha256="202d14b0f3f78210c7472b7d4ef7c33d828174c30a3bced6950fc1ca88773983",
             strip_prefix="jotaibench-v1",
             tar_compression="bz2",
             benchmark_file_suffix=".c",
@@ -147,9 +147,9 @@ class JotaiBenchRunnableDataset(TarDataset):
             license="GNU General Public License v3.0 (GPLv3)",
             site_data_base=site_data_base,
             tar_urls=[
-                "https://github.com/lac-dcc/jotai-benchmarks/blob/main/benchmarks/jotaibench.bz2"
+                "https://github.com/lac-dcc/jotai-benchmarks/blob/main/benchmarks/jotaibench.bz2?raw=true"
             ],
-            tar_sha256="3657a36b129d462c11d451a5bc9365e73f404a814e8726b383a2d7e64faa3d73",
+            tar_sha256="202d14b0f3f78210c7472b7d4ef7c33d828174c30a3bced6950fc1ca88773983",
             strip_prefix="jotaibench-v1",
             tar_compression="bz2",
             benchmark_file_suffix=".c",
