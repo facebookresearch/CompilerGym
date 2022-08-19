@@ -56,9 +56,9 @@ macos_only = pytest.mark.skipif(
 # Decorator to mark a test as skipped if not running under bazel.
 bazel_only = pytest.mark.skipif(not in_bazel(), reason="bazel only")
 
-# Decorator to mark a test as skipped if not running in the `install-test`
+# Decorator to mark a test as skipped if not running in the `make test`
 # environment.
-install_test_only = pytest.mark.skipif(in_bazel(), reason="install-test only")
+install_test_only = pytest.mark.skipif(in_bazel(), reason="test only")
 
 # Decorator to skip a test if docker is not available.
 with_docker = pytest.mark.skipif(

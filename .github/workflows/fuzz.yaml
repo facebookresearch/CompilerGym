@@ -52,4 +52,4 @@ jobs:
               run: python -m pip install -r tests/requirements.txt
 
             - name: Fuzz test
-              run: FUZZ_TIME=600 make install-fuzz
+              run: FUZZ_TIME=600 make fuzz

@@ -47,5 +47,12 @@ def test_poj104_random_select(
     assert (tmpwd / "source.cc").is_file()
 
 
+@skip_on_ci
+def test_poj104_random_benchmark(env: LlvmEnv, poj104_dataset: POJ104Dataset):
+    benchmark = poj104_dataset.random_benchmark()
+    env.reset(benchmark=benchmark)
+    assert benchmark.source
+
+
 if __name__ == "__main__":
     main()
