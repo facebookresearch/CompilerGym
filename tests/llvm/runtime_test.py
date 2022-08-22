@@ -191,10 +191,10 @@ def test_correct_number_of_observations_during_reset(
 
     # Check that the number of observations that you are receive during reset()
     # matches the amount that you asked for.
-    # FIXME(github.com/facebookresearch/CompilerGym/issues/756): This is broken.
-    # Only a single observation is received, irrespective of how many you ask
-    # for.
-    assert len(env.reward.spaces["runtimeseries"].last_runtime_observation) == 1
+    assert (
+        len(env.reward.spaces["runtimeseries"].last_runtime_observation)
+        == runtime_observation_count
+    )
 
     # Check that the number of observations that you are receive during step()
     # matches the amount that you asked for.
