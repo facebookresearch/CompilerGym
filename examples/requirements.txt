@@ -11,7 +11,5 @@ pandas>=1.1.5
 ray[default,rllib]==2.0.0
 submitit>=1.2.0
 submitit>=1.2.0
-tensorflow==2.6.2;python_version<"3.7"
-tensorflow==2.8.0;python_version>="3.7"
 torch>=1.6.0
 typer[all]>=0.3.2

@@ -1,7 +1,7 @@
 ---
 type: ImpalaTrainer
 args:
-    framework: tf
+    framework: torch
     horizon: 45
     evaluation_config:
         explore: false
