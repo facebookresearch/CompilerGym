@@ -263,25 +263,6 @@ def get_llvm_datasets(site_data_base: Optional[Path] = None) -> Iterable[Dataset
         deprecated="Please use anghabench-v1",
     )
     yield JotaiBenchDataset(site_data_base=site_data_base, sort_order=0)
-    # Add legacy version of Jotaibench using an old manifest.
-    jotaibench_v0_manifest_url, jotaibench_v0_manifest_sha256 = {
-        "darwin": (
-            "https://github.com/lac-dcc/jotai-benchmarks/blob/main/benchmarks/jotaibench.bz2",
-            "39464256405aacefdb7550a7f990c9c578264c132804eec3daac091fa3c21bd1",
-        ),
-        "linux": (
-            "https://github.com/lac-dcc/jotai-benchmarks/blob/main/benchmarks/jotaibench.bz2",
-            "3657a36b129d462c11d451a5bc9365e73f404a814e8726b383a2d7e64faa3d73",
-        ),
-    }[sys.platform]
-    yield JotaiBenchDataset(
-        name="benchmark://jotaibench-v0",
-        site_data_base=site_data_base,
-        sort_order=0,
-        manifest_url=jotaibench_v0_manifest_url,
-        manifest_sha256=jotaibench_v0_manifest_sha256,
-        deprecated="Please use jotaibench-v1",
-    )
     yield BlasDataset(site_data_base=site_data_base, sort_order=0)
     yield CLgenDataset(site_data_base=site_data_base, sort_order=0)
     yield CBenchDataset(site_data_base=site_data_base)
