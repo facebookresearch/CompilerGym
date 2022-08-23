@@ -20,7 +20,7 @@ class RuntimeSeriesReward(Reward):
         default_value: int = 0,
     ):
         super().__init__(
-            name="runtime",
+            name="runtimeseries",
             observation_spaces=["Runtime"],
             default_value=default_value,
             min=None,
