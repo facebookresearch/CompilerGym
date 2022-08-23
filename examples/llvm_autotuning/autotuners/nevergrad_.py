@@ -29,7 +29,10 @@ def nevergrad(
 
         https://facebookresearch.github.io/nevergrad/
     """
-    if optimization_target == OptimizationTarget.RUNTIME:
+    if (
+        optimization_target == OptimizationTarget.RUNTIME or
+        optimization_target == OptimizationTarget.RUNTIME_SERIES
+    ):
 
         def calculate_negative_reward(actions: Tuple[ActionType]) -> float:
             env.reset()
