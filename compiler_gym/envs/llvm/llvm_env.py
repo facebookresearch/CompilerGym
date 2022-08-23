@@ -377,6 +377,8 @@ class LlvmEnv(ClientServiceCompilerEnv):
                 or "Error reading file:" in str(e)
             ):
                 raise BenchmarkInitError(str(e)) from e
+            elif "Failed to parse LLVM bitcode" in str(e):
+                raise BenchmarkInitError(str(e)) from e
             raise
 
     def make_benchmark(

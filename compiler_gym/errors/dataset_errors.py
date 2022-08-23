@@ -4,7 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 
-class BenchmarkInitError(OSError):
+class BenchmarkInitError(OSError, ValueError):
     """Base class for errors raised if a benchmark fails to initialize."""
 
 

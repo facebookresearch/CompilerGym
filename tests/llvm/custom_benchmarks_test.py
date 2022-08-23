@@ -46,7 +46,7 @@ def test_invalid_benchmark_data(env: LlvmEnv):
     )
 
     with pytest.raises(
-        ValueError, match='Failed to parse LLVM bitcode: "benchmark://new"'
+        BenchmarkInitError, match='Failed to parse LLVM bitcode: "benchmark://new"'
     ):
         env.reset(benchmark=benchmark)
 
@@ -69,7 +69,7 @@ def test_benchmark_path_empty_file(env: LlvmEnv):
 
         benchmark = Benchmark.from_file("benchmark://new", tmpdir / "test.bc")
 
-        with pytest.raises(ValueError, match="Failed to parse LLVM bitcode"):
+        with pytest.raises(BenchmarkInitError, match="Failed to parse LLVM bitcode"):
             env.reset(benchmark=benchmark)
 
 
@@ -81,7 +81,7 @@ def test_invalid_benchmark_path_contents(env: LlvmEnv):
 
         benchmark = Benchmark.from_file("benchmark://new", tmpdir / "test.bc")
 
-        with pytest.raises(ValueError, match="Failed to parse LLVM bitcode"):
+        with pytest.raises(BenchmarkInitError, match="Failed to parse LLVM bitcode"):
             env.reset(benchmark=benchmark)
 
 
