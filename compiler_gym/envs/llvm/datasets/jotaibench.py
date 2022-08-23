@@ -56,15 +56,15 @@ class JotaiBenchDataset(TarDatasetWithManifest):
         manifest_url_, manifest_sha256_ = {
             "darwin": (
                 "https://github.com/lac-dcc/jotai-benchmarks/blob/main/benchmarks/jotaibench.bz2?raw=true",
-                "202d14b0f3f78210c7472b7d4ef7c33d828174c30a3bced6950fc1ca88773983",
+                "b5a51af3d4e2f77a66001635ec64ed321e0ece19873c4a888040859af7556401",
             ),
             "linux": (
                 "https://github.com/lac-dcc/jotai-benchmarks/blob/main/benchmarks/jotaibench.bz2?raw=true",
-                "202d14b0f3f78210c7472b7d4ef7c33d828174c30a3bced6950fc1ca88773983",
+                "b5a51af3d4e2f77a66001635ec64ed321e0ece19873c4a888040859af7556401",
             ),
         }[sys.platform]
         super().__init__(
-            name=name or "benchmark://jotaibench-v1",
+            name=name or "benchmark://jotaibench-v0",
             description="Compile-only C/C++ functions extracted from GitHub",
             references={
                 "Paper": "https://homepages.dcc.ufmg.br/~fernando/publications/papers/FaustinoCGO21.pdf",
@@ -77,8 +77,8 @@ class JotaiBenchDataset(TarDatasetWithManifest):
             tar_urls=[
                 "https://github.com/lac-dcc/jotai-benchmarks/blob/main/benchmarks/jotaibench.bz2?raw=true"
             ],
-            tar_sha256="202d14b0f3f78210c7472b7d4ef7c33d828174c30a3bced6950fc1ca88773983",
-            strip_prefix="jotaibench-v1",
+            tar_sha256="b5a51af3d4e2f77a66001635ec64ed321e0ece19873c4a888040859af7556401",
+            strip_prefix="jotaibench-v0",
             tar_compression="bz2",
             benchmark_file_suffix=".c",
             sort_order=sort_order,
@@ -142,7 +142,7 @@ class JotaiBenchRunnableDataset(TarDataset):
         site_data_base: Path,
     ):
         super().__init__(
-            name="benchmark://jotai-runnable-v1",
+            name="benchmark://jotai-runnable-v0",
             description="Runnable C/C++ functions extracted from GitHub",
             references={
                 "Paper": "https://homepages.dcc.ufmg.br/~fernando/publications/papers/FaustinoCGO21.pdf",
@@ -153,8 +153,8 @@ class JotaiBenchRunnableDataset(TarDataset):
             tar_urls=[
                 "https://github.com/lac-dcc/jotai-benchmarks/blob/main/benchmarks/jotaibench.bz2?raw=true"
             ],
-            tar_sha256="202d14b0f3f78210c7472b7d4ef7c33d828174c30a3bced6950fc1ca88773983",
-            strip_prefix="jotaibench-v1",
+            tar_sha256="b5a51af3d4e2f77a66001635ec64ed321e0ece19873c4a888040859af7556401",
+            strip_prefix="jotaibench-v0",
             tar_compression="bz2",
             benchmark_file_suffix=".c",
         )

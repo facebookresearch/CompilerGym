@@ -22,7 +22,7 @@ pytest_plugins = ["tests.pytest_plugins.common", "tests.pytest_plugins.llvm"]
 @pytest.fixture(scope="module")
 def jotaibench_dataset() -> JotaiBenchDataset:
     with gym.make("llvm-v0") as env:
-        ds = env.datasets["jotaibench-v1"]
+        ds = env.datasets["jotaibench-v0"]
     yield ds
 
 
@@ -38,15 +38,15 @@ def test_missing_benchmark_name(jotaibench_dataset: JotaiBenchDataset, mocker):
     mocker.patch.object(jotaibench_dataset, "install")
 
     with pytest.raises(
-        LookupError, match=r"^No benchmark specified: benchmark://jotaibench-v1$"
+        LookupError, match=r"^No benchmark specified: benchmark://jotaibench-v0$"
     ):
-        jotaibench_dataset.benchmark("benchmark://jotaibench-v1")
+        jotaibench_dataset.benchmark("benchmark://jotaibench-v0")
     jotaibench_dataset.install.assert_called_once()
 
     with pytest.raises(
-        LookupError, match=r"^No benchmark specified: benchmark://jotaibench-v1/$"
+        LookupError, match=r"^No benchmark specified: benchmark://jotaibench-v0/$"
     ):
-        jotaibench_dataset.benchmark("benchmark://jotaibench-v1/")
+        jotaibench_dataset.benchmark("benchmark://jotaibench-v0/")
     assert jotaibench_dataset.install.call_count == 2
 
 
