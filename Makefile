@@ -291,6 +291,8 @@ TEST_TARGET ?=
 # Extra command line arguments for pytest.
 PYTEST_ARGS ?=
 
+DEFAULT_PYTEST_ARGS = --ignore tests/mlir
+
 # The path of the XML pytest coverage report to generate when running the
 # test-cov target.
 COV_REPORT ?= $(ROOT)/coverage.xml
@@ -312,7 +314,7 @@ install-test-setup:
 	ln -s "$(ROOT)/tox.ini" "$(INSTALL_TEST_ROOT)"
 
 define pytest
-	cd "$(INSTALL_TEST_ROOT)" && pytest $(if $(TEST_TARGET),$(TEST_TARGET),tests) $(1) $(PYTEST_ARGS)
+	cd "$(INSTALL_TEST_ROOT)" && pytest $(if $(TEST_TARGET),$(TEST_TARGET),tests) $(1) $(DEFAULT_PYTEST_ARGS) $(PYTEST_ARGS)
 endef
 
 # DEPRECATED(v0.2.5): To be removed no earlier than v0.2.6.
