@@ -607,11 +607,9 @@ class LlvmEnv(ClientServiceCompilerEnv):
             self.send_param(
                 "llvm.set_runtimes_per_observation_count", str(n), resend_on_reset=True
             )
-            # NOTE(cummins): Keep this after the send_param() call because
-            # send_param() will raise an error if the valid is invalid.
-            self._runtimes_per_observation_count = n
         except SessionNotFound:
             pass  # Not in session yet, will be sent on reset().
+        self._runtimes_per_observation_count = n
 
     @property
     def runtime_warmup_runs_count(self) -> int:
@@ -649,11 +647,9 @@ class LlvmEnv(ClientServiceCompilerEnv):
                 str(n),
                 resend_on_reset=True,
             )
-            # NOTE(cummins): Keep this after the send_param() call because
-            # send_param() will raise an error if the valid is invalid.
-            self._runtimes_warmup_per_observation_count = n
         except SessionNotFound:
             pass  # Not in session yet, will be sent on reset().
+        self._runtimes_warmup_per_observation_count = n
 
     def fork(self):
         fkd = super().fork()
