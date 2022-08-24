@@ -12,7 +12,7 @@ const MainNavbar = () => {
   const { darkTheme, toggleTheme } = useContext(ThemeContext);
 
   return (
-    <Navbar bg="dark" variant="dark" expand="lg">
+    <Navbar bg="primary" variant="dark" expand="lg">
       <Container fluid>
         <Navbar.Brand>CompilerGym Explorer</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />

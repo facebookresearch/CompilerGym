@@ -4,8 +4,10 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import React, { useEffect, useState, useRef} from 'react';
+import React, { useEffect, useState, useRef, useContext } from 'react';
+import classnames from "classnames";
 import ControlsContainer from './ControlsContainer';
+import ThemeContext from '../../context/ThemeContext'
 
 const MIN_WIDTH = 140;
 
@@ -35,6 +37,7 @@ const PanelsContainer = ({right, className}) => {
     const [separatorXPosition, setSeparatorXPosition] = useState(undefined)
     const [dragging, setDragging] = useState(false);
     const splitPanelRef = useRef();
+    const themeContext = useContext(ThemeContext);
 
     const onMouseDown = (e) => {
       setSeparatorXPosition(e.clientX);
@@ -96,25 +99,28 @@ const PanelsContainer = ({right, className}) => {
     });
 
     return (
-        <div ref={splitPanelRef} className={`splitView ${className || ""}`}>
-          <LeftPanel leftWidth={leftWidth} setLeftWidth={setLeftWidth}>
-            <ControlsContainer/>
-          </LeftPanel>
+      <div
+        ref={splitPanelRef}
+        className={classnames(`splitView ${className}`, {
+          "bg-dark": themeContext.darkTheme,
+        })}
+      >
+        <LeftPanel leftWidth={leftWidth} setLeftWidth={setLeftWidth}>
+          <ControlsContainer />
+        </LeftPanel>
 
-          <div
-            className="divider-hitbox"
-            onMouseDown={onMouseDown}
-            onTouchStart={onTouchStart}
-            onTouchEnd={onMouseUp}
-          >
-            <div className="divider" />
-          </div>
-
-          <div className="rightPane">
-            {right}
-          </div>
+        <div
+          className="divider-hitbox"
+          onMouseDown={onMouseDown}
+          onTouchStart={onTouchStart}
+          onTouchEnd={onMouseUp}
+        >
+          <div className="divider" />
         </div>
-    )
+
+        <div className="rightPane">{right}</div>
+      </div>
+    );
 }
 
 export default PanelsContainer;

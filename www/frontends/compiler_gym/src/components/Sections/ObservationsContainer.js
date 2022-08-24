@@ -5,6 +5,7 @@
  */
 
 import React, { useContext, useState } from "react";
+import classnames from "classnames";
 import { Tabs, Tab } from "react-bootstrap";
 import ApiContext from "../../context/ApiContext";
 import ThemeContext from "../../context/ThemeContext";
@@ -63,7 +64,10 @@ const StateContainer = () => {
     <>
       <div className="m-0 action-navbar-wrapper">
         <Tabs
-          className="bg-white"
+          className={classnames({
+            "dark_tabs": themeContext.darkTheme,
+            "light_tabs": !themeContext.darkTheme,
+          })}
           id="uncontrolled-tab"
           activeKey={stateSelector}
           transition={false}

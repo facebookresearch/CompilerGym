@@ -114,3 +114,29 @@
     top: 8rem;
   }
 }
+
+.light_tabs {
+  background-color: $white;
+  li,
+  button {
+    background-color: $white !important;
+    color: $dark !important;
+    border-bottom: 2px solid $gray-300;
+  }
+}
+
+.dark_tabs {
+  background-color: $dark;
+  li,
+  button {
+    background-color: $dark !important;
+    color: $white !important;
+    border-bottom: 2px solid $gray-400 !important;
+  }
+}
+
+
+.btn-primary:active {
+  color: black;
+  background-color:$dark !important;
+}
