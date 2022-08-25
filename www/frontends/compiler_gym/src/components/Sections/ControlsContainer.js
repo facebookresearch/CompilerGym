@@ -34,7 +34,8 @@ const ControlsContainer = () => {
     layer: 1,
   });
   const [locationKeys, setLocationKeys] = useState([]);
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
+  const [isRunning, setIsRunning] = useState(false);
 
   const children =
     compilerGym.actions &&
@@ -216,7 +217,7 @@ const ControlsContainer = () => {
         `${params.dataset}/${params.datasetUri}`,
         params.reward,
         "",
-        "1"
+        ""
       );
       setSession(response);
       setTreeData(
@@ -274,10 +275,12 @@ const ControlsContainer = () => {
     let nodeActionID = nodeDatum.action_id.split(".")[0];
     let nodeDepth = nodeDatum.__rd3t.depth;
 
+    setIsRunning(true)
     // Reset all actions when root node is clicked.
     if (nodeDepth === 0) {
       await resetAllActions();
       handleResetActionsTracker();
+      setIsRunning(false)
     }
 
     if (nodeDatum !== undefined && nodeDepth !== 0) {
@@ -289,6 +292,7 @@ const ControlsContainer = () => {
             actionsTaken: [...actionsTracker.actionsTaken, nodeDatum.action_id],
             layer: actionsTracker.layer + 1,
           });
+          setIsRunning(false)
         } else if (nodeDepth === session.states.length - 1 && nodeDepth > 1) { // level of node clicked is one previous to last level of tree.
           await undoStep();
           setActionsTracker({
@@ -301,6 +305,7 @@ const ControlsContainer = () => {
             actionsTaken: actionsTracker.actionsTaken.slice(0, -1),
             layer: actionsTracker.layer - 1,
           });
+          setIsRunning(false)
         } else if (nodeDepth < session.states.length && nodeDepth > 0) { // level of node clicked is between root and last children.
           let actionIds = actionsTracker.actionsTaken
             .map((i) => i.split(".")[0])
@@ -311,6 +316,7 @@ const ControlsContainer = () => {
             nodeActionID
           ); // modify the array of actions adding the node clicked and removing ones on the right side of array.
           await replicateSteps(actionIds);
+          setIsRunning(false)
         } else {
           return;
         }
@@ -445,6 +451,7 @@ const ControlsContainer = () => {
       <RewardsSection
         session={session}
         highlightedPoint={highlightedPoint}
+        isRunning={isRunning}
         handleClickOnChart={handleClickOnChart}
       />
     </div>

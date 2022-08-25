@@ -6,7 +6,7 @@
 
 import React, { useState, useEffect, useContext } from "react";
 import classnames from "classnames";
-import { Row, FormControl, Col } from "react-bootstrap";
+import { Row, FormControl, Col, Spinner } from "react-bootstrap";
 import ThemeContext from "../../context/ThemeContext";
 import RewardHistoryChart from "./RewardHistoryChart";
 
@@ -17,7 +17,7 @@ import RewardHistoryChart from "./RewardHistoryChart";
  * @param {Object} highlightedPoint an object prop containing data about a node in the tree to display an action description.
  * @returns
  */
-const RewardsSection = ({ session, highlightedPoint, handleClickOnChart }) => {
+const RewardsSection = ({ session, highlightedPoint, isRunning, handleClickOnChart }) => {
   const { darkTheme } = useContext(ThemeContext);
   const [cumulativeSum, setCumulativeSum] = useState("");
   const [toggle, setToggle] = useState(true);
@@ -62,15 +62,27 @@ const RewardsSection = ({ session, highlightedPoint, handleClickOnChart }) => {
           <Col lg={4} md={4} xs={4}></Col>
         )}
         <Col lg={7} md={7} xs={7} className="text-right">
-          {highlightedPoint.nodeDescription && (
+          {highlightedPoint.nodeDescription && !isRunning ? (
             <h5>
               <span className="text-weight">Depth: </span>
               {highlightedPoint.point}
             </h5>
-          )}
+          ) : null}
+          {isRunning && !highlightedPoint.nodeDescription ? (
+            <Spinner
+              animation="border"
+              role="status"
+              aria-hidden="true"
+              variant={darkTheme ? "success" : "dark"}
+            />
+          ) : null}
         </Col>
       </Row>
-      <RewardHistoryChart session={session} highlightedPoint={highlightedPoint} handleClickOnChart={handleClickOnChart}/>
+      <RewardHistoryChart
+        session={session}
+        highlightedPoint={highlightedPoint}
+        handleClickOnChart={handleClickOnChart}
+      />
     </>
   );
 };
