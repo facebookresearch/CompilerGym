@@ -70,7 +70,15 @@ class RuntimePointEstimateReward(CompilerEnvWrapper):
         )
 
 class RuntimeSeriesEstimateReward(CompilerEnvWrapper):
-    """TODO: documentation
+    """LLVM wrapper that estimates the runtime of a program using N runtime
+    observations and uses it as the reward.
+
+    This class wraps an LLVM environment and registers a new runtime reward
+    space. It is similar to the RuntimePointEstimateReward except that it only
+    computes runtime differences if the change in runtime is significantly
+    different from the runtimes in the previous step.
+
+    See RuntimeSeriesReward for more details.
     """
 
     def __init__(
@@ -101,7 +109,7 @@ class RuntimeSeriesEstimateReward(CompilerEnvWrapper):
 
     def fork(self) -> "RuntimeSeriesEstimateReward":
         fkd = self.env.fork()
-        # Remove the original "runtime" space so that we that new
+        # Remove the original "runtimeseries" space so that we that new
         # RuntimeSeriesEstimateReward wrapper instance does not attempt to
         # redefine, raising a warning.
         del fkd.unwrapped.reward.spaces["runtimeseries"]
