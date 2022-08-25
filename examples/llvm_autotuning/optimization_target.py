@@ -94,29 +94,10 @@ class OptimizationTarget(str, Enum):
                 env.observation.ObjectTextSizeBytes(), 1
             )
 
-        if self.value == OptimizationTarget.RUNTIME:
-            with _RUNTIME_LOCK:
-                with compiler_gym.make("llvm-v0", benchmark=env.benchmark) as new_env:
-                    new_env.reset()
-                    new_env.runtime_observation_count = runtime_count
-                    new_env.runtime_warmup_count = 0
-                    new_env.apply(env.state)
-                    final_runtimes = new_env.observation.Runtime()
-                    assert len(final_runtimes) == runtime_count
-
-                    new_env.reset()
-                    new_env.send_param("llvm.apply_baseline_optimizations", "-O3")
-                    o3_runtimes = new_env.observation.Runtime()
-                    assert len(o3_runtimes) == runtime_count
-
-                logger.debug("O3 runtimes: %s", o3_runtimes)
-                logger.debug("Final runtimes: %s", final_runtimes)
-                speedup = np.median(o3_runtimes) / max(np.median(final_runtimes), 1e-12)
-                logger.debug("Speedup: %.4f", speedup)
-
-                return speedup
-
-        if self.value == OptimizationTarget.RUNTIME_SERIES:
+        if (
+            self.value == OptimizationTarget.RUNTIME or
+            self.value == OptimizationTarget.RUNTIME_SERIES
+        ):
             with _RUNTIME_LOCK:
                 with compiler_gym.make("llvm-v0", benchmark=env.benchmark) as new_env:
                     new_env.reset()
