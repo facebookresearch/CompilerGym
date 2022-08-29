@@ -20,7 +20,7 @@ import {
 import ApiContext from "../../context/ApiContext";
 import ThemeContext from "../../context/ThemeContext";
 import LargeModal from "../Modals/LargeModal";
-import { getCommandLineArray, INITIAL_SETTINGS } from "../../utils/Helpers";
+import { getCommandLineArray } from "../../utils/Helpers";
 
 const CustomMenu = forwardRef(
   ({children, style, className, "aria-labelledby": labeledBy}, ref) => {
@@ -148,11 +148,6 @@ const ActionsNavbar = ({
     ) {
       setIsLoading(true)
       fetchData();
-    } else {
-      searchParams.set("dataset", INITIAL_SETTINGS.dataset);
-      searchParams.set("dataset_uri", INITIAL_SETTINGS.datasetUri);
-      searchParams.set("reward", INITIAL_SETTINGS.reward);
-      history.push({ ...location, search: searchParams.toString() });
     }
 
     return () => {};

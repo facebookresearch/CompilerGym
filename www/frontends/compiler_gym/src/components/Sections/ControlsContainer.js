@@ -274,8 +274,16 @@ const ControlsContainer = () => {
   const handleNodeClick = async (nodeDatum) => {
     let nodeActionID = nodeDatum.action_id.split(".")[0];
     let nodeDepth = nodeDatum.__rd3t.depth;
-
     setIsRunning(true)
+
+    // Push parameters to URL only when there are not parameters set.
+    if (!location.search) {
+      searchParams.set("dataset", params.dataset);
+      searchParams.set("dataset_uri", params.datasetUri);
+      searchParams.set("reward", params.reward);
+      history.push({ ...location, search: searchParams.toString() });
+    }
+
     // Reset all actions when root node is clicked.
     if (nodeDepth === 0) {
       await resetAllActions();
