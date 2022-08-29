@@ -13,13 +13,9 @@ import ThemeContext from "./context/ThemeContext";
 import useThemeDetector from "./hooks/useThemeDetector";
 import SplashPage from "./components/Pages/SplashPage";
 import MainPage from "./components/Pages/MainPage";
+import { INITIAL_SETTINGS } from "./utils/Helpers";
 
 const api = new ApiService();
-const INITIAL_SETTINGS = {
-  reward: "IrInstructionCountOz",
-  dataset: "benchmark://cbench-v1",
-  datasetUri: "adpcm",
-};
 
 function App() {
   const isDarkTheme = useThemeDetector();

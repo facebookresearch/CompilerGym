@@ -10,7 +10,7 @@ import { useHistory, useLocation } from "react-router";
 import { Spinner } from "react-bootstrap";
 import ApiContext from "../../context/ApiContext";
 import ThemeContext from "../../context/ThemeContext";
-import { makeSessionTreeData } from "../../utils/Helpers";
+import { INITIAL_SETTINGS, makeSessionTreeData } from "../../utils/Helpers";
 import ActionsNavbar from "../Navbars/ActionsNavbar";
 import SearchTree from "./SearchTree";
 import RewardsSection from "./RewardsSection";
@@ -69,6 +69,10 @@ const ControlsContainer = () => {
       setTreeData(
         makeSessionTreeData(session.states, children, session.commandline)
       );
+      searchParams.set("dataset", INITIAL_SETTINGS.dataset);
+      searchParams.set("dataset_uri", INITIAL_SETTINGS.datasetUri);
+      searchParams.set("reward", INITIAL_SETTINGS.reward);
+      history.push({ ...location, search: searchParams.toString() });
     }
     return () => {};
   }, [session.states]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -403,7 +407,7 @@ const ControlsContainer = () => {
         point: null,
       }));
     }
-  },[]);
+  }, []);
 
   /**
    * a setter that listens to a click on the historial reward chart.
