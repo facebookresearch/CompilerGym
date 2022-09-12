@@ -224,7 +224,11 @@ def _make_benchmark(name: str, source: str) -> Benchmark:
         tmpfile = Path(d) / Path(name).name
         with open(tmpfile, "w") as f:
             f.write(source)
-        return make_benchmark(tmpfile, timeout=60)
+
+        try:
+            return make_benchmark(tmpfile, timeout=60)
+        except Exception as e:
+            raise ValueError(f"Failed to compiler benchmark {name}: {e}")
 
 
 def _step(request: StepRequest) -> StepReply:
