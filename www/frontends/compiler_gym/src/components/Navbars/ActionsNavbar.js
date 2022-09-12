@@ -241,7 +241,7 @@ const ActionsNavbar = ({
           <Col lg={3} md={3} xs={12} className="mt-1 pr-lg-1">
             <InputGroup className="mb-1">
               <Dropdown as={InputGroup.Prepend} onSelect={handleNewDataset}>
-                <Dropdown.Toggle variant="dark" id="dropdown-benchmark">
+                <Dropdown.Toggle variant="primary" id="dropdown-benchmark">
                   Dataset
                 </Dropdown.Toggle>
                 <Dropdown.Menu
@@ -271,7 +271,7 @@ const ActionsNavbar = ({
           <Col lg={3} md={3} xs={12} className="mt-1 pl-lg-0 pr-lg-1">
             <InputGroup className="mb-1">
               <Dropdown as={InputGroup.Prepend} onSelect={handleDatasetUri}>
-                <Dropdown.Toggle variant="dark" id="dropdown-benchmark-uri">
+                <Dropdown.Toggle variant="primary" id="dropdown-benchmark-uri">
                   Benchmark
                 </Dropdown.Toggle>
                 <Dropdown.Menu
@@ -301,7 +301,7 @@ const ActionsNavbar = ({
           <Col lg={3} md={3} xs={12} className="mt-1 pl-lg-0 pr-lg-1">
             <InputGroup className="mb-1">
               <Dropdown as={InputGroup.Prepend} onSelect={handleRewardSelect}>
-                <Dropdown.Toggle variant="dark" id="dropdown-reward">
+                <Dropdown.Toggle variant="primary" id="dropdown-reward">
                   Reward
                 </Dropdown.Toggle>
                 <Dropdown.Menu
@@ -332,7 +332,7 @@ const ActionsNavbar = ({
           <Col lg={3} md={3} sm={12} className="mt-1 pl-lg-0">
             <InputGroup className="mb-1">
               <Dropdown as={InputGroup.Prepend} onSelect={handleActionSpace}>
-                <Dropdown.Toggle variant="dark" id="dropdown-action-space">
+                <Dropdown.Toggle variant="primary" id="dropdown-action-space">
                   Actions
                 </Dropdown.Toggle>
                 <Dropdown.Menu
@@ -365,7 +365,7 @@ const ActionsNavbar = ({
           <Col lg={11} md={11} xs={11} className="my-1">
             <InputGroup>
               <InputGroup.Text
-                className="bg-dark"
+                className="bg-primary"
                 id="inputGroup-sizing-sm"
                 style={{ color: "white" }}
               >

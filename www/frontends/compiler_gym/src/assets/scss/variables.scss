@@ -53,7 +53,7 @@ $cyan:    #87bfa1 !default;
 $blue2:   #5CA5B2 !default;
 
 $default:       #172b4d !default;
-$primary:       #2D303D !default;
+$primary:       #1b1c1c !default;
 $secondary:     $gray-200 !default;
 $success:       $green !default;
 $info:          $teal !default;
@@ -140,11 +140,15 @@ $input-border-color:          rgba($dark, .15) !default;
 // Dropdown
 
 $dropdown-bg:                    $dark !default;
-$dropdown-border-width:          0 !default;
-$dropdown-border-color:          rgba($black, .15) !default;
+$dropdown-border-width:          1px !default;
+$dropdown-border-color:          rgba($white, .35) !default;
 $dropdown-font-size:             .75rem !default;
 
 $dropdown-link-color:            $white !default;
+
+$dropdown-link-hover-color:      darken($gray-900, 5%) !default;
+$dropdown-link-hover-bg:         $gray-100 !default;
+
 $dropdown-link-active-color:     $dark !default;
 $dropdown-link-active-bg:        $gray-300 !default;
 
@@ -171,3 +175,11 @@ $list-group-action-hover-color:     $primary;
 
 $list-group-action-active-color:    $dark;
 $list-group-action-active-bg:       $gray-200;
+
+// Tabs
+
+$nav-tabs-border-color:             $gray-400;
+$nav-tabs-border-radius:            $border-radius;
+$nav-tabs-link-hover-border-color:  $gray-300 $gray-300 $nav-tabs-border-color;
+$nav-tabs-link-active-color:        $gray-700;
+$nav-tabs-link-active-border-color: $gray-300 $gray-300 $gray-300;

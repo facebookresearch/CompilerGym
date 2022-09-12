@@ -5,23 +5,33 @@
  */
 
 import React, { useState, useEffect, useRef } from "react";
-import { Modal, Button, FormControl, Row, Col } from "react-bootstrap";
+import { Modal, Button, FormControl, Row, Col, Badge } from "react-bootstrap";
 
 const LargeModal = ({ showModal, handleModal, title, getShareLink }) => {
   const [copySuccess, setCopySuccess] = useState("");
-  const [shareLink, setShareLink] = useState("")
+  const [shareLink, setShareLink] = useState("");
   const textAreaRef = useRef();
 
   useEffect(() => {
-    setShareLink(getShareLink)
-    return () => {}
-  }, [getShareLink])
+    setShareLink(getShareLink);
+    return () => {};
+  }, [getShareLink]);
+
+  /**
+   * Resets clipboard message on closing modal.
+   */
+  useEffect(() => {
+    if (!showModal) {
+      setCopySuccess("");
+    }
+    return () => {};
+  }, [showModal]);
 
   const copyToClipboard = (e) => {
     textAreaRef.current.select();
     document.execCommand("copy");
     e.target.focus();
-    setCopySuccess("Copied!");
+    setCopySuccess("Copied to clipboard");
   };
 
   return (
@@ -41,12 +51,17 @@ const LargeModal = ({ showModal, handleModal, title, getShareLink }) => {
             />
           </Col>
           <Col lg={1} md={1} xs={1}>
-            <i className="bi bi-clipboard cg-icon" onClick={copyToClipboard}></i>
+            <i
+              className="bi bi-clipboard cg-icon"
+              onClick={copyToClipboard}
+            ></i>
           </Col>
         </Row>
         <Row className="justify-content-start">
-          <Col lg={2} className="mt-1 h5">
-            {copySuccess}
+          <Col lg={2} className="mt-2 h3">
+            <Badge pill bg="success">
+              {copySuccess}
+            </Badge>
           </Col>
         </Row>
       </Modal.Body>

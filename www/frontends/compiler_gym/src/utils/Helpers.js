@@ -5,6 +5,15 @@
  */
 
 /**
+ * Default settings to set up environment on a fresh page session
+ */
+export const INITIAL_SETTINGS = {
+  reward: "IrInstructionCountOz",
+  dataset: "benchmark://cbench-v1",
+  datasetUri: "adpcm",
+};
+
+/**
  * An utility function to test for an empty object.
  * @param {Object} obj
  * @returns {Boolean}
