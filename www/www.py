@@ -49,7 +49,11 @@ This exposes an API with two operations:
         Compute the state from the given environment description. Query
         arguments:
 
-            benchmark: The name of the benchmark.
+            benchmark: The name of the benchmark. If "benchmark_source" is set
+                (see below), this is the name of the local file that the user
+                selected.
+
+            benchmark_source: An inline string of code to use as the benchmark.
 
             reward: The name of the reward signal to use.
 
@@ -79,17 +83,21 @@ This exposes an API with two operations:
 import logging
 import os
 import sys
+import tempfile
+from functools import lru_cache
 from itertools import islice
 from pathlib import Path
 from threading import Lock
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from flask import Flask, jsonify, request, send_file
 from flask_cors import CORS
 from pydantic import BaseModel
 
 import compiler_gym
+from compiler_gym.datasets.benchmark import Benchmark
 from compiler_gym.envs import LlvmEnv
+from compiler_gym.envs.llvm import make_benchmark
 from compiler_gym.util.truncate import truncate
 
 app = Flask("compiler_gym")
@@ -122,6 +130,9 @@ class StepRequest(BaseModel):
     # The name of the benchmark.
     benchmark: str
 
+    # The inline source code for a benchmark.
+    benchmark_source: Optional[str]
+
     # The reward space to use.
     reward: str
 
@@ -149,6 +160,7 @@ class StepRequest(BaseModel):
 
         return cls(
             benchmark=required_arg("benchmark"),
+            benchmark_source=request.args.get("benchmark_source"),
             reward=required_arg("reward"),
             actions=actions,
             all_states=request.args.get("all_states", "0") == "1",
@@ -205,13 +217,31 @@ def describe():
         )
 
 
+@lru_cache(maxsize=16)
+def _make_benchmark(name: str, source: str) -> Benchmark:
+    """Construct a benchmark from a file name and contents."""
+    with tempfile.TemporaryDirectory() as d:
+        tmpfile = Path(d) / Path(name).name
+        with open(tmpfile, "w") as f:
+            f.write(source)
+        return make_benchmark(tmpfile, timeout=60)
+
+
 def _step(request: StepRequest) -> StepReply:
     """Run the actual step with parsed arguments."""
     states: List[StateToVisualize] = []
 
     with env_lock:
         env.reward_space = request.reward
-        env.reset(benchmark=request.benchmark)
+
+        # Create a benchmark from user-supplied code, or just look up the
+        # benchmark by name.
+        if request.benchmark_source:
+            benchmark = _make_benchmark(request.benchmark, request.benchmark_source)
+        else:
+            benchmark = request.benchmark
+
+        env.reset(benchmark=benchmark)
 
         # Replay all actions except the last one.
         if request.all_states:
