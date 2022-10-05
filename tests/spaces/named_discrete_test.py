@@ -10,9 +10,8 @@ from tests.test_main import main
 
 
 def test_empty_space():
-    space = NamedDiscrete([], name="test")
-    assert space.n == 0
-    assert space.names == []
+    with pytest.raises(ValueError, "No values for discrete space"):
+        NamedDiscrete([], name="test")
 
 
 def test_invalid_name_lookup():

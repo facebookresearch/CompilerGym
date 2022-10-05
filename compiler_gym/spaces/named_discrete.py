@@ -39,6 +39,9 @@ class NamedDiscrete(Discrete):
         :param items: A list of names for items in the space.
         :param name: The name of the space.
         """
+        items = list(items)
+        if not items:
+            raise ValueError("No values for discrete space")
         self.names = [str(x) for x in items]
         super().__init__(n=len(self.names), name=name)
 
