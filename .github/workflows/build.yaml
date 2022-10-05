@@ -94,4 +94,4 @@ jobs:
               uses: ./.github/actions/install-runtime-dependencies
 
             - name: Run the examples tests
-              run: make -C examples test
+              run: make -C examples test PYTEST_ARGS="--ignore loop_optimizations_service --ignore example_unrolling_service"
