@@ -4,12 +4,15 @@
 # LICENSE file in the root directory of this source tree.
 """Integrations tests for LLVM runtime support."""
 from pathlib import Path
+from typing import List
 
 import numpy as np
 import pytest
 from flaky import flaky
 
 from compiler_gym.envs.llvm import LlvmEnv, llvm_benchmark
+from compiler_gym.spaces.reward import Reward
+from compiler_gym.util.gym_type_hints import ActionType, ObservationType
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.llvm"]
@@ -142,6 +145,65 @@ def test_default_runtime_observation_count_fork(env: LlvmEnv):
     with env.fork() as fkd:
         assert fkd.runtime_observation_count == rc
         assert fkd.runtime_warmup_runs_count == wc
+
+
+class RewardDerivedFromRuntime(Reward):
+    """A custom reward space that is derived from the Runtime observation space."""
+
+    def __init__(self):
+        super().__init__(
+            name="runtimeseries",
+            observation_spaces=["Runtime"],
+            default_value=0,
+            min=None,
+            max=None,
+            default_negates_returns=True,
+            deterministic=False,
+            platform_dependent=True,
+        )
+        self.last_runtime_observation: List[float] = None
+
+    def reset(self, benchmark, observation_view) -> None:
+        del benchmark  # unused
+        self.last_runtime_observation = observation_view["Runtime"]
+
+    def update(
+        self,
+        actions: List[ActionType],
+        observations: List[ObservationType],
+        observation_view,
+    ) -> float:
+        del actions  # unused
+        del observation_view  # unused
+        self.last_runtime_observation = observations[0]
+        return 0
+
+
+@flaky  # runtime may fail
+@pytest.mark.parametrize("runtime_observation_count", [1, 3, 5])
+def test_correct_number_of_observations_during_reset(
+    env: LlvmEnv, runtime_observation_count: int
+):
+    env.reward.add_space(RewardDerivedFromRuntime())
+    env.runtime_observation_count = runtime_observation_count
+    env.reset(reward_space="runtimeseries")
+    assert env.runtime_observation_count == runtime_observation_count
+
+    # Check that the number of observations that you are receive during reset()
+    # matches the amount that you asked for.
+    assert (
+        len(env.reward.spaces["runtimeseries"].last_runtime_observation)
+        == runtime_observation_count
+    )
+
+    # Check that the number of observations that you are receive during step()
+    # matches the amount that you asked for.
+    env.reward.spaces["runtimeseries"].last_runtime_observation = None
+    env.step(0)
+    assert (
+        len(env.reward.spaces["runtimeseries"].last_runtime_observation)
+        == runtime_observation_count
+    )
 
 
 if __name__ == "__main__":

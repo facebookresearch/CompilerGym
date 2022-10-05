@@ -259,6 +259,8 @@ py_test(
     deps = [
         "//compiler_gym/envs/llvm",
         "//compiler_gym/service:connection",
+        "//compiler_gym/spaces",
+        "//compiler_gym/util",
         "//tests:test_main",
         "//tests/pytest_plugins:llvm",
     ],

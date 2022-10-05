@@ -202,6 +202,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
 
         self._service_endpoint: Union[str, Path] = service
         self._connection_settings = connection_settings or ConnectionOpts()
+        self._params_to_send_on_reset: List[SessionParameter] = []
 
         self.service = service_connection or CompilerGymServiceConnection(
             endpoint=self._service_endpoint,
@@ -788,6 +789,12 @@ class ClientServiceCompilerEnv(CompilerEnv):
                 reply.new_action_space
             )
 
+        # Re-send any session parameters that we marked as needing to be
+        # re-sent on reset(). Do this before any other initialization as they
+        # may affect the behavior of subsequent service calls.
+        if self._params_to_send_on_reset:
+            self.send_params(*[(p.key, p.value) for p in self._params_to_send_on_reset])
+
         self.reward.reset(benchmark=self.benchmark, observation_view=self.observation)
         if self.reward_space:
             self.episode_reward = 0.0
@@ -1236,7 +1243,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
             **validation,
         )
 
-    def send_param(self, key: str, value: str) -> str:
+    def send_param(self, key: str, value: str, resend_on_reset: bool = False) -> str:
         """Send a single <key, value> parameter to the compiler service.
 
         See :meth:`send_params() <compiler_gym.envs.ClientServiceCompilerEnv.send_params>`
@@ -1246,14 +1253,19 @@ class ClientServiceCompilerEnv(CompilerEnv):
 
         :param value: The parameter value.
 
+        :param resend_on_reset: Whether to resend this parameter to the compiler
+            service on :code:`reset()`.
+
         :return: The response from the compiler service.
 
         :raises SessionNotFound: If called before :meth:`reset()
             <compiler_gym.envs.ClientServiceCompilerEnv.reset>`.
         """
-        return self.send_params((key, value))[0]
+        return self.send_params((key, value), resend_on_reset=resend_on_reset)[0]
 
-    def send_params(self, *params: Iterable[Tuple[str, str]]) -> List[str]:
+    def send_params(
+        self, *params: Iterable[Tuple[str, str]], resend_on_reset: bool = False
+    ) -> List[str]:
         """Send a list of <key, value> parameters to the compiler service.
 
         This provides a mechanism to send messages to the backend compilation
@@ -1270,17 +1282,25 @@ class ClientServiceCompilerEnv(CompilerEnv):
         :param params: A list of parameters, where each parameter is a
             :code:`(key, value)` tuple.
 
+        :param resend_on_reset: Whether to resend this parameter to the compiler
+            service on :code:`reset()`.
+
         :return: A list of string responses, one per parameter.
 
         :raises SessionNotFound: If called before :meth:`reset()
             <compiler_gym.envs.ClientServiceCompilerEnv.reset>`.
         """
+        params_to_send = [SessionParameter(key=k, value=v) for (k, v) in params]
+
+        if resend_on_reset:
+            self._params_to_send_on_reset += params_to_send
+
         if not self.in_episode:
             raise SessionNotFound("Must call reset() before send_params()")
 
         request = SendSessionParameterRequest(
             session_id=self._session_id,
-            parameter=[SessionParameter(key=k, value=v) for (k, v) in params],
+            parameter=params_to_send,
         )
         reply: SendSessionParameterReply = self.service(
             self.service.stub.SendSessionParameter, request
