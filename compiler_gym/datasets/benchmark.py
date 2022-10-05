@@ -85,8 +85,6 @@ class Benchmark:
 
     """
 
-    __slots__ = ["_proto", "_validation_callbacks", "_sources"]
-
     def __init__(
         self,
         proto: BenchmarkProto,

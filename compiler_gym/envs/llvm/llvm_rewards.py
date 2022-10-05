@@ -16,12 +16,6 @@ class CostFunctionReward(Reward):
     function.
     """
 
-    __slots__ = [
-        "cost_function",
-        "init_cost_function",
-        "previous_cost",
-    ]
-
     def __init__(self, cost_function: str, init_cost_function: str, **kwargs):
         """Constructor.
 
@@ -61,8 +55,6 @@ class CostFunctionReward(Reward):
 class NormalizedReward(CostFunctionReward):
     """A cost function reward that is normalized to the initial value."""
 
-    __slots__ = ["cost_norm", "benchmark"]
-
     def __init__(self, **kwargs):
         """Constructor."""
         super().__init__(**kwargs)
@@ -99,8 +91,6 @@ class BaselineImprovementNormalizedReward(NormalizedReward):
     """A cost function reward that is normalized to improvement made by a
     baseline approach.
     """
-
-    __slots__ = ["baseline_cost_function"]
 
     def __init__(self, baseline_cost_function: str, **kwargs):
         super().__init__(**kwargs)
