@@ -3,7 +3,7 @@ deprecated>=1.2.12
 docker>=4.0.0
 fasteners>=0.15
 grpcio>=1.32.0,<1.44.0
-gym>=0.18.0,<0.21
+gym>=0.18.0,<=0.21
 humanize>=2.6.0
 loop_tool_py==0.0.7
 networkx>=2.5
