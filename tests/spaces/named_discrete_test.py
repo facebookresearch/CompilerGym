@@ -10,7 +10,7 @@ from tests.test_main import main
 
 
 def test_empty_space():
-    with pytest.raises(ValueError, "No values for discrete space"):
+    with pytest.raises(ValueError, match="No values for discrete space"):
         NamedDiscrete([], name="test")
 
 
