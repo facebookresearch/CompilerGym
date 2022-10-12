@@ -6,6 +6,7 @@ from concurrent.futures import as_completed
 from pathlib import Path
 from typing import Callable, Iterable, List, NamedTuple, Optional, Union
 
+from compiler_gym.util.decorators import frozen_class
 import compiler_gym.errors
 from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.errors import ValidationError
@@ -40,6 +41,7 @@ class BenchmarkSource(NamedTuple):
         return str(self.filename)
 
 
+@frozen_class
 class Benchmark:
     """A benchmark represents a particular program that is being compiled.
 
