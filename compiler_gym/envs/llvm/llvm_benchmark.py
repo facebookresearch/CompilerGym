@@ -10,6 +10,7 @@ import subprocess
 import sys
 import tempfile
 from concurrent.futures import as_completed
+from copy import deepcopy
 from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
@@ -175,6 +176,27 @@ class ClangInvocation:
 
         return cmd
 
+    # NOTE(cummins): There is some discussion about the best way to create a
+    # bitcode that is unoptimized yet does not hinder downstream
+    # optimization opportunities. Here we are using a configuration based on
+    # -O1 in which we prevent the -O1 optimization passes from running. This
+    # is because LLVM produces different function attributes dependening on
+    # the optimization level. E.g. "-O0 -Xclang -disable-llvm-optzns -Xclang
+    # -disable-O0-optnone" will generate code with "noinline" attributes set
+    # on the functions, wheras "-Oz -Xclang -disable-llvm-optzns" will
+    # generate functions with "minsize" and "optsize" attributes set.
+    #
+    # See also:
+    #   <https://lists.llvm.org/pipermail/llvm-dev/2018-August/thread.html#125365>
+    #   <https://github.com/facebookresearch/CompilerGym/issues/110>
+    DEFAULT_COPT = [
+        "-O1",
+        "-Xclang",
+        "-disable-llvm-passes",
+        "-Xclang",
+        "-disable-llvm-optzns",
+    ]
+
     @classmethod
     def from_c_file(
         cls,
@@ -184,29 +206,8 @@ class ClangInvocation:
         timeout: int = 600,
     ) -> "ClangInvocation":
         copt = copt or []
-        # NOTE(cummins): There is some discussion about the best way to create a
-        # bitcode that is unoptimized yet does not hinder downstream
-        # optimization opportunities. Here we are using a configuration based on
-        # -O1 in which we prevent the -O1 optimization passes from running. This
-        # is because LLVM produces different function attributes dependening on
-        # the optimization level. E.g. "-O0 -Xclang -disable-llvm-optzns -Xclang
-        # -disable-O0-optnone" will generate code with "noinline" attributes set
-        # on the functions, wheras "-Oz -Xclang -disable-llvm-optzns" will
-        # generate functions with "minsize" and "optsize" attributes set.
-        #
-        # See also:
-        #   <https://lists.llvm.org/pipermail/llvm-dev/2018-August/thread.html#125365>
-        #   <https://github.com/facebookresearch/CompilerGym/issues/110>
-        DEFAULT_COPT = [
-            "-O1",
-            "-Xclang",
-            "-disable-llvm-passes",
-            "-Xclang",
-            "-disable-llvm-optzns",
-        ]
-
         return cls(
-            DEFAULT_COPT + copt + [str(path)],
+            cls.DEFAULT_COPT + copt + [str(path)],
             system_includes=system_includes,
             timeout=timeout,
         )
@@ -422,3 +423,219 @@ def make_benchmark(
     timestamp = datetime.now().strftime("%Y%m%HT%H%M%S")
     uri = f"benchmark://user-v0/{timestamp}-{random.randrange(16**4):04x}"
     return Benchmark.from_file_contents(uri, bitcode)
+
+
+def make_benchmark_from_source(
+    source: str,
+    copt: Optional[List[str]] = None,
+    lang: str = "c++",
+    system_includes: bool = True,
+    timeout: int = 600,
+) -> Benchmark:
+    """Create a benchmark from a string of source code.
+
+    This function takes a string of source code and generates a benchmark that
+    can be passed to :meth:`compiler_gym.envs.LlvmEnv.reset`.
+
+    Example usage:
+
+        >>> benchmark = make_benchmark_from_source("int A() {return 0;}")
+        >>> env = gym.make("llvm-v0")
+        >>> env.reset(benchmark=benchmark)
+
+    The clang invocation used is roughly equivalent to:
+
+    .. code-block::
+
+        $ clang - -O0 -c -emit-llvm -o benchmark.bc
+
+    Additional compile-time arguments to clang can be provided using the
+    :code:`copt` argument:
+
+        >>> benchmark = make_benchmark_from_source("...", copt=['-O2'])
+
+    :param source: A string of source code.
+
+    :param copt: A list of command line options to pass to clang when compiling
+        source files.
+
+    :param lang: The source language, passed to clang via the :code:`-x`
+        argument. Defaults to C++.
+
+    :param system_includes: Whether to include the system standard libraries
+        during compilation jobs. This requires a system toolchain. See
+        :func:`get_system_library_flags`.
+
+    :param timeout: The maximum number of seconds to allow clang to run before
+        terminating.
+
+    :return: A :code:`Benchmark` instance.
+
+    :raises FileNotFoundError: If any input sources are not found.
+
+    :raises TypeError: If the inputs are of unsupported types.
+
+    :raises OSError: If a suitable compiler cannot be found.
+
+    :raises BenchmarkInitError: If a compilation job fails.
+
+    :raises TimeoutExpired: If a compilation job exceeds :code:`timeout`
+        seconds.
+    """
+    cmd = [
+        str(llvm.clang_path()),
+        f"-x{lang}",
+        "-",
+        "-o",
+        "-",
+        "-c",
+        "-emit-llvm",
+        *ClangInvocation.DEFAULT_COPT,
+    ]
+    if system_includes:
+        cmd += get_system_library_flags()
+    cmd += copt or []
+
+    with Popen(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE
+    ) as clang:
+        bitcode, stderr = clang.communicate(source.encode("utf-8"), timeout=timeout)
+        if clang.returncode:
+            raise BenchmarkInitError(
+                f"Failed to make benchmark with compiler error: {stderr.decode('utf-8')}"
+            )
+
+    timestamp = datetime.now().strftime("%Y%m%HT%H%M%S")
+    uri = f"benchmark://user-v0/{timestamp}-{random.randrange(16**4):04x}"
+    return Benchmark.from_file_contents(uri, bitcode)
+
+
+def split_benchmark_by_function(
+    benchmark: Benchmark, maximum_function_count: int = 0, timeout: float = 300
+) -> List[Benchmark]:
+    """Split a benchmark into single-function benchmarks.
+
+    This function takes a benchmark as input and divides it into a set of
+    independent benchmarks, where each benchmark contains a single function from
+    the input.
+
+    Under the hood, this uses an extension to `llvm-extract
+    <https://llvm.org/docs/CommandGuide/llvm-extract.html>`__ to pull out
+    individual parts of programs.
+
+    In pseudo code, this is roughly equivalent to:
+
+    .. code-block::py
+
+        for i in number_of_functions_in_benchmark(benchmark):
+            yield llvm_extract(benchmark, function_number=i)
+
+    :param benchmark: A benchmark to split.
+
+    :param maximum_function_count: If a positive integer, this specifies the
+        maximum number of single-function benchmarks to extract from the input.
+        If the input contains more than this number of functions, the remainder
+        are ignored.
+
+    :param timeout: The maximum number of seconds to allow llvm-extract to run
+        before terminating.
+
+    :return: A list of :code:`Benchmark` instances.
+
+    :raises ValueError: If the input benchmark contains no functions, or if
+        llvm-extract fails.
+
+    :raises TimeoutExpired: If any llvm-extract job exceeds :code:`timeout`
+        seconds.
+    """
+    original_uri = deepcopy(benchmark.uri)
+    original_bitcode = benchmark.proto.program.contents
+
+    # Count the number of functions in the benchmark.
+    with Popen(
+        [str(llvm.llvm_extract_one_path()), "-", "-count-only", "-o", "-"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        stdin=subprocess.PIPE,
+    ) as p:
+        stdout, stderr = p.communicate(original_bitcode, timeout=timeout)
+        if p.returncode:
+            raise ValueError(
+                "Failed to count number of functions in benchmark: "
+                f"{stderr.decode('utf-8')}"
+            )
+    number_of_functions = int(stdout.decode("utf-8"))
+    if number_of_functions <= 0:
+        raise ValueError("No functions found!")
+
+    # Iterate over the number of functions, extracting each one in turn.
+    split_benchmarks: List[Benchmark] = []
+    n = min(number_of_functions, maximum_function_count or number_of_functions)
+    for i in range(n):
+        with Popen(
+            [str(llvm.llvm_extract_one_path()), "-", "-n", str(i), "-o", "-"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            stdin=subprocess.PIPE,
+        ) as p:
+            stdout, stderr = p.communicate(original_bitcode, timeout=timeout)
+            if p.returncode:
+                raise ValueError(
+                    "Failed to extract function {i}: " f"{stderr.decode('utf-8')}"
+                )
+
+        original_uri.params["function"] = str(i)
+        split_benchmarks.append(
+            Benchmark.from_file_contents(uri=original_uri, data=stdout)
+        )
+        logger.debug("Extracted %s", original_uri)
+
+    return split_benchmarks
+
+
+def merge_benchmarks(benchmarks: List[Benchmark], timeout: float = 300) -> Benchmark:
+    """Merge a list of benchmarks into a single benchmark.
+
+    Under the hood, this `llvm-link
+    <https://llvm.org/docs/CommandGuide/llvm-link.html>`__ to combine each of
+    the bitcodes of the input benchmarks into a single bitcode.
+
+    :param benchmarks: A list of benchmarks to merge.
+
+    :param timeout: The maximum number of seconds to allow llvm-link to run
+        before terminating.
+
+    :return: A :code:`Benchmark` instance.
+
+    :raises ValueError: If the input contains no benchmarks, or if llvm-link
+        fails.
+
+    :raises TimeoutExpired: If llvm-link exceeds :code:`timeout` seconds.
+    """
+    if not benchmarks:
+        raise ValueError("No benchmarks!")
+
+    transient_cache = transient_cache_path(".")
+    transient_cache.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(dir=transient_cache, prefix="llvm-link") as d:
+        tmpdir = Path(d)
+
+        # Write each of the benchmark bitcodes to a temporary file.
+        cmd = [str(llvm.llvm_link_path()), "-o", "-", "-f"]
+        for i, benchmark in enumerate(benchmarks):
+            bitcode_path = tmpdir / f"{i}.bc"
+            with open(bitcode_path, "wb") as f:
+                f.write(benchmark.proto.program.contents)
+            cmd.append(str(bitcode_path))
+
+        # Run llvm-link on the temporary files.
+        with Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as p:
+            stdout, stderr = p.communicate(timeout=timeout)
+            if p.returncode:
+                raise ValueError(
+                    f"Failed to merge benchmarks: {stderr.decode('utf-8')}"
+                )
+
+    timestamp = datetime.now().strftime("%Y%m%HT%H%M%S")
+    uri = f"benchmark://llvm-link-v0/{timestamp}-{random.randrange(16**4):04x}"
+    return Benchmark.from_file_contents(uri=uri, data=stdout)

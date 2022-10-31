@@ -12,6 +12,9 @@ from compiler_gym.envs.llvm.llvm_benchmark import (
     ClangInvocation,
     get_system_library_flags,
     make_benchmark,
+    make_benchmark_from_source,
+    merge_benchmarks,
+    split_benchmark_by_function,
 )
 from compiler_gym.envs.llvm.llvm_env import LlvmEnv
 
@@ -30,8 +33,11 @@ __all__ = [
     "LLVM_SERVICE_BINARY",
     "LlvmEnv",
     "make_benchmark",
+    "make_benchmark_from_source",
+    "merge_benchmarks",
     "observation_spaces",
     "reward_spaces",
+    "split_benchmark_by_function",
 ]
 
 LLVM_SERVICE_BINARY = runfiles_path(

@@ -169,6 +169,20 @@ cg_cc_library(
   PUBLIC
 )
 
+llvm_map_components_to_libnames(_LLVM_LIBS support core irreader ipo)
+cg_cc_binary(
+  NAME llvm-extract-one
+  SRCS LlvmExtractOne.cc
+  COPTS
+    "-fno-rtti"
+  ABS_DEPS
+    ${_LLVM_LIBS}
+  INCLUDES
+    ${LLVM_INCLUDE_DIRS}
+  DEFINES
+    ${LLVM_DEFINITIONS}
+)
+
 llvm_map_components_to_libnames(_LLVM_LIBS
   core analysis coroutines objcarcopts target codegen
   x86codegen x86asmparser #TODO(boian): can these be found programmatically

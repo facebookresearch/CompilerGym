@@ -16,7 +16,7 @@ from fasteners import InterProcessLock
 
 from compiler_gym.util.download import download
 from compiler_gym.util.filesystem import extract_tar
-from compiler_gym.util.runfiles_path import cache_path, site_data_path
+from compiler_gym.util.runfiles_path import cache_path, runfiles_path, site_data_path
 
 logger = logging.getLogger(__name__)
 
@@ -113,6 +113,11 @@ def llvm_as_path() -> Path:
 def llvm_dis_path() -> Path:
     """Return the path of llvm-as."""
     return download_llvm_files() / "bin/llvm-dis"
+
+
+def llvm_extract_one_path() -> Path:
+    """Return the path of llvm-extract-one."""
+    return runfiles_path("compiler_gym/envs/llvm/service/llvm-extract-one")
 
 
 def llvm_link_path() -> Path:
