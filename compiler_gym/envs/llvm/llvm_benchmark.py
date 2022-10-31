@@ -10,6 +10,7 @@ import subprocess
 import sys
 import tempfile
 from concurrent.futures import as_completed
+from copy import deepcopy
 from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
@@ -422,3 +423,80 @@ def make_benchmark(
     timestamp = datetime.now().strftime("%Y%m%HT%H%M%S")
     uri = f"benchmark://user-v0/{timestamp}-{random.randrange(16**4):04x}"
     return Benchmark.from_file_contents(uri, bitcode)
+
+
+def split_benchmark_by_function(
+    benchmark: Benchmark, timeout_seconds: float = 300
+) -> List[Benchmark]:
+    """Split a benchmark into a list of benchmarks, one per function."""
+    original_uri = deepcopy(benchmark.uri)
+    original_bitcode = benchmark.proto.file.contents
+
+    # Count the number of functions in the benchmark.
+    with Popen(
+        [str(llvm.llvm_extract_one_path()), "-", "-count-only", "-o", "-"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        stdin=subprocess.PIPE,
+    ) as p:
+        stdout, stderr = p.communicate(original_bitcode, timeout=timeout_seconds)
+        if p.returncode:
+            raise ValueError(
+                "Failed to count number of functions in benchmark: "
+                f"{stderr.decode('utf-8')}"
+            )
+    number_of_functions = int(stdout.decode("utf-8"))
+    if number_of_functions <= 0:
+        raise ValueError("No functions found!")
+
+    # Iterate over the number of functions, extracting each one in turn.
+    split_benchmarks: List[Benchmark] = []
+    for i in range(number_of_functions):
+        with Popen(
+            [str(llvm.llvm_extract_one_path()), "-", "-n", str(i), "-o", "-"]
+        ) as p:
+            stdout, stderr = p.communicate(original_bitcode, timeout=timeout_seconds)
+            if p.returncode:
+                raise ValueError(
+                    "Failed to extract function {i}: " f"{stderr.decode('utf-8')}"
+                )
+
+        original_uri.params["function"] = str(i)
+        split_benchmarks.append(
+            Benchmark.from_file_contents(uri=original_uri, data=stdout)
+        )
+        logger.debug("Extracted %s", original_uri)
+
+    return split_benchmarks
+
+
+def merge_benchmarks(
+    benchmarks: List[Benchmark], timeout_seconds: float = 300
+) -> Benchmark:
+    if not benchmarks:
+        raise ValueError("No benchmarks!")
+
+    transient_cache = transient_cache_path(".")
+    transient_cache.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(dir=transient_cache, prefix="llvm-link") as d:
+        tmpdir = Path(d)
+
+        # Write each of the benchmark bitcodes to a temporary file.
+        cmd = [str(llvm.llvm_link_path()), "-o", "-"]
+        for i, benchmark in enumerate(benchmarks):
+            outpath = tmpdir / f"{i}.bc"
+            with open(outpath, "wb") as f:
+                f.write(benchmark.proto.file.contents)
+            cmd.append(str(outpath))
+
+        # Run llvm-link on the temporary files.
+        with Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as p:
+            stdout, stderr = p.communicate(timeout=timeout_seconds)
+            if p.stderr:
+                raise ValueError(
+                    f"Failed to merge benchmarks: {stderr.decode('utf-8')}"
+                )
+
+    timestamp = datetime.now().strftime("%Y%m%HT%H%M%S")
+    uri = f"benchmark://llvm-link-v0/{timestamp}-{random.randrange(16**4):04x}"
+    return Benchmark.from_file_contents(uri=uri, data=stdout)

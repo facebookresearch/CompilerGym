@@ -206,6 +206,47 @@ cc_library(
     ],
 )
 
+filegroup(
+    name = "llvm-extract-one-files",
+    srcs = [
+        ":llvm-extract-one",
+    ] + select({
+        "@llvm//:darwin": [],
+        "//conditions:default": [
+            ":libLLVMPolly",
+        ],
+    }),
+)
+
+cc_binary(
+    name = "llvm-extract-one-prelinked",
+    srcs = ["LlvmExtractOne.cc"],
+    copts = [
+        "-fno-rtti",
+    ],
+    deps = [
+        "@llvm//10.0.0",
+    ],
+)
+
+genrule(
+    name = "llvm-extract-one-bin",
+    srcs = [":llvm-extract-one-prelinked"],
+    outs = ["llvm-extract-one"],
+    cmd = select({
+        "@llvm//:darwin": (
+            "cp $(location :llvm-extract-one-prelinked) $@"
+        ),
+        "//conditions:default": (
+            "cp $(location :llvm-extract-one-prelinked) $@ && " +
+            "chmod 666 $@ && " +
+            "patchelf --set-rpath '$$ORIGIN' $@ && " +
+            "chmod 555 $@"
+        ),
+    }),
+    visibility = ["//visibility:public"],
+)
+
 cc_library(
     name = "LlvmSession",
     srcs = ["LlvmSession.cc"],

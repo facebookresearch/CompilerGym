@@ -14,6 +14,8 @@ cg_py_library(
     llvm
   SRCS
     "__init__.py"
+  DATA
+    compiler_gym::envs::llvm::service::llvm-extract-one
   DEPS
     compiler_gym::util::util
   PUBLIC

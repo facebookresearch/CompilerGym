@@ -8,6 +8,7 @@ load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 py_library(
     name = "llvm",
     srcs = ["__init__.py"],
+    data = ["//compiler_gym/envs/llvm/service:llvm-extract-one"],
     visibility = ["//visibility:public"],
     deps = [
         "//compiler_gym/util",
