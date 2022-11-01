@@ -16,11 +16,10 @@ pytest_plugins = ["tests.pytest_plugins.common"]
 
 
 def test_benchmark_attribute_outside_init():
-    """Test that new attributes cannot be added to Benchmark."""
+    """Test that new attributes can be added to Benchmark."""
     benchmark = Benchmark(None)
-    with pytest.raises(AttributeError):
-        # pylint: disable=assigning-non-slot
-        benchmark.foobar = 123  # noqa
+    benchmark.foobar = 123  # pylint: disable=attribute-defined-outside-init
+    assert benchmark.foobar == 123
 
 
 def test_benchmark_subclass_attribute_outside_init():
