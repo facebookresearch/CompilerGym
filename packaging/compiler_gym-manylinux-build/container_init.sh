@@ -15,4 +15,11 @@ set -euxo pipefail
 
 apt-get update
 pip3 install --no-cache-dir -U setuptools pip wheel
-grep -v grpc compiler_gym/requirements.txt | xargs pip3 install --no-cache-dir
+
+# Filter grpcio as there are problems with installing it at this stage.
+# Note the use of a tempfile to store the filtered requirements rather than
+# just `xargs pip install` because we need to use `pip install -r` to parse
+# the requirements file syntax.
+grep -v '^grpcio' compiler_gym/requirements.txt > /tmp/requirements.txt
+pip3 install --no-cache-dir -r /tmp/requirements.txt
+rm -f /tmp/requiremts.txt
