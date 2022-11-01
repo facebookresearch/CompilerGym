@@ -67,21 +67,23 @@ class RuntimeReward(Reward):
 class ExampleDataset(Dataset):
     def __init__(self, *args, **kwargs):
         super().__init__(
-            name="benchmark://example-v1",
+            name="benchmark://example-compiler-v0",
             license="MIT",
             description="An example dataset",
         )
         self._benchmarks = {
             "/foo": Benchmark.from_file_contents(
-                "benchmark://example-v1/foo", "Ir data".encode("utf-8")
+                "benchmark://example-compiler-v0/foo", "Ir data".encode("utf-8")
             ),
             "/bar": Benchmark.from_file_contents(
-                "benchmark://example-v1/bar", "Ir data".encode("utf-8")
+                "benchmark://example-compiler-v0/bar", "Ir data".encode("utf-8")
             ),
         }
 
     def benchmark_uris(self) -> Iterable[str]:
-        yield from (f"benchmark://example-v1{k}" for k in self._benchmarks.keys())
+        yield from (
+            f"benchmark://example-compiler-v0{k}" for k in self._benchmarks.keys()
+        )
 
     def benchmark_from_parsed_uri(self, uri: BenchmarkUri) -> Benchmark:
         if uri.path in self._benchmarks:
@@ -90,9 +92,9 @@ class ExampleDataset(Dataset):
             raise LookupError("Unknown program name")
 
 
-# Register the environment for use with gym.make(...).
+# Registexample-compiler-v0ironment for use with gym.make(...).
 register(
-    id="example-v1",
+    id="example-compiler-v0",
     entry_point="compiler_gym.service.client_service_compiler_env:ClientServiceCompilerEnv",
     kwargs={
         "service": EXAMPLE_PY_SERVICE_BINARY,
@@ -103,7 +105,7 @@ register(
 
 # Given that the C++ and Python service implementations have identical
 # featuresets, we can parameterize the tests and run them against both backends.
-EXAMPLE_ENVIRONMENTS = ["example-v1"]
+EXAMPLE_ENVIRONMENTS = ["example-compiler-v0"]
 
 
 @pytest.fixture(scope="function", params=EXAMPLE_ENVIRONMENTS)
@@ -118,7 +120,7 @@ def env(request) -> CompilerEnv:
     params=[
         EXAMPLE_PY_SERVICE_BINARY,
     ],
-    ids=["example-v1"],
+    ids=["example-compiler-v0"],
 )
 def bin(request) -> Path:
     yield request.param
@@ -213,7 +215,7 @@ def test_reward_before_reset(env: CompilerEnv):
 def test_reset_invalid_benchmark(env: CompilerEnv):
     """Test requesting a specific benchmark."""
     with pytest.raises(LookupError) as ctx:
-        env.reset(benchmark="example-v1/foobar")
+        env.reset(benchmark="example-compiler-v0/foobar")
     assert str(ctx.value) == "Unknown program name"
 
 
@@ -304,8 +306,8 @@ def test_rewards(env: CompilerEnv):
 
 def test_benchmarks(env: CompilerEnv):
     assert list(env.datasets.benchmark_uris()) == [
-        "benchmark://example-v1/foo",
-        "benchmark://example-v1/bar",
+        "benchmark://example-compiler-v0/foo",
+        "benchmark://example-compiler-v0/bar",
     ]
 
 

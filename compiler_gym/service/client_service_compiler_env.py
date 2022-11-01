@@ -237,7 +237,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
         # constructor-time benchmark as otherwise the behavior of the benchmark
         # property is counter-intuitive:
         #
-        #     >>> env = gym.make("example-v1", benchmark="foo")
+        #     >>> env = gym.make("example-compiler-v0", benchmark="foo")
         #     >>> env.benchmark
         #     None
         #     >>> env.reset()

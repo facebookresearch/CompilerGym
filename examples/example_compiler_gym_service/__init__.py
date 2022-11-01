@@ -56,21 +56,23 @@ class RuntimeReward(Reward):
 class ExampleDataset(Dataset):
     def __init__(self, *args, **kwargs):
         super().__init__(
-            name="benchmark://example-v1",
+            name="benchmark://example-compiler-v0",
             license="MIT",
             description="An example dataset",
         )
         self._benchmarks = {
             "/foo": Benchmark.from_file_contents(
-                "benchmark://example-v1/foo", "Ir data".encode("utf-8")
+                "benchmark://example-compiler-v0/foo", "Ir data".encode("utf-8")
             ),
             "/bar": Benchmark.from_file_contents(
-                "benchmark://example-v1/bar", "Ir data".encode("utf-8")
+                "benchmark://example-compiler-v0/bar", "Ir data".encode("utf-8")
             ),
         }
 
     def benchmark_uris(self) -> Iterable[str]:
-        yield from (f"benchmark://example-v1{k}" for k in self._benchmarks.keys())
+        yield from (
+            f"benchmark://example-compiler-v0{k}" for k in self._benchmarks.keys()
+        )
 
     def benchmark_from_parsed_uri(self, uri: BenchmarkUri) -> Benchmark:
         if uri.path in self._benchmarks:
@@ -80,7 +82,7 @@ class ExampleDataset(Dataset):
 
 
 # Register the example service on module import. After importing this module,
-# the example-v1 environment will be available to gym.make(...).
+# the example-compiler-v0 environment will be available to gym.make(...).
 register(
     id="example-cc-v0",
     entry_point="compiler_gym.service.client_service_compiler_env:ClientServiceCompilerEnv",
