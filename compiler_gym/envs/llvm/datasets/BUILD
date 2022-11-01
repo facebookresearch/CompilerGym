@@ -13,6 +13,7 @@ py_library(
         "chstone.py",
         "clgen.py",
         "csmith.py",
+        "jotaibench.py",
         "llvm_stress.py",
         "poj104.py",
     ],

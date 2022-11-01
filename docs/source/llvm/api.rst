@@ -45,6 +45,8 @@ Datasets
 
 .. autoclass:: GitHubDataset
 
+.. autoclass:: JotaiBenchDataset
+
 .. autoclass:: LinuxDataset
 
 .. autoclass:: LlvmStressDataset
