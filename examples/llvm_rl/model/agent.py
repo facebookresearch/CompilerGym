@@ -12,7 +12,7 @@ from pydantic import BaseModel, Field, validator
 # Ignore import deprecation warnings from ray.
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-from ray.rllib.agents.a2c import A2CTrainer  # noqa
+from ray.rllib.agents.a3c import A2CTrainer  # noqa
 from ray.rllib.agents.a3c import A3CTrainer  # noqa
 from ray.rllib.agents.dqn import ApexTrainer, R2D2Trainer  # noqa
 from ray.rllib.agents.impala import ImpalaTrainer  # noqa
