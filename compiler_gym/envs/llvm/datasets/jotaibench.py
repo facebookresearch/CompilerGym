@@ -3,10 +3,8 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 import subprocess
-import sys
 from concurrent.futures import as_completed
 from pathlib import Path
-from typing import Optional
 
 from compiler_gym.datasets import Benchmark, TarDataset, TarDatasetWithManifest
 from compiler_gym.datasets.benchmark import BenchmarkWithSource
@@ -47,24 +45,9 @@ class JotaiBenchDataset(TarDatasetWithManifest):
     def __init__(
         self,
         site_data_base: Path,
-        sort_order: int = 0,
-        manifest_url: Optional[str] = None,
-        manifest_sha256: Optional[str] = None,
-        deprecated: Optional[str] = None,
-        name: Optional[str] = None,
     ):
-        manifest_url_, manifest_sha256_ = {
-            "darwin": (
-                "https://github.com/lac-dcc/jotai-benchmarks/blob/main/benchmarks/jotaibench.bz2?raw=true",
-                "b5a51af3d4e2f77a66001635ec64ed321e0ece19873c4a888040859af7556401",
-            ),
-            "linux": (
-                "https://github.com/lac-dcc/jotai-benchmarks/blob/main/benchmarks/jotaibench.bz2?raw=true",
-                "b5a51af3d4e2f77a66001635ec64ed321e0ece19873c4a888040859af7556401",
-            ),
-        }[sys.platform]
         super().__init__(
-            name=name or "benchmark://jotaibench-v0",
+            name="benchmark://jotaibench-v0",
             description="Compile-only C/C++ functions extracted from GitHub",
             references={
                 "Paper": "https://homepages.dcc.ufmg.br/~fernando/publications/papers/FaustinoCGO21.pdf",
@@ -72,17 +55,18 @@ class JotaiBenchDataset(TarDatasetWithManifest):
             },
             license="GNU General Public License v3.0 (GPLv3)",
             site_data_base=site_data_base,
-            manifest_urls=[manifest_url or manifest_url_],
-            manifest_sha256=manifest_sha256 or manifest_sha256_,
+            manifest_urls=[
+                "https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-jotaibench-v0.bz2"
+            ],
+            manifest_sha256="ac4ee456e52073964d472d3e3969058b2f3052f8a4b402719013a3c603eb4b62",
             tar_urls=[
-                "https://github.com/lac-dcc/jotai-benchmarks/blob/main/benchmarks/jotaibench.bz2?raw=true"
+                "https://github.com/ChrisCummins/jotai-benchmarks/raw/ca26ccd27afecf38919c1e101c64e3cc17e39631/benchmarks/jotaibench.bz2"
             ],
             tar_sha256="b5a51af3d4e2f77a66001635ec64ed321e0ece19873c4a888040859af7556401",
-            strip_prefix="jotaibench-v0",
+            strip_prefix="jotaibench/jotaibench-v0",
             tar_compression="bz2",
             benchmark_file_suffix=".c",
-            sort_order=sort_order,
-            deprecated=deprecated,
+            sort_order=0,
         )
 
     def benchmark_from_parsed_uri(self, uri: BenchmarkUri) -> Benchmark:

@@ -3,14 +3,12 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Tests for the JotaiBench dataset."""
-import sys
 from itertools import islice
 from pathlib import Path
 
-import gym
 import pytest
 
-import compiler_gym.envs.llvm  # noqa register environments
+import compiler_gym
 from compiler_gym.envs.llvm import LlvmEnv
 from compiler_gym.envs.llvm.datasets import JotaiBenchDataset
 from tests.pytest_plugins.common import skip_on_ci
@@ -21,16 +19,13 @@ pytest_plugins = ["tests.pytest_plugins.common", "tests.pytest_plugins.llvm"]
 
 @pytest.fixture(scope="module")
 def jotaibench_dataset() -> JotaiBenchDataset:
-    with gym.make("llvm-v0") as env:
+    with compiler_gym.make("llvm-v0") as env:
         ds = env.datasets["jotaibench-v0"]
     yield ds
 
 
 def test_jotaibench_size(jotaibench_dataset: JotaiBenchDataset):
-    if sys.platform == "darwin":
-        assert jotaibench_dataset.size == 2138894
-    else:
-        assert jotaibench_dataset.size == 2138894
+    assert jotaibench_dataset.size == 18761
 
 
 def test_missing_benchmark_name(jotaibench_dataset: JotaiBenchDataset, mocker):

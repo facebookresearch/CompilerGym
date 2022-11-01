@@ -262,7 +262,7 @@ def get_llvm_datasets(site_data_base: Optional[Path] = None) -> Iterable[Dataset
         manifest_sha256=anghabench_v0_manifest_sha256,
         deprecated="Please use anghabench-v1",
     )
-    yield JotaiBenchDataset(site_data_base=site_data_base, sort_order=0)
+    yield JotaiBenchDataset(site_data_base=site_data_base)
     yield BlasDataset(site_data_base=site_data_base, sort_order=0)
     yield CLgenDataset(site_data_base=site_data_base, sort_order=0)
     yield CBenchDataset(site_data_base=site_data_base)
