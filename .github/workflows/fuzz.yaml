@@ -10,14 +10,14 @@ name: Release Fuzz
 on:
     workflow_dispatch:
     schedule:
-        - cron: 0 9 * * 1-5  # every weekday at 9am
+        - cron: 0 9 * * 1-5 # every weekday at 9am
 
 jobs:
     fuzz:
         runs-on: ubuntu-latest
 
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v3
 
             - name: Persist the bazel cache
               uses: actions/cache@v2
@@ -29,7 +29,7 @@ jobs:
                       bazel-
 
             - name: Set up Python
-              uses: actions/setup-python@v2
+              uses: actions/setup-python@v4
               with:
                   python-version: 3.9
 
