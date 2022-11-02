@@ -33,7 +33,7 @@ jobs:
                   BAZEL_BUILD_OPTS: --config=ci
 
             - name: Upload Python wheel
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               with:
                   name: linux-wheel
                   path: dist/*.whl
@@ -81,7 +81,7 @@ jobs:
               shell: bash
 
             - name: Upload Python wheel
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               with:
                   name: linux-wheel-cmake
                   path: ~/cmake_build/py_pkg/dist/*.whl
@@ -89,7 +89,7 @@ jobs:
                   retention-days: 7
 
             - name: Upload compute_programl binary
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               with:
                   name: linux-compute-programl-cmake
                   path: compiler_gym/third_party/programl/compute_programl
@@ -97,7 +97,7 @@ jobs:
                   retention-days: 7
 
             - name: Upload loop_unroller binary
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               with:
                   name: linux-loop-unroller-cmake
                   path: examples/example_unrolling_service/loop_unroller/loop_unroller
@@ -105,7 +105,7 @@ jobs:
                   retention-days: 7
 
             - name: Upload opt_loops binary
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               with:
                   name: linux-opt-loops-cmake
                   path: examples/loop_optimizations_service/opt_loops/opt_loops
@@ -157,7 +157,7 @@ jobs:
               shell: bash
 
             - name: Upload Python wheel
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               with:
                   name: mlir-env-linux-wheel-cmake
                   path: ~/cmake_build/py_pkg/dist/*.whl
@@ -184,7 +184,7 @@ jobs:
                   BAZEL_BUILD_OPTS: --config=ci
 
             - name: Upload Python wheel
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               with:
                   name: macos-wheel
                   path: dist/*.whl
@@ -207,7 +207,7 @@ jobs:
                   python-version: ${{ matrix.python }}
 
             - name: Download Python wheel
-              uses: actions/download-artifact@v2
+              uses: actions/download-artifact@v3
               with:
                   name: linux-wheel
 
@@ -244,7 +244,7 @@ jobs:
                   python-version: ${{ matrix.python }}
 
             - name: Download Python wheel
-              uses: actions/download-artifact@v2
+              uses: actions/download-artifact@v3
               with:
                   name: linux-wheel-cmake
 
@@ -258,17 +258,17 @@ jobs:
               run: python -m pip install -r tests/requirements.txt
 
             - name: Download compute_programl
-              uses: actions/download-artifact@v2
+              uses: actions/download-artifact@v3
               with:
                   name: linux-compute-programl-cmake
 
             - name: Download loop_unroller
-              uses: actions/download-artifact@v2
+              uses: actions/download-artifact@v3
               with:
                   name: linux-loop-unroller-cmake
 
             - name: Download opt_loops
-              uses: actions/download-artifact@v2
+              uses: actions/download-artifact@v3
               with:
                   name: linux-opt-loops-cmake
 
@@ -304,7 +304,7 @@ jobs:
                   python-version: ${{ matrix.python }}
 
             - name: Download Python wheel
-              uses: actions/download-artifact@v2
+              uses: actions/download-artifact@v3
               with:
                   name: mlir-env-linux-wheel-cmake
 
@@ -336,7 +336,7 @@ jobs:
                   python-version: ${{ matrix.python }}
 
             - name: Download Python wheel
-              uses: actions/download-artifact@v2
+              uses: actions/download-artifact@v3
               with:
                   name: macos-wheel
 
@@ -373,7 +373,7 @@ jobs:
                   python-version: ${{ matrix.python }}
 
             - name: Download Python wheel
-              uses: actions/download-artifact@v2
+              uses: actions/download-artifact@v3
               with:
                   name: linux-wheel
 
@@ -407,7 +407,7 @@ jobs:
                   python-version: ${{ matrix.python }}
 
             - name: Download Python wheel
-              uses: actions/download-artifact@v2
+              uses: actions/download-artifact@v3
               with:
                   name: macos-wheel
 
@@ -441,7 +441,7 @@ jobs:
                   python-version: ${{ matrix.python }}
 
             - name: Download Python wheel
-              uses: actions/download-artifact@v2
+              uses: actions/download-artifact@v3
               with:
                   name: linux-wheel
 
@@ -477,7 +477,7 @@ jobs:
             - uses: actions/checkout@v3
 
             - name: Download Python wheel
-              uses: actions/download-artifact@v2
+              uses: actions/download-artifact@v3
               with:
                   name: linux-wheel
 
@@ -508,7 +508,7 @@ jobs:
                   python-version: '3.10'
 
             - name: Download Python wheel
-              uses: actions/download-artifact@v2
+              uses: actions/download-artifact@v3
               with:
                   name: macos-wheel
 
@@ -539,7 +539,7 @@ jobs:
             - uses: actions/checkout@v3
 
             - name: Download Python wheel
-              uses: actions/download-artifact@v2
+              uses: actions/download-artifact@v3
               with:
                   name: linux-wheel
 
@@ -570,7 +570,7 @@ jobs:
                   python-version: '3.10'
 
             - name: Download Python wheel
-              uses: actions/download-artifact@v2
+              uses: actions/download-artifact@v3
               with:
                   name: macos-wheel
 
@@ -605,7 +605,7 @@ jobs:
                   python-version: ${{ matrix.python }}
 
             - name: Download Python wheel
-              uses: actions/download-artifact@v2
+              uses: actions/download-artifact@v3
               with:
                   name: linux-wheel
 
@@ -640,7 +640,7 @@ jobs:
                   python-version: ${{ matrix.python }}
 
             - name: Download Python wheel
-              uses: actions/download-artifact@v2
+              uses: actions/download-artifact@v3
               with:
                   name: macos-wheel
 
@@ -684,7 +684,7 @@ jobs:
                   BAZEL_BUILD_OPTS: --config=ci
 
             - name: Upload address sanitized LLVM compiler service
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               with:
                   name: compiler_gym-llvm-service-linux-asan-build
                   path: compiler_gym-llvm-service.tar.bz2
@@ -703,12 +703,12 @@ jobs:
                   python-version: '3.10'
 
             - name: Download Python wheel
-              uses: actions/download-artifact@v2
+              uses: actions/download-artifact@v3
               with:
                   name: linux-wheel
 
             - name: Download address sanitized LLVM compiler service
-              uses: actions/download-artifact@v2
+              uses: actions/download-artifact@v3
               with:
                   name: compiler_gym-llvm-service-linux-asan-build
 
@@ -755,7 +755,7 @@ jobs:
               with:
                   python-version: '3.10'
 
-            - uses: actions/setup-node@v2
+            - uses: actions/setup-node@v3
               with:
                   node-version: ${{ matrix.node }}
                   cache: npm
