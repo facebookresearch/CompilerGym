@@ -18,7 +18,7 @@ def test_default_dataset_list():
             "benchmark://chstone-v0",
             "benchmark://clgen-v0",
             "benchmark://github-v0",
-            "benchmark://jotaibench-v1",
+            "benchmark://jotaibench-v0",
             "benchmark://linux-v0",
             "benchmark://mibench-v1",
             "benchmark://npb-v0",
