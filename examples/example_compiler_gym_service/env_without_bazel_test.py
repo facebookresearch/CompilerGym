@@ -92,9 +92,9 @@ class ExampleDataset(Dataset):
             raise LookupError("Unknown program name")
 
 
-# Registexample-compiler-v0ironment for use with gym.make(...).
+# Register example-compiler-v0 for use with gym.make(...).
 register(
-    id="example-compiler-v0",
+    id="example-without-bazel-v0",
     entry_point="compiler_gym.service.client_service_compiler_env:ClientServiceCompilerEnv",
     kwargs={
         "service": EXAMPLE_PY_SERVICE_BINARY,
@@ -103,27 +103,17 @@ register(
     },
 )
 
-# Given that the C++ and Python service implementations have identical
-# featuresets, we can parameterize the tests and run them against both backends.
-EXAMPLE_ENVIRONMENTS = ["example-compiler-v0"]
 
-
-@pytest.fixture(scope="function", params=EXAMPLE_ENVIRONMENTS)
-def env(request) -> CompilerEnv:
+@pytest.fixture(scope="function")
+def env() -> CompilerEnv:
     """Text fixture that yields an environment."""
-    with gym.make(request.param) as env:
+    with gym.make("example-without-bazel-v0") as env:
         yield env
 
 
-@pytest.fixture(
-    scope="module",
-    params=[
-        EXAMPLE_PY_SERVICE_BINARY,
-    ],
-    ids=["example-compiler-v0"],
-)
-def bin(request) -> Path:
-    yield request.param
+@pytest.fixture(scope="module")
+def bin() -> Path:
+    return EXAMPLE_PY_SERVICE_BINARY
 
 
 def test_invalid_arguments(bin: Path):
@@ -133,7 +123,7 @@ def test_invalid_arguments(bin: Path):
         with Popen(
             cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True
         ) as p:
-            stdout, stderr = p.communicate(timeout=10)
+            stdout, stderr = p.communicate(timeout=60)
             return p.returncode, stdout, stderr
 
     returncode, _, stderr = run([str(bin), "foobar"])
