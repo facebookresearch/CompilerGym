@@ -14,8 +14,6 @@ from compiler_gym.spaces.common import issubdtype
 class Scalar(Space):
     """A scalar value."""
 
-    __slots__ = ["min", "max", "dtype"]
-
     def __init__(
         self,
         name: str,
@@ -35,10 +33,10 @@ class Scalar(Space):
 
         :param dtype: The type of this scalar.
         """
+        self.name = name
         self.min = min
         self.max = max
         self.dtype = dtype
-        self.name = name
 
     def sample(self):
         min = 0 if self.min is None else self.min

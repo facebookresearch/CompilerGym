@@ -7,14 +7,13 @@ on:
             - development
     pull_request:
 
-
 jobs:
     all:
         name: all
         runs-on: ubuntu-latest
 
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v3
             - name: Install clang-format
               run: |
                   wget --quiet -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
@@ -24,7 +23,7 @@ jobs:
                   clang-format --version
 
             - name: Install go
-              uses: actions/setup-go@v2
+              uses: actions/setup-go@v3
               with:
                   go-version: ^1.13.1
 
@@ -45,7 +44,7 @@ jobs:
                   sudo mv hadolint /usr/local/bin
 
             - name: Set up Python
-              uses: actions/setup-python@v2
+              uses: actions/setup-python@v4
               with:
                   python-version: 3.9
 
@@ -57,7 +56,7 @@ jobs:
                   python3 -m pre_commit --version
 
             - name: Run pre-commit checks
-              # TODO(github.com/facebookresearch/CompilerGym/issues/1): Disable
-              # isort due to inconsistent results when run locally versus in
-              # the GitHub Actions environment.
+        # TODO(github.com/facebookresearch/CompilerGym/issues/1): Disable
+        # isort due to inconsistent results when run locally versus in
+        # the GitHub Actions environment.
               run: SKIP=isort python3 -m pre_commit run --all-files --show-diff-on-failure

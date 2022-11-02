@@ -3,6 +3,8 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Unit tests for //compiler_gym/spaces:scalar."""
+from copy import copy, deepcopy
+
 from compiler_gym.spaces import Scalar
 from tests.test_main import main
 
@@ -65,6 +67,13 @@ def test_not_equal():
     assert scalar != Scalar(name="test_scalar", min=-10, max=5, dtype=int)
     assert scalar != Scalar(name="test_scalar", min=-10, max=10, dtype=float)
     assert scalar != "not_as_scalar"
+
+
+def test_deepcopy_regression_test():
+    """Test to reproduce github.com/facebookresearch/CompilerGym/issues/768."""
+    x = Scalar(name="foo")
+    copy(x)
+    deepcopy(x)
 
 
 if __name__ == "__main__":

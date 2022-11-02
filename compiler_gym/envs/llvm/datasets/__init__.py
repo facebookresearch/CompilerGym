@@ -16,6 +16,7 @@ from compiler_gym.envs.llvm.datasets.cbench import (
 from compiler_gym.envs.llvm.datasets.chstone import CHStoneDataset
 from compiler_gym.envs.llvm.datasets.clgen import CLgenDataset
 from compiler_gym.envs.llvm.datasets.csmith import CsmithBenchmark, CsmithDataset
+from compiler_gym.envs.llvm.datasets.jotaibench import JotaiBenchDataset
 from compiler_gym.envs.llvm.datasets.llvm_stress import LlvmStressDataset
 from compiler_gym.envs.llvm.datasets.poj104 import POJ104Dataset, POJ104LegacyDataset
 from compiler_gym.util.runfiles_path import site_data_path
@@ -261,6 +262,7 @@ def get_llvm_datasets(site_data_base: Optional[Path] = None) -> Iterable[Dataset
         manifest_sha256=anghabench_v0_manifest_sha256,
         deprecated="Please use anghabench-v1",
     )
+    yield JotaiBenchDataset(site_data_base=site_data_base)
     yield BlasDataset(site_data_base=site_data_base, sort_order=0)
     yield CLgenDataset(site_data_base=site_data_base, sort_order=0)
     yield CBenchDataset(site_data_base=site_data_base)
@@ -302,6 +304,7 @@ __all__ = [
     "CsmithDataset",
     "get_llvm_datasets",
     "GitHubDataset",
+    "JotaiBenchDataset",
     "LinuxDataset",
     "LlvmStressDataset",
     "MibenchDataset",

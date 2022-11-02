@@ -4,9 +4,6 @@
 # LICENSE file in the root directory of this source tree.
 """Tests for serializing LLVM datasets."""
 import pickle
-import sys
-
-import pytest
 
 from compiler_gym.datasets import Dataset
 from compiler_gym.envs.llvm import LlvmEnv
@@ -20,7 +17,6 @@ pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 
 @skip_on_ci
-@pytest.mark.skipif(sys.version_info < (3, 7), reason="Fails on py3.6")
 def test_pickle_dataset(dataset: Dataset):
     """Test that datasets can be pickled."""
     assert pickle.loads(pickle.dumps(dataset)) == dataset
@@ -37,7 +33,6 @@ def test_pickle_benchmark(dataset: Dataset):
 
 
 @ci_only
-@pytest.mark.skipif(sys.version_info < (3, 7), reason="Fails on py3.6")
 def test_pickle_cbench_dataset(env: LlvmEnv):
     """Test that datasets can be pickled."""
     dataset = env.datasets["benchmark://cbench-v1"]

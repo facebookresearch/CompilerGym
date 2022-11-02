@@ -19,6 +19,20 @@ py_test(
 )
 
 py_test(
+    name = "jotaibench_test",
+    timeout = "long",
+    srcs = ["jotaibench_test.py"],
+    shard_count = 8,
+    deps = [
+        "//compiler_gym/envs/llvm",
+        "//compiler_gym/envs/llvm/datasets",
+        "//tests:test_main",
+        "//tests/pytest_plugins:common",
+        "//tests/pytest_plugins:llvm",
+    ],
+)
+
+py_test(
     name = "cbench_test",
     timeout = "long",
     srcs = ["cbench_test.py"],

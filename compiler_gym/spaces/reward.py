@@ -26,16 +26,6 @@ class Reward(Scalar):
     signals based on observation values computed by the backend service.
     """
 
-    __slots__ = [
-        "name",
-        "observation_spaces",
-        "default_value",
-        "default_negates_returns",
-        "success_threshold",
-        "deterministic",
-        "platform_dependent",
-    ]
-
     def __init__(
         self,
         name: str,
