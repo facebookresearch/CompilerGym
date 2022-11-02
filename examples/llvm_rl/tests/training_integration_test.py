@@ -8,15 +8,10 @@ import sys
 import warnings
 from pathlib import Path
 
-import pytest
 from llvm_rl.model.model import Model
 from omegaconf import OmegaConf
 
 
-@pytest.mark.xfail(
-    sys.version_info >= (3, 10),
-    reason="github.com/facebookresearch/CompilerGym/issues/750",
-)
 def test_local_train(tmp_path: Path):
     model = Model(
         **OmegaConf.create(
