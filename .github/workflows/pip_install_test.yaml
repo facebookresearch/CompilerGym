@@ -20,7 +20,7 @@ jobs:
             fail-fast: false
             matrix:
                 os: [ubuntu-latest, macos-latest]
-                python: [3.6, 3.7, 3.8, 3.9]
+                python: [3.7, 3.8, 3.9]
 
         steps:
             - uses: actions/setup-python@v4
@@ -28,11 +28,11 @@ jobs:
                   python-version: ${{ matrix.python }}
 
             - name: Install python wheel
-        # We use the TestPyPI repository to install the compiler_gym
-        # package from because we use the install count on the main
-        # repository to track growth and usage of the project. We also
-        # provide the main PyPI repo as a fallback for installing
-        # dependencies.
+              # We use the TestPyPI repository to install the compiler_gym
+              # package from because we use the install count on the main
+              # repository to track growth and usage of the project. We also
+              # provide the main PyPI repo as a fallback for installing
+              # dependencies.
               run: python -m pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ compiler_gym
 
             - name: Check package version

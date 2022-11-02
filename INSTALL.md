@@ -4,7 +4,7 @@ Install the latest CompilerGym release using:
 
     pip install -U compiler_gym
 
-CompilerGym requires Python >= 3.6. The binary works on macOS and Linux (on
+CompilerGym requires Python >= 3.7. The binary works on macOS and Linux (on
 Ubuntu 18.04, Fedora 28, Debian 10 or newer equivalents).
 
 # Building from Source
