@@ -4,11 +4,12 @@
 # LICENSE file in the root directory of this source tree.
 """Regression tests for LlvmEnv.fork() identified by hand or through fuzzing."""
 
-from typing import NamedTuple
+from typing import List, NamedTuple
 
 import pytest
 from flaky import flaky
 
+import compiler_gym
 from compiler_gym.envs import LlvmEnv
 from tests.test_main import main
 
@@ -22,37 +23,48 @@ class ForkRegressionTest(NamedTuple):
     reward_space: str = "IrInstructionCount"
 
 
+# A list of testcases where we have identified the parent and child environment
+# states differing after forking and running identical actions on both.
+#
+# NOTE(cummins): To submit a new testcase, run the
+# "minimize_fork_regression_testcase()" function below to produce a minimal
+# reproducible example and add it to this list.
+MINIMIZED_FORK_REGRESSION_TESTS: List[ForkRegressionTest] = [
+    ForkRegressionTest(
+        benchmark="benchmark://cbench-v1/tiff2bw",
+        pre_fork="-globalopt",
+        post_fork="-gvn-hoist",
+        reward_space="IrInstructionCount",
+    ),
+    ForkRegressionTest(
+        benchmark="benchmark://cbench-v1/bzip2",
+        pre_fork="-mem2reg",
+        post_fork="-loop-guard-widening",
+        reward_space="IrInstructionCount",
+    ),
+    ForkRegressionTest(
+        benchmark="benchmark://cbench-v1/jpeg-d",
+        pre_fork="-sroa",
+        post_fork="-loop-rotate",
+        reward_space="IrInstructionCount",
+    ),
+    ForkRegressionTest(
+        benchmark="benchmark://cbench-v1/qsort",
+        pre_fork="-simplifycfg -newgvn -instcombine -break-crit-edges -gvn -inline",
+        post_fork="-lcssa",
+        reward_space="IrInstructionCount",
+    ),
+    ForkRegressionTest(
+        benchmark="benchmark://poj104-v1/101/859",
+        pre_fork="-licm",
+        post_fork="-loop-rotate",
+        reward_space="IrInstructionCount",
+    ),
+]
+
+
 @flaky
-@pytest.mark.parametrize(
-    "test",
-    [
-        ForkRegressionTest(
-            benchmark="benchmark://cbench-v1/tiff2bw",
-            pre_fork="-loop-unswitch -name-anon-globals -attributor -correlated-propagation -loop-unroll-and-jam -reg2mem -break-crit-edges -globalopt -inline",
-            post_fork="-cross-dso-cfi -gvn-hoist",
-        ),
-        ForkRegressionTest(
-            benchmark="benchmark://cbench-v1/bzip2",
-            pre_fork="-loop-deletion -argpromotion -callsite-splitting -mergeicmps -deadargelim -instsimplify -mem2reg -instcombine -rewrite-statepoints-for-gc -insert-gcov-profiling",
-            post_fork="-partially-inline-libcalls -loop-guard-widening",
-        ),
-        ForkRegressionTest(
-            benchmark="benchmark://cbench-v1/jpeg-d",
-            pre_fork="-bdce -loop-guard-widening -loop-reduce -globaldce -sroa -partially-inline-libcalls -loop-deletion -forceattrs -flattencfg -simple-loop-unswitch",
-            post_fork="-mergefunc -dse -load-store-vectorizer -sroa -mldst-motion -hotcoldsplit -loop-versioning-licm -loop-rotate",
-        ),
-        ForkRegressionTest(
-            benchmark="benchmark://cbench-v1/qsort",
-            pre_fork="-loop-versioning -barrier -deadargelim -loop-guard-widening -elim-avail-extern -elim-avail-extern -lowerinvoke -strip-debug-declare -name-anon-globals -strip-nondebug -rewrite-statepoints-for-gc -redundant-dbg-inst-elim -correlated-propagation -adce -deadargelim -globalopt -div-rem-pairs -elim-avail-extern -nary-reassociate -lowerinvoke -canonicalize-aliases -sancov -inferattrs -loop-reroll -loop-deletion -dse -name-anon-globals -inferattrs -callsite-splitting -alignment-from-assumptions -inferattrs -early-cse -functionattrs -jump-threading -loop-instsimplify -reassociate -flattencfg -memcpyopt -canonicalize-aliases -post-inline-ee-instrument -tailcallelim -lower-matrix-intrinsics -argpromotion -early-cse -inline -lower-constant-intrinsics -die -prune-eh -mergeicmps -pgo-memop-opt -simplifycfg -called-value-propagation -simplifycfg -loop-data-prefetch -loop-reroll -simplifycfg -div-rem-pairs -sccp -slp-vectorizer -ipsccp -separate-const-offset-from-gep -loop-vectorize -sroa -loop-simplifycfg -loop-load-elim -reassociate -loop-distribute -canonicalize-aliases -strip-dead-prototypes -attributor -callsite-splitting -mergereturn -mldst-motion -strip -rpo-functionattrs -dse -loop-idiom -guard-widening -hotcoldsplit -lcssa -loweratomic -prune-eh -newgvn -tailcallelim -prune-eh -rpo-functionattrs -slp-vectorizer -inferattrs -always-inline -float2int -lower-guard-intrinsic -lower-constant-intrinsics -simple-loop-unswitch -loop-versioning -instcombine -loweratomic -add-discriminators -inline -loop-deletion -slp-vectorizer -flattencfg -loop-unroll-and-jam -dse -dse -lower-widenable-condition -loop-rotate -hotcoldsplit -early-cse -mem2reg -tailcallelim -slp-vectorizer -cross-dso-cfi -coro-split -dce -memcpyopt -alignment-from-assumptions -coro-early -sink -loop-versioning -attributor -partially-inline-libcalls -coro-early -instcombine -lower-expect -constprop -loop-unswitch -loop-versioning -rpo-functionattrs -nary-reassociate -gvn -lower-guard-intrinsic -loop-unroll-and-jam -attributor -loop-idiom -lcssa -loop-load-elim -speculative-execution -float2int -mergefunc -lowerswitch -elim-avail-extern -coro-cleanup -scalarizer -redundant-dbg-inst-elim -load-store-vectorizer -instnamer -mem2reg -lower-matrix-intrinsics -insert-gcov-profiling -hotcoldsplit -loop-instsimplify -lowerinvoke -coro-early -coro-early -slp-vectorizer -coro-split -deadargelim -break-crit-edges -pgo-memop-opt -gvn-hoist -loop-instsimplify -loop-data-prefetch -gvn -newgvn -ee-instrument -strip-nondebug -alignment-from-assumptions -inline -mergefunc -adce -coro-cleanup -prune-eh",
-            post_fork="-lcssa ",
-        ),
-        ForkRegressionTest(
-            benchmark="benchmark://poj104-v1/101/859",
-            pre_fork="-bdce -ipconstprop -forceattrs -reg2mem -deadargelim -adce -lower-expect -instsimplify -sink -loop-simplifycfg -inline -loop-unroll-and-jam -sroa -loop-predication -bdce -loop-fusion -sink -float2int -alignment-from-assumptions -licm -strip-debug-declare -dce -sroa -aggressive-instcombine -loop-distribute -rewrite-statepoints-for-gc -slsr -bdce -prune-eh -forceattrs -constprop -name-anon-globals -canonicalize-aliases -deadargelim -loop-simplifycfg -partially-inline-libcalls -die -libcalls-shrinkwrap -called-value-propagation -coro-split -loop-idiom -loop-idiom -mergeicmps -elim-avail-extern -jump-threading -constmerge -canonicalize-aliases -loop-simplifycfg -licm",
-            post_fork="-loop-rotate ",
-        ),
-    ],
-)
+@pytest.mark.parametrize("test", MINIMIZED_FORK_REGRESSION_TESTS)
 def test_fork_regression_test(env: LlvmEnv, test: ForkRegressionTest):
     """Run the fork regression test:
 
@@ -77,6 +89,67 @@ def test_fork_regression_test(env: LlvmEnv, test: ForkRegressionTest):
         fkd.multistep(post_fork)
         # Verify that the environment states no longer line up.
         assert env.state != fkd.state
+
+
+# Utility function for generating test cases. Copy this code into a standalone
+# script and call the function on your test case. It will print a minimized
+# version of it.
+
+
+def minimize_fork_regression_testcase(test: ForkRegressionTest):
+    def _check_hypothesis(
+        benchmark: str, pre_fork: List[int], post_fork: List[int]
+    ) -> bool:
+        with compiler_gym.make("llvm-v0", reward_space="IrInstructionCount") as env:
+            env.reset(benchmark)
+            _, _, done, info = env.multistep(pre_fork)
+            assert not done, info  # Sanity check
+            with env.fork() as fkd:
+                assert env.state == fkd.state  # Sanity check
+                env.multistep(post_fork)
+                fkd.multistep(post_fork)
+                return env.state != fkd.state
+
+    with compiler_gym.make("llvm-v0", reward_space=test.reward_space) as env:
+        pre_fork = [env.action_space[f] for f in test.pre_fork.split()]
+        post_fork = [env.action_space[f] for f in test.post_fork.split()]
+
+        pre_fork_mask = [True] * len(pre_fork)
+        post_fork_mask = [True] * len(post_fork)
+
+        print("Minimizing the pre-fork actions list")
+        for i in range(len(pre_fork)):
+            pre_fork_mask[i] = False
+            masked_pre_fork = [p for p, m in zip(pre_fork, pre_fork_mask) if m]
+            if _check_hypothesis(test.benchmark, masked_pre_fork, post_fork):
+                print(
+                    f"Removed pre-fork action {env.action_space.names[pre_fork[i]]}, {sum(pre_fork_mask)} remaining"
+                )
+            else:
+                pre_fork_mask[i] = True
+        pre_fork = [p for p, m in zip(pre_fork, pre_fork_mask) if m]
+
+        print("Minimizing the post-fork actions list")
+        for i in range(len(post_fork)):
+            post_fork_mask[i] = False
+            masked_post_fork = [p for p, m in zip(post_fork, post_fork_mask) if m]
+            if _check_hypothesis(test.benchmark, pre_fork, masked_post_fork):
+                print(
+                    f"Removed post-fork action {env.action_space.names[post_fork[i]]}, {sum(post_fork_mask)} remaining"
+                )
+            else:
+                pre_fork_mask[i] = True
+        post_fork = [p for p, m in zip(post_fork, post_fork_mask) if m]
+
+        pre_fork = " ".join(env.action_space.names[p] for p in pre_fork)
+        post_fork = " ".join(env.action_space.names[p] for p in post_fork)
+
+    return ForkRegressionTest(
+        benchmark=test.benchmark,
+        pre_fork=pre_fork,
+        post_fork=post_fork,
+        reward_space=test.reward_space,
+    )
 
 
 if __name__ == "__main__":
