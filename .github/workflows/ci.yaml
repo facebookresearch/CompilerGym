@@ -722,6 +722,7 @@ jobs:
                   rm *.whl
                   chmod +x compiler_gym-*/compiler_gym-*.data/purelib/compiler_gym/third_party/csmith/csmith/bin/csmith
                   chmod +x compiler_gym-*/compiler_gym-*.data/purelib/compiler_gym/envs/llvm/service/compute_observation
+                  chmod +x compiler_gym-*/compiler_gym-*.data/purelib/compiler_gym/envs/llvm/service/llvm-extract-one
                   mv compiler_gym-llvm-service compiler_gym-*/compiler_gym-*.data/purelib/compiler_gym/envs/llvm/service/compiler_gym-llvm-service
                   wheel pack compiler_gym-*
 
