@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>compiler_gym.envs.llvm.llvm_env &mdash; CompilerGym 0.2.4 documentation</title>
+  <title>compiler_gym.envs.llvm.llvm_env &mdash; CompilerGym 0.2.5 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/custom.css" type="text/css" />
@@ -15,7 +15,9 @@
         <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="author" title="About these documents" href="../../../../about.html" />
     <link rel="index" title="Index" href="../../../../genindex.html" />
@@ -31,7 +33,7 @@
             <img src="../../../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.2.4
+                0.2.5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -41,7 +43,7 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../about.html">About</a></li>
@@ -51,14 +53,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Environments</span></p>
+<p class="caption" role="heading"><span class="caption-text">Environments</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../envs/gcc.html">GCC Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../envs/loop_tool.html">loop_tool Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../envs/mlir.html">MLIR Environment Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
@@ -72,7 +74,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/views.html">compiler_gym.views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
 </ul>
-<p class="caption"><span class="caption-text">C++ API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">C++ API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../cc/compiler_gym/service.html">compiler_gym/service</a></li>
@@ -124,6 +126,7 @@
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets</span> <span class="kn">import</span> <span class="n">Benchmark</span><span class="p">,</span> <span class="n">Dataset</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.envs.llvm.benchmark_from_command_line</span> <span class="kn">import</span> <span class="n">BenchmarkFromCommandLine</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.envs.llvm.datasets</span> <span class="kn">import</span> <span class="n">get_llvm_datasets</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.envs.llvm.lexed_ir</span> <span class="kn">import</span> <span class="n">LexedToken</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.envs.llvm.llvm_benchmark</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ClangInvocation</span><span class="p">,</span>
     <span class="n">get_system_library_flags</span><span class="p">,</span>
@@ -134,7 +137,7 @@
     <span class="n">CostFunctionReward</span><span class="p">,</span>
     <span class="n">NormalizedReward</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.errors</span> <span class="kn">import</span> <span class="n">BenchmarkInitError</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.errors</span> <span class="kn">import</span> <span class="n">BenchmarkInitError</span><span class="p">,</span> <span class="n">SessionNotFound</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.service.client_service_compiler_env</span> <span class="kn">import</span> <span class="n">ClientServiceCompilerEnv</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.spaces</span> <span class="kn">import</span> <span class="n">Box</span><span class="p">,</span> <span class="n">Commandline</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.spaces</span> <span class="kn">import</span> <span class="n">Dict</span> <span class="k">as</span> <span class="n">DictSpace</span>
@@ -416,6 +419,30 @@
                         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">AUTOPHASE_FEATURE_NAMES</span><span class="p">,</span> <span class="n">base_observation</span><span class="p">)</span>
                     <span class="p">},</span>
                 <span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;LexedIrTuple&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;base_id&quot;</span><span class="p">:</span> <span class="s2">&quot;LexedIr&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;space&quot;</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">(</span>
+                        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;LexedToken&quot;</span><span class="p">,</span>
+                        <span class="n">size_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+                        <span class="n">dtype</span><span class="o">=</span><span class="n">LexedToken</span><span class="p">,</span>
+                    <span class="p">),</span>
+                    <span class="s2">&quot;translate&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">base_observation</span><span class="p">:</span> <span class="p">[</span>
+                        <span class="n">LexedToken</span><span class="p">(</span><span class="n">tid</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">cat</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">tid</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">cat</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                            <span class="n">base_observation</span><span class="p">[</span><span class="s2">&quot;token_id&quot;</span><span class="p">],</span>
+                            <span class="n">base_observation</span><span class="p">[</span><span class="s2">&quot;token_kind&quot;</span><span class="p">],</span>
+                            <span class="n">base_observation</span><span class="p">[</span><span class="s2">&quot;token_category&quot;</span><span class="p">],</span>
+                            <span class="n">base_observation</span><span class="p">[</span><span class="s2">&quot;token_value&quot;</span><span class="p">],</span>
+                        <span class="p">)</span>
+                    <span class="p">],</span>
+                    <span class="s2">&quot;default_value&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;token_id&quot;</span><span class="p">:</span> <span class="p">[],</span>
+                        <span class="s2">&quot;token_kind&quot;</span><span class="p">:</span> <span class="p">[],</span>
+                        <span class="s2">&quot;token_category&quot;</span><span class="p">:</span> <span class="p">[],</span>
+                        <span class="s2">&quot;token_value&quot;</span><span class="p">:</span> <span class="p">[],</span>
+                    <span class="p">},</span>
+                <span class="p">},</span>
             <span class="p">],</span>
         <span class="p">)</span>
 
@@ -445,7 +472,7 @@
 
 <div class="viewcode-block" id="LlvmEnv.reset"><a class="viewcode-back" href="../../../../compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">observation</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="c1"># Catch and re-raise some known benchmark initialization errors with</span>
             <span class="c1"># a more informative error type.</span>
@@ -459,16 +486,7 @@
                 <span class="ow">or</span> <span class="s2">&quot;Error reading file:&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
             <span class="p">):</span>
                 <span class="k">raise</span> <span class="n">BenchmarkInitError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span> <span class="kn">from</span> <span class="nn">e</span>
-            <span class="k">raise</span>
-
-        <span class="c1"># Resend the runtimes-per-observation session parameter, if it is a</span>
-        <span class="c1"># non-default value.</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runtimes_per_observation_count</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">runtime_observation_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runtimes_per_observation_count</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runtimes_warmup_per_observation_count</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">runtime_warmup_runs_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runtimes_warmup_per_observation_count</span>
-
-        <span class="k">return</span> <span class="n">observation</span></div>
+            <span class="k">raise</span></div>
 
 <div class="viewcode-block" id="LlvmEnv.make_benchmark"><a class="viewcode-back" href="../../../../compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.make_benchmark">[docs]</a>    <span class="k">def</span> <span class="nf">make_benchmark</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -694,10 +712,12 @@
 
     <span class="nd">@runtime_observation_count</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">runtime_observation_count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_episode</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">send_param</span><span class="p">(</span><span class="s2">&quot;llvm.set_runtimes_per_observation_count&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
-        <span class="c1"># NOTE(cummins): Keep this after the send_param() call because</span>
-        <span class="c1"># send_param() will raise an error if the valid is invalid.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_param</span><span class="p">(</span>
+                <span class="s2">&quot;llvm.set_runtimes_per_observation_count&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">resend_on_reset</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="n">SessionNotFound</span><span class="p">:</span>
+            <span class="k">pass</span>  <span class="c1"># Not in session yet, will be sent on reset().</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_runtimes_per_observation_count</span> <span class="o">=</span> <span class="n">n</span>
 
     <span class="nd">@property</span>
@@ -730,12 +750,14 @@
 
     <span class="nd">@runtime_warmup_runs_count</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">runtime_warmup_runs_count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_episode</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">send_param</span><span class="p">(</span>
-                <span class="s2">&quot;llvm.set_warmup_runs_count_per_runtime_observation&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+                <span class="s2">&quot;llvm.set_warmup_runs_count_per_runtime_observation&quot;</span><span class="p">,</span>
+                <span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="p">),</span>
+                <span class="n">resend_on_reset</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="c1"># NOTE(cummins): Keep this after the send_param() call because</span>
-        <span class="c1"># send_param() will raise an error if the valid is invalid.</span>
+        <span class="k">except</span> <span class="n">SessionNotFound</span><span class="p">:</span>
+            <span class="k">pass</span>  <span class="c1"># Not in session yet, will be sent on reset().</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_runtimes_warmup_per_observation_count</span> <span class="o">=</span> <span class="n">n</span>
 
 <div class="viewcode-block" id="LlvmEnv.fork"><a class="viewcode-back" href="../../../../compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.fork">[docs]</a>    <span class="k">def</span> <span class="nf">fork</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

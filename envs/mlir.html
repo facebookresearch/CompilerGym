@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MLIR Environment Reference &mdash; CompilerGym 0.2.4 documentation</title>
+  <title>MLIR Environment Reference &mdash; CompilerGym 0.2.5 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
@@ -15,7 +16,9 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="author" title="About these documents" href="../about.html" />
     <link rel="index" title="Index" href="../genindex.html" />
@@ -33,7 +36,7 @@
             <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.2.4
+                0.2.5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -43,7 +46,7 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../about.html">About</a></li>
@@ -53,7 +56,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Environments</span></p>
+<p class="caption" role="heading"><span class="caption-text">Environments</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gcc.html">GCC Environment Reference</a></li>
@@ -69,7 +72,7 @@
 </ul>
 </li>
 </ul>
-<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
@@ -83,7 +86,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../compiler_gym/views.html">compiler_gym.views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
 </ul>
-<p class="caption"><span class="caption-text">C++ API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">C++ API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cc/compiler_gym/service.html">compiler_gym/service</a></li>
@@ -115,8 +118,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <div class="section" id="mlir-environment-reference">
-<h1>MLIR Environment Reference<a class="headerlink" href="#mlir-environment-reference" title="Permalink to this headline"></a></h1>
+  <section id="mlir-environment-reference">
+<h1>MLIR Environment Reference<a class="headerlink" href="#mlir-environment-reference" title="Permalink to this heading"></a></h1>
 <p><strong>⚠️ Under construction ⚠️</strong>. In its current state as a MVP, the MLIR
 environment exposes benchmarks and an action space geared towards optimization
 of matrix multiplication. The environment is not yet included in the CompilerGym
@@ -130,21 +133,21 @@ matrix multiplication.</p>
 <p>where <code class="code docutils literal notranslate"><span class="pre">A</span></code> is an <code class="code docutils literal notranslate"><span class="pre">MxK</span></code> matrix and <code class="code docutils literal notranslate"><span class="pre">B</span></code> is an <code class="code docutils literal notranslate"><span class="pre">KxN</span></code> matrix.</p>
 <p>Each episode is only 1 step long. All optimization parameters are supplied in a
 single action.</p>
-<div class="section" id="environment-configuration">
-<h2>Environment Configuration<a class="headerlink" href="#environment-configuration" title="Permalink to this headline"></a></h2>
+<section id="environment-configuration">
+<h2>Environment Configuration<a class="headerlink" href="#environment-configuration" title="Permalink to this heading"></a></h2>
 <p>M, N and K are benchmark parameters that initialize the environment and can not
 be changed.</p>
-</div>
-<div class="section" id="observation-space">
-<h2>Observation Space<a class="headerlink" href="#observation-space" title="Permalink to this headline"></a></h2>
+</section>
+<section id="observation-space">
+<h2>Observation Space<a class="headerlink" href="#observation-space" title="Permalink to this heading"></a></h2>
 <p>The observation is the running time of the calculation.</p>
-</div>
-<div class="section" id="reward-space">
-<h2>Reward Space<a class="headerlink" href="#reward-space" title="Permalink to this headline"></a></h2>
+</section>
+<section id="reward-space">
+<h2>Reward Space<a class="headerlink" href="#reward-space" title="Permalink to this heading"></a></h2>
 <p>The reward is negative running time.</p>
-</div>
-<div class="section" id="action-space">
-<h2>Action Space<a class="headerlink" href="#action-space" title="Permalink to this headline"></a></h2>
+</section>
+<section id="action-space">
+<h2>Action Space<a class="headerlink" href="#action-space" title="Permalink to this heading"></a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">compiler_gym.spaces</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">Box</span><span class="p">,</span>
     <span class="n">Dict</span><span class="p">,</span>
@@ -210,16 +213,16 @@ be changed.</p>
 </div>
 <p>Note that not all optimization pass configurations are valid and some will
 result in an error.</p>
-</div>
-<div class="section" id="rl-wrapper">
-<h2>RL Wrapper<a class="headerlink" href="#rl-wrapper" title="Permalink to this headline"></a></h2>
+</section>
+<section id="rl-wrapper">
+<h2>RL Wrapper<a class="headerlink" href="#rl-wrapper" title="Permalink to this heading"></a></h2>
 <p>The environment uses some non OpenAI Gym spaces in the action space. To be able
 to train with off-the-shelf RL frameworks there is a wrapper (constructed using
 <code class="xref py py-func docutils literal notranslate"><span class="pre">compiler_gym.wrappers.mlir.make_mlir_rl_wrapper_env()</span></code>) that converts the
 action space to use only OpenAI Gym spaces.</p>
-</div>
-<div class="section" id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline"></a></h2>
+</section>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h2>
 <p>The environment requires LLVM 14 and it can be built only with CMake, not with
 Bazel. It is incompatible with the LLVM environment due to LLVM version
 conflict. To enable the MLIR environment use these CMake variables.</p>
@@ -248,9 +251,9 @@ To do that pass to CMake these variables</p>
 <span class="n">Clang_DIR</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="example-usage">
-<h2>Example Usage<a class="headerlink" href="#example-usage" title="Permalink to this headline"></a></h2>
+</section>
+<section id="example-usage">
+<h2>Example Usage<a class="headerlink" href="#example-usage" title="Permalink to this heading"></a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">gym</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.wrappers.mlir</span> <span class="kn">import</span> <span class="n">make_mlir_rl_wrapper_env</span>
 
@@ -260,8 +263,8 @@ To do that pass to CMake these variables</p>
 <span class="n">observation</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">wrapper</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">wrapper</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">sample</span><span class="p">())</span>
 </pre></div>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>

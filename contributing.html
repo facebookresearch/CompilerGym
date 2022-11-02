@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Contributing &mdash; CompilerGym 0.2.4 documentation</title>
+  <title>Contributing &mdash; CompilerGym 0.2.5 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
@@ -15,7 +16,9 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
@@ -33,7 +36,7 @@
             <img src="_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.2.4
+                0.2.5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -43,7 +46,7 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
@@ -60,14 +63,14 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Environments</span></p>
+<p class="caption" role="heading"><span class="caption-text">Environments</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="envs/gcc.html">GCC Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="envs/loop_tool.html">loop_tool Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="envs/mlir.html">MLIR Environment Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/datasets.html">compiler_gym.datasets</a></li>
@@ -81,7 +84,7 @@
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/views.html">compiler_gym.views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
 </ul>
-<p class="caption"><span class="caption-text">C++ API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">C++ API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cc/compiler_gym/service.html">compiler_gym/service</a></li>
@@ -113,8 +116,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <div class="section" id="contributing">
-<h1>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline"></a></h1>
+  <section id="contributing">
+<h1>Contributing<a class="headerlink" href="#contributing" title="Permalink to this heading"></a></h1>
 <p><strong>Table of Contents</strong></p>
 <ul class="simple">
 <li><p><a class="reference external" href="#how-to-contribute">How to Contribute</a></p></li>
@@ -125,8 +128,8 @@
 (“CLA”)</a></p></li>
 </ul>
 <hr class="docutils" />
-<div class="section" id="how-to-contribute">
-<h2>How to Contribute<a class="headerlink" href="#how-to-contribute" title="Permalink to this headline"></a></h2>
+<section id="how-to-contribute">
+<h2>How to Contribute<a class="headerlink" href="#how-to-contribute" title="Permalink to this heading"></a></h2>
 <p>We want to make contributing to CompilerGym as easy and transparent as
 possible. The most helpful ways to contribute are:</p>
 <ol class="arabic simple">
@@ -156,9 +159,9 @@ research results using CompilerGym, etc.</p></li>
 </ul>
 </li>
 </ol>
-</div>
-<div class="section" id="pull-requests">
-<h2>Pull Requests<a class="headerlink" href="#pull-requests" title="Permalink to this headline"></a></h2>
+</section>
+<section id="pull-requests">
+<h2>Pull Requests<a class="headerlink" href="#pull-requests" title="Permalink to this heading"></a></h2>
 <p>We actively welcome your pull requests.</p>
 <ol class="arabic simple">
 <li><p>Fork <a class="reference external" href="https://github.com/facebookresearch/CompilerGym">the repo</a>
@@ -174,9 +177,9 @@ to set up your environment.</p></li>
 <li><p>If you haven’t already, complete the <a class="reference external" href="#contributor-license-agreement-cla">Contributor License Agreement
 (“CLA”)</a>.</p></li>
 </ol>
-</div>
-<div class="section" id="leaderboard-submissions">
-<h2>Leaderboard Submissions<a class="headerlink" href="#leaderboard-submissions" title="Permalink to this headline"></a></h2>
+</section>
+<section id="leaderboard-submissions">
+<h2>Leaderboard Submissions<a class="headerlink" href="#leaderboard-submissions" title="Permalink to this heading"></a></h2>
 <p>To add a new result to the leaderboard, add a new entry to the
 leaderboard table and file a <a class="reference external" href="#pull-requests">Pull Request</a>. Please
 include:</p>
@@ -197,9 +200,9 @@ may ask clarifying questions if we feel that those would be useful to
 improve reproducibility. <a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/117">Take a look
 here</a> for
 an example of a well-formed pull request submission.</p>
-</div>
-<div class="section" id="code-style">
-<h2>Code Style<a class="headerlink" href="#code-style" title="Permalink to this headline"></a></h2>
+</section>
+<section id="code-style">
+<h2>Code Style<a class="headerlink" href="#code-style" title="Permalink to this heading"></a></h2>
 <p>We want to ease the burden of code formatting using tools. Our code
 style is simple:</p>
 <ul class="simple">
@@ -224,15 +227,15 @@ for installation and usage instructions.</p>
 <li><p>Prefer easy-to-use code over easy-to-read, and easy-to-read code over
 easy-to-write.</p></li>
 </ul>
-</div>
-<div class="section" id="contributor-license-agreement-cla">
-<h2>Contributor License Agreement (“CLA”)<a class="headerlink" href="#contributor-license-agreement-cla" title="Permalink to this headline"></a></h2>
+</section>
+<section id="contributor-license-agreement-cla">
+<h2>Contributor License Agreement (“CLA”)<a class="headerlink" href="#contributor-license-agreement-cla" title="Permalink to this heading"></a></h2>
 <p>In order to accept your pull request, we need you to submit a CLA. You
 only need to do this once to work on any of Facebook’s open source
 projects.</p>
 <p>Complete your CLA here: <a class="reference external" href="https://code.facebook.com/cla">https://code.facebook.com/cla</a></p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>

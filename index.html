@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Indices and tables &mdash; CompilerGym 0.2.4 documentation</title>
+  <title>Indices and tables &mdash; CompilerGym 0.2.5 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
@@ -15,7 +16,9 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
@@ -32,7 +35,7 @@
             <img src="_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.2.4
+                0.2.5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -42,7 +45,7 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
@@ -52,14 +55,14 @@
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Environments</span></p>
+<p class="caption" role="heading"><span class="caption-text">Environments</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="envs/gcc.html">GCC Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="envs/loop_tool.html">loop_tool Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="envs/mlir.html">MLIR Environment Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/datasets.html">compiler_gym.datasets</a></li>
@@ -73,7 +76,7 @@
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/views.html">compiler_gym.views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
 </ul>
-<p class="caption"><span class="caption-text">C++ API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">C++ API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cc/compiler_gym/service.html">compiler_gym/service</a></li>
@@ -114,7 +117,7 @@ problems in a language and vocabulary with which they are comfortable, and
 provides a toolkit for systems developers to expose new compiler tasks for ML
 research. We aim to act as a catalyst for making compilers faster using ML.</p>
 <div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">User Guide</span></p>
+<p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
@@ -126,7 +129,7 @@ research. We aim to act as a catalyst for making compilers faster using ML.</p>
 </ul>
 </div>
 <div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">Environments</span></p>
+<p class="caption" role="heading"><span class="caption-text">Environments</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="llvm/index.html">LLVM Environment Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="llvm/index.html#installation">Installation</a></li>
@@ -165,90 +168,283 @@ research. We aim to act as a catalyst for making compilers faster using ML.</p>
 </ul>
 </div>
 <div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/compiler_gym.html">compiler_gym</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/compiler_gym.html#compilerenvstate">CompilerEnvState</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/compiler_gym.html#validation">Validation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/compiler_gym.html#filesystem-paths">Filesystem Paths</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/compiler_gym.html#debugging">Debugging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/compiler_gym.html#compilerenvstate">CompilerEnvState</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/compiler_gym.html#compiler_gym.CompilerEnvState"><code class="docutils literal notranslate"><span class="pre">CompilerEnvState</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/compiler_gym.html#compiler_gym.CompilerEnvStateWriter"><code class="docutils literal notranslate"><span class="pre">CompilerEnvStateWriter</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/compiler_gym.html#compiler_gym.CompilerEnvStateReader"><code class="docutils literal notranslate"><span class="pre">CompilerEnvStateReader</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/compiler_gym.html#validation">Validation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/compiler_gym.html#compiler_gym.ValidationResult"><code class="docutils literal notranslate"><span class="pre">ValidationResult</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/compiler_gym.html#compiler_gym.ValidationError"><code class="docutils literal notranslate"><span class="pre">ValidationError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/compiler_gym.html#compiler_gym.validate_states"><code class="docutils literal notranslate"><span class="pre">validate_states()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/compiler_gym.html#filesystem-paths">Filesystem Paths</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/compiler_gym.html#compiler_gym.cache_path"><code class="docutils literal notranslate"><span class="pre">cache_path()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/compiler_gym.html#compiler_gym.site_data_path"><code class="docutils literal notranslate"><span class="pre">site_data_path()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/compiler_gym.html#compiler_gym.transient_cache_path"><code class="docutils literal notranslate"><span class="pre">transient_cache_path()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/compiler_gym.html#compiler_gym.download"><code class="docutils literal notranslate"><span class="pre">download()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/compiler_gym.html#debugging">Debugging</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/compiler_gym.html#compiler_gym.get_debug_level"><code class="docutils literal notranslate"><span class="pre">get_debug_level()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/compiler_gym.html#compiler_gym.get_logging_level"><code class="docutils literal notranslate"><span class="pre">get_logging_level()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/compiler_gym.html#compiler_gym.set_debug_level"><code class="docutils literal notranslate"><span class="pre">set_debug_level()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/datasets.html">compiler_gym.datasets</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/datasets.html#benchmarkuri">BenchmarkUri</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/datasets.html#benchmark">Benchmark</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/datasets.html#dataset">Dataset</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/datasets.html#filesdataset">FilesDataset</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/datasets.html#tardataset">TarDataset</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/datasets.html#tardatasetwithmanifest">TarDatasetWithManifest</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/datasets.html#datasets">Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/datasets.html#benchmarkuri">BenchmarkUri</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/datasets.html#compiler_gym.datasets.BenchmarkUri"><code class="docutils literal notranslate"><span class="pre">BenchmarkUri</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/datasets.html#benchmark">Benchmark</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/datasets.html#compiler_gym.datasets.Benchmark"><code class="docutils literal notranslate"><span class="pre">Benchmark</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/datasets.html#compiler_gym.datasets.BenchmarkSource"><code class="docutils literal notranslate"><span class="pre">BenchmarkSource</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/datasets.html#compiler_gym.datasets.BenchmarkInitError"><code class="docutils literal notranslate"><span class="pre">BenchmarkInitError</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/datasets.html#dataset">Dataset</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/datasets.html#compiler_gym.datasets.Dataset"><code class="docutils literal notranslate"><span class="pre">Dataset</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/datasets.html#compiler_gym.datasets.DatasetInitError"><code class="docutils literal notranslate"><span class="pre">DatasetInitError</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/datasets.html#filesdataset">FilesDataset</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/datasets.html#compiler_gym.datasets.FilesDataset"><code class="docutils literal notranslate"><span class="pre">FilesDataset</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/datasets.html#tardataset">TarDataset</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/datasets.html#compiler_gym.datasets.TarDataset"><code class="docutils literal notranslate"><span class="pre">TarDataset</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/datasets.html#tardatasetwithmanifest">TarDatasetWithManifest</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/datasets.html#compiler_gym.datasets.TarDatasetWithManifest"><code class="docutils literal notranslate"><span class="pre">TarDatasetWithManifest</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/datasets.html#datasets">Datasets</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/datasets.html#compiler_gym.datasets.Datasets"><code class="docutils literal notranslate"><span class="pre">Datasets</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/envs.html">compiler_gym.envs</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/envs.html#compilerenv">CompilerEnv</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/envs.html#llvmenv">LlvmEnv</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/envs.html#gccenv">GccEnv</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/envs.html#compilerenv">CompilerEnv</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv"><code class="docutils literal notranslate"><span class="pre">CompilerEnv</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/envs.html#llvmenv">LlvmEnv</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.LlvmEnv"><code class="docutils literal notranslate"><span class="pre">LlvmEnv</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/envs.html#gccenv">GccEnv</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.GccEnv"><code class="docutils literal notranslate"><span class="pre">GccEnv</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/envs/gcc.html">compiler_gym.envs.gcc</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/envs/gcc.html#compiler-description">Compiler Description</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/envs/gcc.html#datasets">Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/envs/gcc.html#compiler-description">Compiler Description</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/envs/gcc.html#compiler_gym.envs.gcc.gcc.Gcc"><code class="docutils literal notranslate"><span class="pre">Gcc</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/envs/gcc.html#compiler_gym.envs.gcc.gcc.GccSpec"><code class="docutils literal notranslate"><span class="pre">GccSpec</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/envs/gcc.html#compiler_gym.envs.gcc.gcc.Option"><code class="docutils literal notranslate"><span class="pre">Option</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/envs/gcc.html#compiler_gym.envs.gcc.gcc.GccOOption"><code class="docutils literal notranslate"><span class="pre">GccOOption</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/envs/gcc.html#compiler_gym.envs.gcc.gcc.GccFlagOption"><code class="docutils literal notranslate"><span class="pre">GccFlagOption</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/envs/gcc.html#compiler_gym.envs.gcc.gcc.GccFlagEnumOption"><code class="docutils literal notranslate"><span class="pre">GccFlagEnumOption</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/envs/gcc.html#compiler_gym.envs.gcc.gcc.GccFlagIntOption"><code class="docutils literal notranslate"><span class="pre">GccFlagIntOption</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/envs/gcc.html#compiler_gym.envs.gcc.gcc.GccFlagAlignOption"><code class="docutils literal notranslate"><span class="pre">GccFlagAlignOption</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/envs/gcc.html#compiler_gym.envs.gcc.gcc.GccParamEnumOption"><code class="docutils literal notranslate"><span class="pre">GccParamEnumOption</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/envs/gcc.html#compiler_gym.envs.gcc.gcc.GccParamIntOption"><code class="docutils literal notranslate"><span class="pre">GccParamIntOption</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/envs/gcc.html#datasets">Datasets</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/envs/gcc.html#compiler_gym.envs.gcc.datasets.get_gcc_datasets"><code class="docutils literal notranslate"><span class="pre">get_gcc_datasets()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/envs/gcc.html#compiler_gym.envs.gcc.datasets.AnghaBenchDataset"><code class="docutils literal notranslate"><span class="pre">AnghaBenchDataset</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/envs/gcc.html#compiler_gym.envs.gcc.datasets.CHStoneDataset"><code class="docutils literal notranslate"><span class="pre">CHStoneDataset</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/envs/gcc.html#compiler_gym.envs.gcc.datasets.CsmithDataset"><code class="docutils literal notranslate"><span class="pre">CsmithDataset</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="llvm/api.html">compiler_gym.envs.llvm</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="llvm/api.html#constructing-benchmarks">Constructing Benchmarks</a></li>
-<li class="toctree-l2"><a class="reference internal" href="llvm/api.html#datasets">Datasets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="llvm/api.html#miscellaneous">Miscellaneous</a></li>
+<li class="toctree-l2"><a class="reference internal" href="llvm/api.html#constructing-benchmarks">Constructing Benchmarks</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="llvm/api.html#compiler_gym.envs.llvm.make_benchmark"><code class="docutils literal notranslate"><span class="pre">make_benchmark()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="llvm/api.html#compiler_gym.envs.llvm.BenchmarkFromCommandLine"><code class="docutils literal notranslate"><span class="pre">BenchmarkFromCommandLine</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="llvm/api.html#compiler_gym.envs.llvm.ClangInvocation"><code class="docutils literal notranslate"><span class="pre">ClangInvocation</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="llvm/api.html#compiler_gym.envs.llvm.get_system_library_flags"><code class="docutils literal notranslate"><span class="pre">get_system_library_flags()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="llvm/api.html#datasets">Datasets</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="llvm/api.html#compiler_gym.envs.llvm.datasets.get_llvm_datasets"><code class="docutils literal notranslate"><span class="pre">get_llvm_datasets()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="llvm/api.html#compiler_gym.envs.llvm.datasets.AnghaBenchDataset"><code class="docutils literal notranslate"><span class="pre">AnghaBenchDataset</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="llvm/api.html#compiler_gym.envs.llvm.datasets.BlasDataset"><code class="docutils literal notranslate"><span class="pre">BlasDataset</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="llvm/api.html#compiler_gym.envs.llvm.datasets.CBenchDataset"><code class="docutils literal notranslate"><span class="pre">CBenchDataset</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="llvm/api.html#compiler_gym.envs.llvm.datasets.CLgenDataset"><code class="docutils literal notranslate"><span class="pre">CLgenDataset</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="llvm/api.html#compiler_gym.envs.llvm.datasets.CsmithDataset"><code class="docutils literal notranslate"><span class="pre">CsmithDataset</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="llvm/api.html#compiler_gym.envs.llvm.datasets.GitHubDataset"><code class="docutils literal notranslate"><span class="pre">GitHubDataset</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="llvm/api.html#compiler_gym.envs.llvm.datasets.JotaiBenchDataset"><code class="docutils literal notranslate"><span class="pre">JotaiBenchDataset</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="llvm/api.html#compiler_gym.envs.llvm.datasets.LinuxDataset"><code class="docutils literal notranslate"><span class="pre">LinuxDataset</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="llvm/api.html#compiler_gym.envs.llvm.datasets.LlvmStressDataset"><code class="docutils literal notranslate"><span class="pre">LlvmStressDataset</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="llvm/api.html#compiler_gym.envs.llvm.datasets.MibenchDataset"><code class="docutils literal notranslate"><span class="pre">MibenchDataset</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="llvm/api.html#compiler_gym.envs.llvm.datasets.NPBDataset"><code class="docutils literal notranslate"><span class="pre">NPBDataset</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="llvm/api.html#compiler_gym.envs.llvm.datasets.OpenCVDataset"><code class="docutils literal notranslate"><span class="pre">OpenCVDataset</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="llvm/api.html#compiler_gym.envs.llvm.datasets.POJ104Dataset"><code class="docutils literal notranslate"><span class="pre">POJ104Dataset</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="llvm/api.html#compiler_gym.envs.llvm.datasets.TensorFlowDataset"><code class="docutils literal notranslate"><span class="pre">TensorFlowDataset</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="llvm/api.html#miscellaneous">Miscellaneous</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="llvm/api.html#compiler_gym.envs.llvm.compute_observation"><code class="docutils literal notranslate"><span class="pre">compute_observation()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/leaderboard.html">compiler_gym.leaderboard</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/leaderboard.html#module-compiler_gym.leaderboard.llvm_instcount">LLVM Instruction Count</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/leaderboard.html#module-compiler_gym.leaderboard.llvm_instcount">LLVM Instruction Count</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/leaderboard.html#compiler_gym.leaderboard.llvm_instcount.eval_llvm_instcount_policy"><code class="docutils literal notranslate"><span class="pre">eval_llvm_instcount_policy()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/service.html">compiler_gym.service</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/service.html#the-compilationsession-interface">The CompilationSession Interface</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/service.html#clientservicecompilerenv">ClientServiceCompilerEnv</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/service.html#the-connection-object">The connection object</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/service.html#configuring-the-connection">Configuring the connection</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/service.html#exceptions">Exceptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/service.html#the-compilationsession-interface">The CompilationSession Interface</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/service.html#compiler_gym.service.CompilationSession"><code class="docutils literal notranslate"><span class="pre">CompilationSession</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/service.html#clientservicecompilerenv">ClientServiceCompilerEnv</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/service.html#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv"><code class="docutils literal notranslate"><span class="pre">ClientServiceCompilerEnv</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/service.html#compiler_gym.service.client_service_compiler_env.ServiceMessageConverters"><code class="docutils literal notranslate"><span class="pre">ServiceMessageConverters</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/service.html#the-connection-object">The connection object</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/service.html#compiler_gym.service.CompilerGymServiceConnection"><code class="docutils literal notranslate"><span class="pre">CompilerGymServiceConnection</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/service.html#configuring-the-connection">Configuring the connection</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/service.html#compiler_gym.service.ConnectionOpts"><code class="docutils literal notranslate"><span class="pre">ConnectionOpts</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/service.html#exceptions">Exceptions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/service.html#compiler_gym.service.ServiceError"><code class="docutils literal notranslate"><span class="pre">ServiceError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/service.html#compiler_gym.service.EnvironmentNotSupported"><code class="docutils literal notranslate"><span class="pre">EnvironmentNotSupported</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/service.html#compiler_gym.service.ServiceInitError"><code class="docutils literal notranslate"><span class="pre">ServiceInitError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/service.html#compiler_gym.service.ServiceTransportError"><code class="docutils literal notranslate"><span class="pre">ServiceTransportError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/service.html#compiler_gym.service.ServiceIsClosed"><code class="docutils literal notranslate"><span class="pre">ServiceIsClosed</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/service.html#compiler_gym.service.SessionNotFound"><code class="docutils literal notranslate"><span class="pre">SessionNotFound</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/service/runtime.html">compiler_gym.service.runtime</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/service/runtime.html#module-compiler_gym.service.runtime">Common Runtime</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/service/runtime.html#compilergymservice">CompilerGymService</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/service/runtime.html#benchmarkcache">BenchmarkCache</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/service/runtime.html#module-compiler_gym.service.runtime">Common Runtime</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/service/runtime.html#compiler_gym.service.runtime.create_and_run_compiler_gym_service"><code class="docutils literal notranslate"><span class="pre">create_and_run_compiler_gym_service()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/service/runtime.html#compilergymservice">CompilerGymService</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/service/runtime.html#compiler_gym.service.runtime.compiler_gym_service.CompilerGymService"><code class="docutils literal notranslate"><span class="pre">CompilerGymService</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/service/runtime.html#benchmarkcache">BenchmarkCache</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/service/runtime.html#compiler_gym.service.runtime.benchmark_cache.BenchmarkCache"><code class="docutils literal notranslate"><span class="pre">BenchmarkCache</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/spaces.html">compiler_gym.spaces</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/spaces.html#commandline">Commandline</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/spaces.html#dict">Dict</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/spaces.html#discrete">Discrete</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/spaces.html#nameddiscrete">NamedDiscrete</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/spaces.html#permutation">Permutation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/spaces.html#reward">Reward</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/spaces.html#scalar">Scalar</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/spaces.html#spacesequence">SpaceSequence</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/spaces.html#sequence">Sequence</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/spaces.html#tuple">Tuple</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/spaces.html#commandline">Commandline</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/spaces.html#compiler_gym.spaces.Commandline"><code class="docutils literal notranslate"><span class="pre">Commandline</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/spaces.html#compiler_gym.spaces.CommandlineFlag"><code class="docutils literal notranslate"><span class="pre">CommandlineFlag</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/spaces.html#dict">Dict</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/spaces.html#compiler_gym.spaces.Dict"><code class="docutils literal notranslate"><span class="pre">Dict</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/spaces.html#discrete">Discrete</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/spaces.html#compiler_gym.spaces.Discrete"><code class="docutils literal notranslate"><span class="pre">Discrete</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/spaces.html#nameddiscrete">NamedDiscrete</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/spaces.html#compiler_gym.spaces.NamedDiscrete"><code class="docutils literal notranslate"><span class="pre">NamedDiscrete</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/spaces.html#permutation">Permutation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/spaces.html#compiler_gym.spaces.Permutation"><code class="docutils literal notranslate"><span class="pre">Permutation</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/spaces.html#reward">Reward</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/spaces.html#compiler_gym.spaces.Reward"><code class="docutils literal notranslate"><span class="pre">Reward</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/spaces.html#scalar">Scalar</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/spaces.html#compiler_gym.spaces.Scalar"><code class="docutils literal notranslate"><span class="pre">Scalar</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/spaces.html#spacesequence">SpaceSequence</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/spaces.html#compiler_gym.spaces.SpaceSequence"><code class="docutils literal notranslate"><span class="pre">SpaceSequence</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/spaces.html#sequence">Sequence</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/spaces.html#compiler_gym.spaces.Sequence"><code class="docutils literal notranslate"><span class="pre">Sequence</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/spaces.html#tuple">Tuple</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/spaces.html#compiler_gym.spaces.Tuple"><code class="docutils literal notranslate"><span class="pre">Tuple</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/views.html">compiler_gym.views</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/views.html#observationview">ObservationView</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/views.html#observationspacespec">ObservationSpaceSpec</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/views.html#rewardview">RewardView</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/views.html#observationview">ObservationView</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/views.html#compiler_gym.views.ObservationView"><code class="docutils literal notranslate"><span class="pre">ObservationView</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/views.html#observationspacespec">ObservationSpaceSpec</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/views.html#compiler_gym.views.ObservationSpaceSpec"><code class="docutils literal notranslate"><span class="pre">ObservationSpaceSpec</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/views.html#rewardview">RewardView</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/views.html#compiler_gym.views.RewardView"><code class="docutils literal notranslate"><span class="pre">RewardView</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/wrappers.html">compiler_gym.wrappers</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/wrappers.html#base-wrappers">Base wrappers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/wrappers.html#action-space-wrappers">Action space wrappers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/wrappers.html#datasets-wrappers">Datasets wrappers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compiler_gym/wrappers.html#llvm-environment-wrappers">LLVM Environment wrappers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/wrappers.html#base-wrappers">Base wrappers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/wrappers.html#compiler_gym.wrappers.CompilerEnvWrapper"><code class="docutils literal notranslate"><span class="pre">CompilerEnvWrapper</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/wrappers.html#compiler_gym.wrappers.ActionWrapper"><code class="docutils literal notranslate"><span class="pre">ActionWrapper</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/wrappers.html#compiler_gym.wrappers.ObservationWrapper"><code class="docutils literal notranslate"><span class="pre">ObservationWrapper</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/wrappers.html#compiler_gym.wrappers.RewardWrapper"><code class="docutils literal notranslate"><span class="pre">RewardWrapper</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/wrappers.html#action-space-wrappers">Action space wrappers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/wrappers.html#compiler_gym.wrappers.CommandlineWithTerminalAction"><code class="docutils literal notranslate"><span class="pre">CommandlineWithTerminalAction</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/wrappers.html#compiler_gym.wrappers.ConstrainedCommandline"><code class="docutils literal notranslate"><span class="pre">ConstrainedCommandline</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/wrappers.html#compiler_gym.wrappers.TimeLimit"><code class="docutils literal notranslate"><span class="pre">TimeLimit</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/wrappers.html#compiler_gym.wrappers.ForkOnStep"><code class="docutils literal notranslate"><span class="pre">ForkOnStep</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/wrappers.html#datasets-wrappers">Datasets wrappers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/wrappers.html#compiler_gym.wrappers.IterateOverBenchmarks"><code class="docutils literal notranslate"><span class="pre">IterateOverBenchmarks</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/wrappers.html#compiler_gym.wrappers.CycleOverBenchmarks"><code class="docutils literal notranslate"><span class="pre">CycleOverBenchmarks</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/wrappers.html#compiler_gym.wrappers.CycleOverBenchmarksIterator"><code class="docutils literal notranslate"><span class="pre">CycleOverBenchmarksIterator</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/wrappers.html#compiler_gym.wrappers.RandomOrderBenchmarks"><code class="docutils literal notranslate"><span class="pre">RandomOrderBenchmarks</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/wrappers.html#llvm-environment-wrappers">LLVM Environment wrappers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/wrappers.html#compiler_gym.wrappers.RuntimePointEstimateReward"><code class="docutils literal notranslate"><span class="pre">RuntimePointEstimateReward</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiler_gym/wrappers.html#compiler_gym.wrappers.SynchronousSqliteLogger"><code class="docutils literal notranslate"><span class="pre">SynchronousSqliteLogger</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
 </div>
 <div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">C++ API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">C++ API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="cc/compiler_gym/envs/llvm/service.html#actionspace-h">ActionSpace.h</a></li>
@@ -281,15 +477,15 @@ research. We aim to act as a catalyst for making compilers faster using ML.</p>
 </li>
 </ul>
 </div>
-<div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline"></a></h1>
+<section id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading"></a></h1>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
 </ul>
 <p><a class="reference external" href="https://opensource.fb.com/legal/terms/">Terms of Use</a>.
 <a class="reference external" href="https://opensource.fb.com/legal/privacy/">Privacy Policy</a>.</p>
-</div>
+</section>
 
 
            </div>

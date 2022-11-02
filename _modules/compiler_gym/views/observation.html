@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>compiler_gym.views.observation &mdash; CompilerGym 0.2.4 documentation</title>
+  <title>compiler_gym.views.observation &mdash; CompilerGym 0.2.5 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
@@ -15,7 +15,9 @@
         <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="author" title="About these documents" href="../../../about.html" />
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -31,7 +33,7 @@
             <img src="../../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.2.4
+                0.2.5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -41,7 +43,7 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../about.html">About</a></li>
@@ -51,14 +53,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Environments</span></p>
+<p class="caption" role="heading"><span class="caption-text">Environments</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../envs/gcc.html">GCC Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../envs/loop_tool.html">loop_tool Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../envs/mlir.html">MLIR Environment Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
@@ -72,7 +74,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/views.html">compiler_gym.views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
 </ul>
-<p class="caption"><span class="caption-text">C++ API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">C++ API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../cc/compiler_gym/service.html">compiler_gym/service</a></li>
@@ -110,8 +112,6 @@
 <span class="c1"># This source code is licensed under the MIT license found in the</span>
 <span class="c1"># LICENSE file in the root directory of this source tree.</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
-
-<span class="kn">from</span> <span class="nn">deprecated.sphinx</span> <span class="kn">import</span> <span class="n">deprecated</span>
 
 <span class="kn">from</span> <span class="nn">compiler_gym.errors</span> <span class="kn">import</span> <span class="n">ServiceError</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">ObservationSpace</span>
@@ -202,50 +202,7 @@
         <span class="c1"># env.observation.FooBar().</span>
         <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">space</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="p">[</span><span class="n">space</span><span class="o">.</span><span class="n">id</span><span class="p">])</span>
 
-<div class="viewcode-block" id="ObservationView.add_derived_space"><a class="viewcode-back" href="../../../compiler_gym/views.html#compiler_gym.views.ObservationView.add_derived_space">[docs]</a>    <span class="nd">@deprecated</span><span class="p">(</span>
-        <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.2.1&quot;</span><span class="p">,</span>
-        <span class="n">reason</span><span class="o">=</span><span class="p">(</span>
-            <span class="s2">&quot;Use the derived_observation_spaces argument to CompilerEnv constructor. &quot;</span>
-            <span class="s2">&quot;See &lt;https://github.com/facebookresearch/CompilerGym/issues/461&gt;.&quot;</span>
-        <span class="p">),</span>
-    <span class="p">)</span>
-    <span class="k">def</span> <span class="nf">add_derived_space</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">base_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Alias to :func:`ObservationSpaceSpec.make_derived_space()</span>
-<span class="sd">        &lt;compiler_gym.views.ObservationSpaceSpec.make_derived_space&gt;` that adds</span>
-<span class="sd">        the derived space to the observation view.</span>
-
-<span class="sd">        Example usage:</span>
-
-<span class="sd">            &gt;&gt;&gt; env.observation.add_derived_space(</span>
-<span class="sd">                id=&quot;src_len&quot;,</span>
-<span class="sd">                base_id=&quot;src&quot;,</span>
-<span class="sd">                translate=lambda src: np.array([len(src)], dtype=np.int32),</span>
-<span class="sd">                shape=Box(shape=(1,), dtype=np.int32),</span>
-<span class="sd">            )</span>
-<span class="sd">            &gt;&gt;&gt; env.observation[&quot;src_len&quot;]</span>
-<span class="sd">            1029</span>
-
-<span class="sd">        :param id: The name of the new observation space.</span>
-
-<span class="sd">        :param base_id: The name of the observation space that this is derived</span>
-<span class="sd">            from.</span>
-
-<span class="sd">        :param \\**kwargs: Arguments passed to</span>
-<span class="sd">            :func:`ObservationSpaceSpec.make_derived_space</span>
-<span class="sd">            &lt;compiler_gym.views.ObservationSpaceSpec.make_derived_space&gt;`.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">base_space</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="n">base_id</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_add_space</span><span class="p">(</span><span class="n">base_space</span><span class="o">.</span><span class="n">make_derived_space</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span></div>
-
-    <span class="c1"># NOTE(github.com/facebookresearch/CompilerGym/issues/461): This method will</span>
-    <span class="c1"># be renamed to add_derived_space() once the current method with that name</span>
-    <span class="c1"># is removed.</span>
-<div class="viewcode-block" id="ObservationView.add_derived_space_internal"><a class="viewcode-back" href="../../../compiler_gym/views.html#compiler_gym.views.ObservationView.add_derived_space_internal">[docs]</a>    <span class="k">def</span> <span class="nf">add_derived_space_internal</span><span class="p">(</span>
+<div class="viewcode-block" id="ObservationView.add_derived_space"><a class="viewcode-back" href="../../../compiler_gym/views.html#compiler_gym.views.ObservationView.add_derived_space">[docs]</a>    <span class="k">def</span> <span class="nf">add_derived_space</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">base_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>compiler_gym.envs.compiler_env &mdash; CompilerGym 0.2.4 documentation</title>
+  <title>compiler_gym.envs.compiler_env &mdash; CompilerGym 0.2.5 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
@@ -15,7 +15,9 @@
         <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="author" title="About these documents" href="../../../about.html" />
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -31,7 +33,7 @@
             <img src="../../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.2.4
+                0.2.5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -41,7 +43,7 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../about.html">About</a></li>
@@ -51,14 +53,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Environments</span></p>
+<p class="caption" role="heading"><span class="caption-text">Environments</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../envs/gcc.html">GCC Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../envs/loop_tool.html">loop_tool Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../envs/mlir.html">MLIR Environment Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
@@ -72,7 +74,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/views.html">compiler_gym.views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
 </ul>
-<p class="caption"><span class="caption-text">C++ API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">C++ API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../cc/compiler_gym/service.html">compiler_gym/service</a></li>
@@ -114,7 +116,6 @@
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">gym</span>
-<span class="kn">from</span> <span class="nn">deprecated.sphinx</span> <span class="kn">import</span> <span class="n">deprecated</span>
 <span class="kn">from</span> <span class="nn">gym.spaces</span> <span class="kn">import</span> <span class="n">Space</span>
 
 <span class="kn">from</span> <span class="nn">compiler_gym.compiler_env_state</span> <span class="kn">import</span> <span class="n">CompilerEnvState</span>
@@ -291,14 +292,6 @@
 
     <span class="nd">@property</span>
     <span class="nd">@abstractmethod</span>
-    <span class="nd">@deprecated</span><span class="p">(</span>
-        <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.2.1&quot;</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="k">def</span> <span class="nf">logger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">version</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;The version string of the compiler service.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span>
@@ -437,6 +430,13 @@
 <span class="sd">            &gt;&gt;&gt; new_env.step(1) == env.step(1)</span>
 <span class="sd">            True</span>
 
+<span class="sd">        .. note::</span>
+
+<span class="sd">            The client/service implementation of CompilerGym means that the</span>
+<span class="sd">            forked and base environments share a common backend resource. This</span>
+<span class="sd">            means that if either of them crash, such as due to a compiler</span>
+<span class="sd">            assertion, both environments must be reset.</span>
+
 <span class="sd">        :return: A new environment instance.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract method&quot;</span><span class="p">)</span></div>
@@ -452,6 +452,7 @@
         <span class="n">reward_space</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
             <span class="n">OptionalArgumentValue</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Reward</span>
         <span class="p">]</span> <span class="o">=</span> <span class="n">OptionalArgumentValue</span><span class="o">.</span><span class="n">UNCHANGED</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">300</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ObservationType</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Reset the environment state.</span>
 
@@ -488,9 +489,14 @@
 <span class="sd">            available spaces, see :class:`env.reward.spaces</span>
 <span class="sd">            &lt;compiler_gym.views.RewardView&gt;`.</span>
 
+<span class="sd">        :param timeout: The maximum number of seconds to wait for reset to</span>
+<span class="sd">            succeed.</span>
+
 <span class="sd">        :return: The initial observation.</span>
 
-<span class="sd">        :raises BenchmarkInitError: If the benchmark is invalid. In this case,</span>
+<span class="sd">        :raises BenchmarkInitError: If the benchmark is invalid. This can happen</span>
+<span class="sd">            if the benchmark contains code that the compiler does not support,</span>
+<span class="sd">            or because of some internal error within the compiler. In this case,</span>
 <span class="sd">            another benchmark must be used.</span>
 
 <span class="sd">        :raises TypeError: If no benchmark has been set, and the environment</span>
@@ -506,6 +512,7 @@
         <span class="n">reward_spaces</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Reward</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">observations</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ObservationSpaceSpec</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">rewards</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Reward</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">300</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StepType</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Take a step.</span>
 
@@ -517,10 +524,13 @@
 <span class="sd">            requested spaces. The default :code:`env.observation_space` is not</span>
 <span class="sd">            returned.</span>
 
-<span class="sd">        :param reward_spaces: A list of reward spaces to compute rewards from. If</span>
-<span class="sd">            provided, this changes the :code:`reward` element of the return</span>
+<span class="sd">        :param reward_spaces: A list of reward spaces to compute rewards from.</span>
+<span class="sd">            If provided, this changes the :code:`reward` element of the return</span>
 <span class="sd">            tuple to be a list of rewards from the requested spaces. The default</span>
 <span class="sd">            :code:`env.reward_space` is not returned.</span>
+
+<span class="sd">        :param timeout: The maximum number of seconds to wait for the step to</span>
+<span class="sd">            succeed. Accepts a float value. The default is 300 seconds.</span>
 
 <span class="sd">        :return: A tuple of observation, reward, done, and info. Observation and</span>
 <span class="sd">            reward are None if default observation/reward is not set.</span>
@@ -535,6 +545,7 @@
         <span class="n">reward_spaces</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Reward</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">observations</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ObservationSpaceSpec</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">rewards</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Reward</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">300</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Take a sequence of steps and return the final observation and reward.</span>
 
@@ -546,10 +557,13 @@
 <span class="sd">            requested spaces. The default :code:`env.observation_space` is not</span>
 <span class="sd">            returned.</span>
 
-<span class="sd">        :param reward_spaces: A list of reward spaces to compute rewards from. If</span>
-<span class="sd">            provided, this changes the :code:`reward` element of the return</span>
+<span class="sd">        :param reward_spaces: A list of reward spaces to compute rewards from.</span>
+<span class="sd">            If provided, this changes the :code:`reward` element of the return</span>
 <span class="sd">            tuple to be a list of rewards from the requested spaces. The default</span>
 <span class="sd">            :code:`env.reward_space` is not returned.</span>
+
+<span class="sd">        :param timeout: The maximum number of seconds to wait for the steps to</span>
+<span class="sd">            succeed. Accepts a float value. The default is 300 seconds.</span>
 
 <span class="sd">        :return: A tuple of observation, reward, done, and info. Observation and</span>
 <span class="sd">            reward are None if default observation/reward is not set.</span>

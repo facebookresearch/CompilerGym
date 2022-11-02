@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; CompilerGym 0.2.4 documentation</title>
+  <title>Index &mdash; CompilerGym 0.2.5 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
@@ -15,7 +15,9 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="#" />
@@ -31,7 +33,7 @@
             <img src="_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.2.4
+                0.2.5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -41,7 +43,7 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
@@ -51,14 +53,14 @@
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Environments</span></p>
+<p class="caption" role="heading"><span class="caption-text">Environments</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="envs/gcc.html">GCC Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="envs/loop_tool.html">loop_tool Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="envs/mlir.html">MLIR Environment Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/datasets.html">compiler_gym.datasets</a></li>
@@ -72,7 +74,7 @@
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/views.html">compiler_gym.views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
 </ul>
-<p class="caption"><span class="caption-text">C++ API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">C++ API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cc/compiler_gym/service.html">compiler_gym/service</a></li>
@@ -276,16 +278,14 @@
 </li>
       <li><a href="compiler_gym/views.html#compiler_gym.views.ObservationView.add_derived_space">add_derived_space() (compiler_gym.views.ObservationView method)</a>
 </li>
-      <li><a href="compiler_gym/views.html#compiler_gym.views.ObservationView.add_derived_space_internal">add_derived_space_internal() (compiler_gym.views.ObservationView method)</a>
-</li>
       <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Benchmark.add_source">add_source() (compiler_gym.datasets.Benchmark method)</a>
 </li>
       <li><a href="compiler_gym/views.html#compiler_gym.views.RewardView.add_space">add_space() (compiler_gym.views.RewardView method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Benchmark.add_validation_callback">add_validation_callback() (compiler_gym.datasets.Benchmark method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compiler_gym/service/runtime.html#compiler_gym.service.runtime.compiler_gym_service.CompilerGymService.AddBenchmark">AddBenchmark() (compiler_gym.service.runtime.compiler_gym_service.CompilerGymService method)</a>
 </li>
       <li><a href="rpc.html#_CPPv417AddBenchmarkReply">AddBenchmarkReply (C++ struct)</a>
@@ -747,13 +747,15 @@
 </li>
       <li><a href="cc/compiler_gym/envs/llvm/service.html#_CPPv4N12compiler_gym12llvm_service20LlvmObservationSpace23IR_INSTRUCTION_COUNT_OZE">compiler_gym::llvm_service::LlvmObservationSpace::IR_INSTRUCTION_COUNT_OZ (C++ enumerator)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cc/compiler_gym/envs/llvm/service.html#_CPPv4N12compiler_gym12llvm_service20LlvmObservationSpace7IR_SHA1E">compiler_gym::llvm_service::LlvmObservationSpace::IR_SHA1 (C++ enumerator)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cc/compiler_gym/envs/llvm/service.html#_CPPv4N12compiler_gym12llvm_service20LlvmObservationSpace12IS_BUILDABLEE">compiler_gym::llvm_service::LlvmObservationSpace::IS_BUILDABLE (C++ enumerator)</a>
 </li>
       <li><a href="cc/compiler_gym/envs/llvm/service.html#_CPPv4N12compiler_gym12llvm_service20LlvmObservationSpace11IS_RUNNABLEE">compiler_gym::llvm_service::LlvmObservationSpace::IS_RUNNABLE (C++ enumerator)</a>
+</li>
+      <li><a href="cc/compiler_gym/envs/llvm/service.html#_CPPv4N12compiler_gym12llvm_service20LlvmObservationSpace8LEXED_IRE">compiler_gym::llvm_service::LlvmObservationSpace::LEXED_IR (C++ enumerator)</a>
 </li>
       <li><a href="cc/compiler_gym/envs/llvm/service.html#_CPPv4N12compiler_gym12llvm_service20LlvmObservationSpace22OBJECT_TEXT_SIZE_BYTESE">compiler_gym::llvm_service::LlvmObservationSpace::OBJECT_TEXT_SIZE_BYTES (C++ enumerator)</a>
 </li>
@@ -1342,6 +1344,10 @@
       <li><a href="compiler_gym/compiler_gym.html#compiler_gym.ValidationResult.join">join() (compiler_gym.ValidationResult class method)</a>
 </li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="llvm/api.html#compiler_gym.envs.llvm.datasets.JotaiBenchDataset">JotaiBenchDataset (class in compiler_gym.envs.llvm.datasets)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="L">L</h2>
@@ -1355,24 +1361,16 @@
 </li>
       <li><a href="rpc.html#_CPPv49ListSpace">ListSpace (C++ struct)</a>
 </li>
-      <li><a href="compiler_gym/envs.html#compiler_gym.envs.LlvmEnv">LlvmEnv (class in compiler_gym.envs)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compiler_gym/envs.html#compiler_gym.envs.LlvmEnv">LlvmEnv (class in compiler_gym.envs)</a>
+</li>
       <li><a href="llvm/api.html#compiler_gym.envs.llvm.datasets.LlvmStressDataset">LlvmStressDataset (class in compiler_gym.envs.llvm.datasets)</a>
 </li>
       <li><a href="compiler_gym/service.html#compiler_gym.service.ConnectionOpts.local_service_exit_max_seconds">local_service_exit_max_seconds (compiler_gym.service.ConnectionOpts attribute)</a>
 </li>
       <li><a href="compiler_gym/service.html#compiler_gym.service.ConnectionOpts.local_service_port_init_max_seconds">local_service_port_init_max_seconds (compiler_gym.service.ConnectionOpts attribute)</a>
 </li>
-      <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Dataset.logger">logger (compiler_gym.datasets.Dataset property)</a>
-
-      <ul>
-        <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.logger">(compiler_gym.envs.CompilerEnv property)</a>
-</li>
-        <li><a href="compiler_gym/service.html#compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv.logger">(compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv property)</a>
-</li>
-      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -1570,10 +1568,10 @@
 </li>
       <li><a href="cc/compiler_gym/util.html#c.RETURN_IF_ERROR">RETURN_IF_ERROR (C macro)</a>
 </li>
-      <li><a href="compiler_gym/wrappers.html#compiler_gym.wrappers.ActionWrapper.reverse_action">reverse_action() (compiler_gym.wrappers.ActionWrapper method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compiler_gym/wrappers.html#compiler_gym.wrappers.ActionWrapper.reverse_action">reverse_action() (compiler_gym.wrappers.ActionWrapper method)</a>
+</li>
       <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.Reward">Reward (class in compiler_gym.spaces)</a>
 </li>
       <li><a href="compiler_gym/compiler_gym.html#compiler_gym.CompilerEnvState.reward">reward (compiler_gym.CompilerEnvState attribute)</a>
@@ -1607,8 +1605,6 @@
       <li><a href="compiler_gym/views.html#compiler_gym.views.RewardView">RewardView (class in compiler_gym.views)</a>
 </li>
       <li><a href="compiler_gym/wrappers.html#compiler_gym.wrappers.RewardWrapper">RewardWrapper (class in compiler_gym.wrappers)</a>
-</li>
-      <li><a href="compiler_gym/service.html#compiler_gym.service.ConnectionOpts.rpc_call_max_seconds">rpc_call_max_seconds (compiler_gym.service.ConnectionOpts attribute)</a>
 </li>
       <li><a href="compiler_gym/service.html#compiler_gym.service.ConnectionOpts.rpc_init_max_seconds">rpc_init_max_seconds (compiler_gym.service.ConnectionOpts attribute)</a>
 </li>
@@ -1784,8 +1780,6 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="compiler_gym/envs.html#compiler_gym.envs.GccEnv.timeout">timeout (compiler_gym.envs.GccEnv property)</a>
-</li>
       <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.NamedDiscrete.to_string">to_string() (compiler_gym.spaces.NamedDiscrete method)</a>
 </li>
       <li><a href="compiler_gym/compiler_gym.html#compiler_gym.transient_cache_path">transient_cache_path() (in module compiler_gym)</a>

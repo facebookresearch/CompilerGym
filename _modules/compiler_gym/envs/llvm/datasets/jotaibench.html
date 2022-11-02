@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>compiler_gym.envs.llvm.datasets.anghabench &mdash; CompilerGym 0.2.5 documentation</title>
+  <title>compiler_gym.envs.llvm.datasets.jotaibench &mdash; CompilerGym 0.2.5 documentation</title>
       <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../../../_static/css/custom.css" type="text/css" />
@@ -98,7 +98,7 @@
       <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="../../../../index.html">Module code</a> &raquo;</li>
           <li><a href="../datasets.html">compiler_gym.envs.llvm.datasets</a> &raquo;</li>
-      <li>compiler_gym.envs.llvm.datasets.anghabench</li>
+      <li>compiler_gym.envs.llvm.datasets.jotaibench</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -107,26 +107,28 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>Source code for compiler_gym.envs.llvm.datasets.anghabench</h1><div class="highlight"><pre>
+  <h1>Source code for compiler_gym.envs.llvm.datasets.jotaibench</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright (c) Facebook, Inc. and its affiliates.</span>
 <span class="c1">#</span>
 <span class="c1"># This source code is licensed under the MIT license found in the</span>
 <span class="c1"># LICENSE file in the root directory of this source tree.</span>
 <span class="kn">import</span> <span class="nn">subprocess</span>
-<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">concurrent.futures</span> <span class="kn">import</span> <span class="n">as_completed</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
 
-<span class="kn">from</span> <span class="nn">compiler_gym.datasets</span> <span class="kn">import</span> <span class="n">Benchmark</span><span class="p">,</span> <span class="n">TarDatasetWithManifest</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.datasets</span> <span class="kn">import</span> <span class="n">Benchmark</span><span class="p">,</span> <span class="n">TarDataset</span><span class="p">,</span> <span class="n">TarDatasetWithManifest</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets.benchmark</span> <span class="kn">import</span> <span class="n">BenchmarkWithSource</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets.uri</span> <span class="kn">import</span> <span class="n">BenchmarkUri</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.envs.llvm.llvm_benchmark</span> <span class="kn">import</span> <span class="n">ClangInvocation</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.envs.llvm.llvm_benchmark</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ClangInvocation</span><span class="p">,</span>
+    <span class="n">get_system_library_flags</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">BenchmarkDynamicConfig</span><span class="p">,</span> <span class="n">Command</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util</span> <span class="kn">import</span> <span class="n">thread_pool</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.filesystem</span> <span class="kn">import</span> <span class="n">atomic_file_write</span>
 
 
-<div class="viewcode-block" id="AnghaBenchDataset"><a class="viewcode-back" href="../../../../../llvm/api.html#compiler_gym.envs.llvm.datasets.AnghaBenchDataset">[docs]</a><span class="k">class</span> <span class="nc">AnghaBenchDataset</span><span class="p">(</span><span class="n">TarDatasetWithManifest</span><span class="p">):</span>
+<div class="viewcode-block" id="JotaiBenchDataset"><a class="viewcode-back" href="../../../../../llvm/api.html#compiler_gym.envs.llvm.datasets.JotaiBenchDataset">[docs]</a><span class="k">class</span> <span class="nc">JotaiBenchDataset</span><span class="p">(</span><span class="n">TarDatasetWithManifest</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A dataset of C programs curated from GitHub source code.</span>
 
 <span class="sd">    The dataset is from:</span>
@@ -140,12 +142,12 @@
 
 <span class="sd">    And is available at:</span>
 
-<span class="sd">        http://cuda.dcc.ufmg.br/angha/home</span>
+<span class="sd">        http://cuda.dcc.ufmg.br/Jotai/src/</span>
 
 <span class="sd">    Installation</span>
 <span class="sd">    ------------</span>
 
-<span class="sd">    The AnghaBench dataset consists of C functions that are compiled to LLVM-IR</span>
+<span class="sd">    The JotaiBench dataset consists of C functions that are compiled to LLVM-IR</span>
 <span class="sd">    on-demand and cached. The first time each benchmark is used there is an</span>
 <span class="sd">    overhead of compiling it from C to bitcode. This is a one-off cost.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -153,42 +155,28 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">site_data_base</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
-        <span class="n">sort_order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="n">manifest_url</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">manifest_sha256</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">deprecated</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="n">manifest_url_</span><span class="p">,</span> <span class="n">manifest_sha256_</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;darwin&quot;</span><span class="p">:</span> <span class="p">(</span>
-                <span class="s2">&quot;https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-anghabench-v1-macos-manifest.bz2&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;96ead63da5f8efa07fd0370f0c6e452b59bed840828b8b19402102b1ce3ee109&quot;</span><span class="p">,</span>
-            <span class="p">),</span>
-            <span class="s2">&quot;linux&quot;</span><span class="p">:</span> <span class="p">(</span>
-                <span class="s2">&quot;https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-anghabench-v1-linux-manifest.bz2&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;14df85f650199498cf769715e9f0d7841d09f9fa62a95b8ecc242bdaf227f33a&quot;</span><span class="p">,</span>
-            <span class="p">),</span>
-        <span class="p">}[</span><span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">]</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">name</span><span class="o">=</span><span class="n">name</span> <span class="ow">or</span> <span class="s2">&quot;benchmark://anghabench-v1&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;benchmark://jotaibench-v0&quot;</span><span class="p">,</span>
             <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Compile-only C/C++ functions extracted from GitHub&quot;</span><span class="p">,</span>
             <span class="n">references</span><span class="o">=</span><span class="p">{</span>
                 <span class="s2">&quot;Paper&quot;</span><span class="p">:</span> <span class="s2">&quot;https://homepages.dcc.ufmg.br/~fernando/publications/papers/FaustinoCGO21.pdf&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;Homepage&quot;</span><span class="p">:</span> <span class="s2">&quot;http://cuda.dcc.ufmg.br/angha/&quot;</span><span class="p">,</span>
             <span class="p">},</span>
-            <span class="n">license</span><span class="o">=</span><span class="s2">&quot;Unknown. See: https://github.com/brenocfg/AnghaBench/issues/1&quot;</span><span class="p">,</span>
+            <span class="n">license</span><span class="o">=</span><span class="s2">&quot;GNU General Public License v3.0 (GPLv3)&quot;</span><span class="p">,</span>
             <span class="n">site_data_base</span><span class="o">=</span><span class="n">site_data_base</span><span class="p">,</span>
-            <span class="n">manifest_urls</span><span class="o">=</span><span class="p">[</span><span class="n">manifest_url</span> <span class="ow">or</span> <span class="n">manifest_url_</span><span class="p">],</span>
-            <span class="n">manifest_sha256</span><span class="o">=</span><span class="n">manifest_sha256</span> <span class="ow">or</span> <span class="n">manifest_sha256_</span><span class="p">,</span>
-            <span class="n">tar_urls</span><span class="o">=</span><span class="p">[</span>
-                <span class="s2">&quot;https://github.com/brenocfg/AnghaBench/archive/d8034ac8562b8c978376008f4b33df01b8887b19.tar.gz&quot;</span>
+            <span class="n">manifest_urls</span><span class="o">=</span><span class="p">[</span>
+                <span class="s2">&quot;https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-jotaibench-v0.bz2&quot;</span>
             <span class="p">],</span>
-            <span class="n">tar_sha256</span><span class="o">=</span><span class="s2">&quot;85d068e4ce44f2581e3355ee7a8f3ccb92568e9f5bd338bc3a918566f3aff42f&quot;</span><span class="p">,</span>
-            <span class="n">strip_prefix</span><span class="o">=</span><span class="s2">&quot;AnghaBench-d8034ac8562b8c978376008f4b33df01b8887b19&quot;</span><span class="p">,</span>
-            <span class="n">tar_compression</span><span class="o">=</span><span class="s2">&quot;gz&quot;</span><span class="p">,</span>
-            <span class="n">benchmark_file_suffix</span><span class="o">=</span><span class="s2">&quot;.bc&quot;</span><span class="p">,</span>
-            <span class="n">sort_order</span><span class="o">=</span><span class="n">sort_order</span><span class="p">,</span>
-            <span class="n">deprecated</span><span class="o">=</span><span class="n">deprecated</span><span class="p">,</span>
+            <span class="n">manifest_sha256</span><span class="o">=</span><span class="s2">&quot;ac4ee456e52073964d472d3e3969058b2f3052f8a4b402719013a3c603eb4b62&quot;</span><span class="p">,</span>
+            <span class="n">tar_urls</span><span class="o">=</span><span class="p">[</span>
+                <span class="s2">&quot;https://github.com/ChrisCummins/jotai-benchmarks/raw/ca26ccd27afecf38919c1e101c64e3cc17e39631/benchmarks/jotaibench.bz2&quot;</span>
+            <span class="p">],</span>
+            <span class="n">tar_sha256</span><span class="o">=</span><span class="s2">&quot;b5a51af3d4e2f77a66001635ec64ed321e0ece19873c4a888040859af7556401&quot;</span><span class="p">,</span>
+            <span class="n">strip_prefix</span><span class="o">=</span><span class="s2">&quot;jotaibench/jotaibench-v0&quot;</span><span class="p">,</span>
+            <span class="n">tar_compression</span><span class="o">=</span><span class="s2">&quot;bz2&quot;</span><span class="p">,</span>
+            <span class="n">benchmark_file_suffix</span><span class="o">=</span><span class="s2">&quot;.c&quot;</span><span class="p">,</span>
+            <span class="n">sort_order</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">benchmark_from_parsed_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="n">BenchmarkUri</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Benchmark</span><span class="p">:</span>
@@ -240,6 +228,99 @@
                 <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
             <span class="p">)</span></div>
+
+
+<span class="k">class</span> <span class="nc">JotaiBenchRunnableDataset</span><span class="p">(</span><span class="n">TarDataset</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">site_data_base</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;benchmark://jotai-runnable-v0&quot;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Runnable C/C++ functions extracted from GitHub&quot;</span><span class="p">,</span>
+            <span class="n">references</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;Paper&quot;</span><span class="p">:</span> <span class="s2">&quot;https://homepages.dcc.ufmg.br/~fernando/publications/papers/FaustinoCGO21.pdf&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Homepage&quot;</span><span class="p">:</span> <span class="s2">&quot;http://cuda.dcc.ufmg.br/angha/&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">license</span><span class="o">=</span><span class="s2">&quot;GNU General Public License v3.0 (GPLv3)&quot;</span><span class="p">,</span>
+            <span class="n">site_data_base</span><span class="o">=</span><span class="n">site_data_base</span><span class="p">,</span>
+            <span class="n">tar_urls</span><span class="o">=</span><span class="p">[</span>
+                <span class="s2">&quot;https://github.com/lac-dcc/jotai-benchmarks/blob/main/benchmarks/jotaibench.bz2?raw=true&quot;</span>
+            <span class="p">],</span>
+            <span class="n">tar_sha256</span><span class="o">=</span><span class="s2">&quot;b5a51af3d4e2f77a66001635ec64ed321e0ece19873c4a888040859af7556401&quot;</span><span class="p">,</span>
+            <span class="n">strip_prefix</span><span class="o">=</span><span class="s2">&quot;jotaibench-v0&quot;</span><span class="p">,</span>
+            <span class="n">tar_compression</span><span class="o">=</span><span class="s2">&quot;bz2&quot;</span><span class="p">,</span>
+            <span class="n">benchmark_file_suffix</span><span class="o">=</span><span class="s2">&quot;.c&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">benchmark_from_parsed_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="n">BenchmarkUri</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Benchmark</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">install</span><span class="p">()</span>
+
+        <span class="n">benchmark_name</span> <span class="o">=</span> <span class="n">uri</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">benchmark_name</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No benchmark specified: </span><span class="si">{</span><span class="n">uri</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># The absolute path of the file, without an extension.</span>
+        <span class="n">path_stem</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_root</span> <span class="o">/</span> <span class="n">benchmark_name</span>
+
+        <span class="n">bitcode_abspath</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path_stem</span><span class="si">}</span><span class="s2">.bc&quot;</span><span class="p">)</span>
+        <span class="n">c_file_abspath</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path_stem</span><span class="si">}</span><span class="s2">.c&quot;</span><span class="p">)</span>
+
+        <span class="c1"># If the file does not exist, compile it to a bitcode file on-demand.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">bitcode_abspath</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">c_file_abspath</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Benchmark not found: </span><span class="si">{</span><span class="n">uri</span><span class="si">}</span><span class="s2"> (file not found: </span><span class="si">{</span><span class="n">c_file_abspath</span><span class="si">}</span><span class="s2">)&quot;</span>
+                <span class="p">)</span>
+
+            <span class="k">with</span> <span class="n">atomic_file_write</span><span class="p">(</span><span class="n">bitcode_abspath</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmp_path</span><span class="p">:</span>
+                <span class="n">compile_cmd</span> <span class="o">=</span> <span class="n">ClangInvocation</span><span class="o">.</span><span class="n">from_c_file</span><span class="p">(</span>
+                    <span class="n">c_file_abspath</span><span class="p">,</span>
+                    <span class="n">copt</span><span class="o">=</span><span class="p">[</span>
+                        <span class="s2">&quot;-ferror-limit=1&quot;</span><span class="p">,</span>  <span class="c1"># Stop on first error.</span>
+                        <span class="s2">&quot;-w&quot;</span><span class="p">,</span>  <span class="c1"># No warnings.</span>
+                    <span class="p">],</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="n">outpath</span><span class="o">=</span><span class="n">tmp_path</span><span class="p">)</span>
+                <span class="n">subprocess</span><span class="o">.</span><span class="n">check_call</span><span class="p">(</span><span class="n">compile_cmd</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+
+        <span class="n">benchmark</span> <span class="o">=</span> <span class="n">BenchmarkWithSource</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">uri</span><span class="p">,</span> <span class="n">bitcode_abspath</span><span class="p">,</span> <span class="s2">&quot;function.c&quot;</span><span class="p">,</span> <span class="n">c_file_abspath</span>
+        <span class="p">)</span>
+
+        <span class="c1"># This is what makes a benchmark &quot;runnable&quot;.</span>
+        <span class="n">benchmark</span><span class="o">.</span><span class="n">proto</span><span class="o">.</span><span class="n">dynamic_config</span><span class="o">.</span><span class="n">MergeFrom</span><span class="p">(</span>
+            <span class="n">BenchmarkDynamicConfig</span><span class="p">(</span>
+                <span class="n">build_cmd</span><span class="o">=</span><span class="n">Command</span><span class="p">(</span>
+                    <span class="n">argument</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;$CC&quot;</span><span class="p">,</span> <span class="s2">&quot;$IN&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">get_system_library_flags</span><span class="p">(),</span>
+                    <span class="n">timeout_seconds</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+                    <span class="n">outfile</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;a.out&quot;</span><span class="p">],</span>
+                <span class="p">),</span>
+                <span class="n">run_cmd</span><span class="o">=</span><span class="n">Command</span><span class="p">(</span>
+                    <span class="n">argument</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;./a.out 0&quot;</span><span class="p">],</span>
+                    <span class="n">timeout_seconds</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+                    <span class="n">infile</span><span class="o">=</span><span class="p">[],</span>
+                    <span class="n">outfile</span><span class="o">=</span><span class="p">[],</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">benchmark</span>
+
+    <span class="k">def</span> <span class="nf">compile_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span>
+        <span class="n">executor</span> <span class="o">=</span> <span class="n">thread_pool</span><span class="o">.</span><span class="n">get_thread_pool_executor</span><span class="p">()</span>
+        <span class="c1"># Since the dataset is lazily compiled, simply iterating over the full</span>
+        <span class="c1"># set of URIs will compile everything. Do this in parallel.</span>
+        <span class="n">futures</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">benchmark</span><span class="p">,</span> <span class="n">uri</span><span class="p">)</span> <span class="k">for</span> <span class="n">uri</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">benchmark_uris</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">future</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">as_completed</span><span class="p">(</span><span class="n">futures</span><span class="p">),</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">future</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\r\033</span><span class="s2">[KCompiled </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2"> programs (</span><span class="si">{</span><span class="n">i</span><span class="o">/</span><span class="n">n</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2"> complete)&quot;</span><span class="p">,</span>
+                <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
 </pre></div>
 
            </div>

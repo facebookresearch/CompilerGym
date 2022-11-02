@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LLVM Environment Reference &mdash; CompilerGym 0.2.4 documentation</title>
+  <title>LLVM Environment Reference &mdash; CompilerGym 0.2.5 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
@@ -15,7 +16,9 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="author" title="About these documents" href="../about.html" />
@@ -34,7 +37,7 @@
             <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.2.4
+                0.2.5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -44,7 +47,7 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../about.html">About</a></li>
@@ -54,7 +57,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Environments</span></p>
+<p class="caption" role="heading"><span class="caption-text">Environments</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">LLVM Environment Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
@@ -90,7 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../envs/loop_tool.html">loop_tool Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../envs/mlir.html">MLIR Environment Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
@@ -104,7 +107,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../compiler_gym/views.html">compiler_gym.views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
 </ul>
-<p class="caption"><span class="caption-text">C++ API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">C++ API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cc/compiler_gym/service.html">compiler_gym/service</a></li>
@@ -136,8 +139,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <div class="section" id="llvm-environment-reference">
-<h1>LLVM Environment Reference<a class="headerlink" href="#llvm-environment-reference" title="Permalink to this headline"></a></h1>
+  <section id="llvm-environment-reference">
+<h1>LLVM Environment Reference<a class="headerlink" href="#llvm-environment-reference" title="Permalink to this heading"></a></h1>
 <p><a class="reference external" href="https://llvm.org/">LLVM</a> is a production-grade compiler used throughout
 industry. It defines a machine independent intermediate representation (IR), and
 comprises a family of tools with frontends for C, C++, OpenCL, and many other
@@ -179,13 +182,13 @@ languages.</p>
 </li>
 </ul>
 </div>
-<div class="section" id="installation">
-<h2><a class="toc-backref" href="#id4">Installation</a><a class="headerlink" href="#installation" title="Permalink to this headline"></a></h2>
+<section id="installation">
+<h2><a class="toc-backref" href="#id4">Installation</a><a class="headerlink" href="#installation" title="Permalink to this heading"></a></h2>
 <p>The LLVM environments are self-installing and work out of the box. A pack of
 required runtime data is downloaded and cached on first use of the environments.</p>
-</div>
-<div class="section" id="datasets">
-<h2><a class="toc-backref" href="#id5">Datasets</a><a class="headerlink" href="#datasets" title="Permalink to this headline"></a></h2>
+</section>
+<section id="datasets">
+<h2><a class="toc-backref" href="#id5">Datasets</a><a class="headerlink" href="#datasets" title="Permalink to this heading"></a></h2>
 <p>We provide several datasets of open-source LLVM-IR benchmarks for use:</p>
 <table class="docutils align-default">
 <colgroup>
@@ -232,48 +235,53 @@ required runtime data is downloaded and cached on first use of the environments.
 <td><p>Compile-only C/C++ objects from GitHub [<a class="reference external" href="https://arxiv.org/pdf/2012.01470.pdf">Paper</a>]</p></td>
 <td><p>No</p></td>
 </tr>
-<tr class="row-even"><td><p>benchmark://linux-v0</p></td>
+<tr class="row-even"><td><p>benchmark://jotaibench-v0</p></td>
+<td><p>18,761</p></td>
+<td><p>Compile-only C/C++ functions extracted from GitHub [<a class="reference external" href="https://github.com/lac-dcc/jotai-benchmarks">Homepage</a>]</p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-odd"><td><p>benchmark://linux-v0</p></td>
 <td><p>13,894</p></td>
 <td><p>Compile-only object files from C Linux kernel [<a class="reference external" href="https://www.linux.org/">Homepage</a>]</p></td>
 <td><p>No</p></td>
 </tr>
-<tr class="row-odd"><td><p>benchmark://mibench-v1</p></td>
+<tr class="row-even"><td><p>benchmark://mibench-v1</p></td>
 <td><p>40</p></td>
 <td><p>C benchmarks [<a class="reference external" href="http://vhosts.eecs.umich.edu/mibench/Publications/MiBench.pdf">Paper</a>]</p></td>
 <td><p>No</p></td>
 </tr>
-<tr class="row-even"><td><p>benchmark://npb-v0</p></td>
+<tr class="row-odd"><td><p>benchmark://npb-v0</p></td>
 <td><p>122</p></td>
 <td><p>NASA Parallel Benchmarks [<a class="reference external" href="http://optout.csc.ncsu.edu/~mueller/codeopt/codeopt05/projects/www4.ncsu.edu/~pgauria/csc791a/papers/NAS-95-020.pdf">Paper</a>]</p></td>
 <td><p>No</p></td>
 </tr>
-<tr class="row-odd"><td><p>benchmark://opencv-v0</p></td>
+<tr class="row-even"><td><p>benchmark://opencv-v0</p></td>
 <td><p>442</p></td>
 <td><p>Compile-only object files from C++ OpenCV library [<a class="reference external" href="https://opencv.org/">Homepage</a>, <a class="reference external" href="https://mipro-proceedings.com/sites/mipro-proceedings.com/files/upload/sp/sp_008.pdf">Paper</a>]</p></td>
 <td><p>No</p></td>
 </tr>
-<tr class="row-even"><td><p>benchmark://poj104-v1</p></td>
+<tr class="row-odd"><td><p>benchmark://poj104-v1</p></td>
 <td><p>49,816</p></td>
 <td><p>Solutions to programming programs [<a class="reference external" href="https://sites.google.com/site/treebasedcnn/">Homepage</a>, <a class="reference external" href="https://ojs.aaai.org/index.php/AAAI/article/download/10139/9998">Paper</a>]</p></td>
 <td><p>No</p></td>
 </tr>
-<tr class="row-odd"><td><p>benchmark://tensorflow-v0</p></td>
+<tr class="row-even"><td><p>benchmark://tensorflow-v0</p></td>
 <td><p>1,985</p></td>
 <td><p>Compile-only object files from C++ TensorFlow library [<a class="reference external" href="https://www.tensorflow.org/">Homepage</a>, <a class="reference external" href="https://www.usenix.org/system/files/conference/osdi16/osdi16-abadi.pdf">Paper</a>]</p></td>
 <td><p>No</p></td>
 </tr>
-<tr class="row-even"><td><p>generator://csmith-v0</p></td>
+<tr class="row-odd"><td><p>generator://csmith-v0</p></td>
 <td><p>∞</p></td>
 <td><p>Random conformant C99 programs [<a class="reference external" href="https://embed.cs.utah.edu/csmith/">Homepage</a>, <a class="reference external" href="http://web.cse.ohio-state.edu/~rountev.1/5343/pdf/pldi11.pdf">Paper</a>]</p></td>
 <td><p>No</p></td>
 </tr>
-<tr class="row-odd"><td><p>generator://llvm-stress-v0</p></td>
+<tr class="row-even"><td><p>generator://llvm-stress-v0</p></td>
 <td><p>∞</p></td>
 <td><p>Randomly generated LLVM-IR [<a class="reference external" href="https://llvm.org/docs/CommandGuide/llvm-stress.html">Documentation</a>]</p></td>
 <td><p>No</p></td>
 </tr>
-<tr class="row-even"><td><p>Total</p></td>
-<td><p>1,158,701</p></td>
+<tr class="row-odd"><td><p>Total</p></td>
+<td><p>1,177,462</p></td>
 <td></td>
 <td></td>
 </tr>
@@ -297,21 +305,21 @@ See <a class="reference internal" href="../cli.html#module-compiler_gym.bin.vali
 <a class="reference internal" href="api.html#datasets"><span class="std std-ref">compiler_gym.envs.llvm.datasets</span></a> for API details.</p>
 <p>We characterize the datasets below in radial plots which show, clockwise from
 the top: the average number of instructions per benchmark, the density of
-branching instructions, the density of arithmetic instructions, and the density
-of memory operations. For example, comparing blas-v0 and cbench-v1 shows that
+branching instructions, the density of memory operations, and the density of
+arithmetic instructions. For example, comparing blas-v0 and cbench-v1 shows that
 blas-v0 consists of smaller programs with a similar density of branches, a
 higher density of arithmetic operations and relatively few memory operations.
 cbench-v1, in contrast to the small linear algebra kernels of blas-v0, contains
 larger programs with a higher density of memory operations and fewer arithmetic
 operations.</p>
 <img alt="../_images/datasets.png" src="../_images/datasets.png" />
-</div>
-<div class="section" id="observation-spaces">
-<h2><a class="toc-backref" href="#id6">Observation Spaces</a><a class="headerlink" href="#observation-spaces" title="Permalink to this headline"></a></h2>
+</section>
+<section id="observation-spaces">
+<h2><a class="toc-backref" href="#id6">Observation Spaces</a><a class="headerlink" href="#observation-spaces" title="Permalink to this heading"></a></h2>
 <p>We provide several observation spaces for LLVM based on published compiler
 research.</p>
-<div class="section" id="llvm-ir">
-<h3><a class="toc-backref" href="#id7">LLVM-IR</a><a class="headerlink" href="#llvm-ir" title="Permalink to this headline"></a></h3>
+<section id="llvm-ir">
+<h3><a class="toc-backref" href="#id7">LLVM-IR</a><a class="headerlink" href="#llvm-ir" title="Permalink to this heading"></a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 51%" />
@@ -347,9 +355,9 @@ the <code class="code docutils literal notranslate"><span class="pre">Ir</span><
 <p>Files generated by the <code class="code docutils literal notranslate"><span class="pre">BitcodeFile</span></code> observation space are put in a
 temporary directory that is removed when <a class="reference internal" href="../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.close" title="compiler_gym.envs.CompilerEnv.close"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.close()</span></code></a> is called.</p>
 </div>
-</div>
-<div class="section" id="instcount">
-<h3><a class="toc-backref" href="#id8">InstCount</a><a class="headerlink" href="#instcount" title="Permalink to this headline"></a></h3>
+</section>
+<section id="instcount">
+<h3><a class="toc-backref" href="#id8">InstCount</a><a class="headerlink" href="#instcount" title="Permalink to this heading"></a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 1%" />
@@ -748,9 +756,9 @@ feature vector:</p>
 </div>
 <p>The InstCount observation space and its derivatives are cheap to compute,
 deterministic, and platform independent.</p>
-</div>
-<div class="section" id="autophase">
-<h3><a class="toc-backref" href="#id9">Autophase</a><a class="headerlink" href="#autophase" title="Permalink to this headline"></a></h3>
+</section>
+<section id="autophase">
+<h3><a class="toc-backref" href="#id9">Autophase</a><a class="headerlink" href="#autophase" title="Permalink to this heading"></a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 2%" />
@@ -1044,9 +1052,9 @@ they appear in the keys of the <code class="code docutils literal notranslate"><
 <span class="go"> &#39;BlockLow&#39;: 32, &#39;NumBitCastInst&#39;: 0, &#39;NumBrInst&#39;: 36, &#39;NumCallInst&#39;: 10, ... }</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="inst2vec">
-<h3><a class="toc-backref" href="#id10">Inst2vec</a><a class="headerlink" href="#inst2vec" title="Permalink to this headline"></a></h3>
+</section>
+<section id="inst2vec">
+<h3><a class="toc-backref" href="#id10">Inst2vec</a><a class="headerlink" href="#inst2vec" title="Permalink to this heading"></a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 50%" />
@@ -1121,9 +1129,9 @@ produce a program embedding.</p>
 <span class="go">         0.8492773 ,  0.8914213 ]], dtype=float32)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="programl">
-<h3><a class="toc-backref" href="#id11">ProGraML</a><a class="headerlink" href="#programl" title="Permalink to this headline"></a></h3>
+</section>
+<section id="programl">
+<h3><a class="toc-backref" href="#id11">ProGraML</a><a class="headerlink" href="#programl" title="Permalink to this heading"></a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 33%" />
@@ -1173,9 +1181,9 @@ flow, and green edges are call flow.</p>
 <span class="go">{&#39;flow&#39;: 2, &#39;position&#39;: 0}</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="hardware-information">
-<h3><a class="toc-backref" href="#id12">Hardware Information</a><a class="headerlink" href="#hardware-information" title="Permalink to this headline"></a></h3>
+</section>
+<section id="hardware-information">
+<h3><a class="toc-backref" href="#id12">Hardware Information</a><a class="headerlink" href="#hardware-information" title="Permalink to this heading"></a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 8%" />
@@ -1202,9 +1210,9 @@ hardware. The values are independent of the compiler and program state.</p>
 <span class="go">{&#39;cores_count&#39;: 8, &#39;l1d_cache_count&#39;: 8, ...}</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="cost-models">
-<h3><a class="toc-backref" href="#id13">Cost Models</a><a class="headerlink" href="#cost-models" title="Permalink to this headline"></a></h3>
+</section>
+<section id="cost-models">
+<h3><a class="toc-backref" href="#id13">Cost Models</a><a class="headerlink" href="#cost-models" title="Permalink to this heading"></a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 24%" />
@@ -1243,9 +1251,9 @@ hardware. The values are independent of the compiler and program state.</p>
 </tbody>
 </table>
 <p>Raw values from the cost models used to compute <a class="reference internal" href="#reward"><span class="std std-ref">rewards</span></a>.</p>
-</div>
-<div class="section" id="runtime">
-<h3><a class="toc-backref" href="#id14">Runtime</a><a class="headerlink" href="#runtime" title="Permalink to this headline"></a></h3>
+</section>
+<section id="runtime">
+<h3><a class="toc-backref" href="#id14">Runtime</a><a class="headerlink" href="#runtime" title="Permalink to this heading"></a></h3>
 <p>🏗️ <strong>Experimental API:</strong> This runtime observation space
 is still in an experimental state and is not yet stable. There may be bugs and
 breaking changes in future releases.</p>
@@ -1276,9 +1284,9 @@ benchmark is executed is determined by the
 use the <code class="code docutils literal notranslate"><span class="pre">IsRunnable</span></code> observation space, that is <code class="code docutils literal notranslate"><span class="pre">1</span></code> if the benchmark
 is runnable, else <code class="code docutils literal notranslate"><span class="pre">0</span></code>. Requesting the <code class="code docutils literal notranslate"><span class="pre">Runtime</span></code> observation space
 for a benchmark that is not runnable will return an empty list.</p>
-</div>
-<div class="section" id="build-time">
-<h3><a class="toc-backref" href="#id15">Build Time</a><a class="headerlink" href="#build-time" title="Permalink to this headline"></a></h3>
+</section>
+<section id="build-time">
+<h3><a class="toc-backref" href="#id15">Build Time</a><a class="headerlink" href="#build-time" title="Permalink to this heading"></a></h3>
 <p>🏗️ <strong>Experimental API:</strong> This compiler time observation
 space is still in an experimental state and is not yet stable. There may be bugs
 and breaking changes in future releases.</p>
@@ -1308,10 +1316,10 @@ use the <code class="code docutils literal notranslate"><span class="pre">IsBuil
 benchmark is buildable, else <code class="code docutils literal notranslate"><span class="pre">0</span></code>. Requesting the <code class="code docutils literal notranslate"><span class="pre">Buildtime</span></code>
 observation space for a benchmark that is not buildable will return an empty
 list.</p>
-</div>
-</div>
-<div class="section" id="reward-spaces">
-<span id="reward"></span><h2><a class="toc-backref" href="#id16">Reward Spaces</a><a class="headerlink" href="#reward-spaces" title="Permalink to this headline"></a></h2>
+</section>
+</section>
+<section id="reward-spaces">
+<span id="reward"></span><h2><a class="toc-backref" href="#id16">Reward Spaces</a><a class="headerlink" href="#reward-spaces" title="Permalink to this heading"></a></h2>
 <p>The goal of CompilerGym tasks is to minimize a cost function <span class="math notranslate nohighlight">\(C(s)\)</span> which
 takes as input the current program state <span class="math notranslate nohighlight">\(s\)</span> and produces a real-valued
 cost. At a given timestep, reward is the reduction in cost from the previous
@@ -1336,8 +1344,8 @@ achieved by applying the baseline policy to produce a baseline state
 <p>These reward spaces are indicated by the baseline policy name as a suffix, e.g.
 the reward space <code class="code docutils literal notranslate"><span class="pre">IrInstructionCountO3</span></code> is <code class="code docutils literal notranslate"><span class="pre">IrInstructionCount</span></code>
 reward normalized to the <code class="code docutils literal notranslate"><span class="pre">-O3</span></code> baseline policy.</p>
-<div class="section" id="ir-instruction-count">
-<h3><a class="toc-backref" href="#id17">IR Instruction Count</a><a class="headerlink" href="#ir-instruction-count" title="Permalink to this headline"></a></h3>
+<section id="ir-instruction-count">
+<h3><a class="toc-backref" href="#id17">IR Instruction Count</a><a class="headerlink" href="#ir-instruction-count" title="Permalink to this heading"></a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 21%" />
@@ -1394,9 +1402,9 @@ to the improvement made by the baseline <code class="code docutils literal notra
 pipelines. LLVM-IR instruction count is fast to evaluate, deterministic, and
 platform-independent, but is not a measure of true codesize reduction as it does
 not take into account the effects of lowering.</p>
-</div>
-<div class="section" id="codesize">
-<h3><a class="toc-backref" href="#id18">Codesize</a><a class="headerlink" href="#codesize" title="Permalink to this headline"></a></h3>
+</section>
+<section id="codesize">
+<h3><a class="toc-backref" href="#id18">Codesize</a><a class="headerlink" href="#codesize" title="Permalink to this heading"></a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 19%" />
@@ -1451,10 +1459,10 @@ not take into account the effects of lowering.</p>
 linking. This is more expensive to compute than <code class="code docutils literal notranslate"><span class="pre">IrInstructionCount</span></code>. The
 object file code size depends on the target platform, see
 <a class="reference internal" href="../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.compiler_version" title="compiler_gym.envs.CompilerEnv.compiler_version"><code class="xref py py-func docutils literal notranslate"><span class="pre">CompilerEnv.compiler_version</span></code></a>.</p>
-</div>
-</div>
-<div class="section" id="action-space">
-<h2><a class="toc-backref" href="#id19">Action Space</a><a class="headerlink" href="#action-space" title="Permalink to this headline"></a></h2>
+</section>
+</section>
+<section id="action-space">
+<h2><a class="toc-backref" href="#id19">Action Space</a><a class="headerlink" href="#action-space" title="Permalink to this heading"></a></h2>
 <p>The LLVM action space exposes the selection of semantics-preserving optimization
 transforms as a discrete space.</p>
 <table class="docutils align-default">
@@ -1839,28 +1847,28 @@ transforms as a discrete space.</p>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="faq">
-<h2><a class="toc-backref" href="#id20">FAQ</a><a class="headerlink" href="#faq" title="Permalink to this headline"></a></h2>
-<div class="section" id="is-this-really-a-sequential-decision-process">
-<h3><a class="toc-backref" href="#id21">Is this really a sequential decision process?</a><a class="headerlink" href="#is-this-really-a-sequential-decision-process" title="Permalink to this headline"></a></h3>
+</section>
+<section id="faq">
+<h2><a class="toc-backref" href="#id20">FAQ</a><a class="headerlink" href="#faq" title="Permalink to this heading"></a></h2>
+<section id="is-this-really-a-sequential-decision-process">
+<h3><a class="toc-backref" href="#id21">Is this really a sequential decision process?</a><a class="headerlink" href="#is-this-really-a-sequential-decision-process" title="Permalink to this heading"></a></h3>
 <p>Yes. Compilers frequently package individual transformations as “optimization
 passes” which are then applied in a sequential order. Usually this order is
 fixed (e.g. <a class="reference external" href="https://github.com/llvm/llvm-project/blob/71a8e4e7d6b947c8b954ec0763ff7969b3879d7b/llvm/lib/Transforms/IPO/PassManagerBuilder.cpp#L517-L922">real world example</a>).
 The CompilerGym LLVM environment replaces that fixed order with a sequential
 decision process where any pass may be applied at any stage.</p>
-</div>
-<div class="section" id="when-does-the-environment-consider-an-episode-done">
-<h3><a class="toc-backref" href="#id22">When does the environment consider an episode “done”?</a><a class="headerlink" href="#when-does-the-environment-consider-an-episode-done" title="Permalink to this headline"></a></h3>
+</section>
+<section id="when-does-the-environment-consider-an-episode-done">
+<h3><a class="toc-backref" href="#id22">When does the environment consider an episode “done”?</a><a class="headerlink" href="#when-does-the-environment-consider-an-episode-done" title="Permalink to this heading"></a></h3>
 <p>The compiler itself doesn’t have a signal for termination. Actions are like
 rewrite rules, it is up to the user to decide when no more improvement can be
 achieved from further rewrites. E.g. for simple random search we can use
 <a class="reference external" href="https://github.com/facebookresearch/CompilerGym/blob/8fa65c232d2bf6a7347af44565579c60775162ac/compiler_gym/bin/random_search.py#L33-L40">“patience”</a>.
 The only exception is if the compiler crashes, or the code ends up in an
 unexpected state - we have to abort. This happens.</p>
-</div>
-<div class="section" id="how-do-i-run-this-on-my-own-program">
-<h3><a class="toc-backref" href="#id23">How do I run this on my own program?</a><a class="headerlink" href="#how-do-i-run-this-on-my-own-program" title="Permalink to this headline"></a></h3>
+</section>
+<section id="how-do-i-run-this-on-my-own-program">
+<h3><a class="toc-backref" href="#id23">How do I run this on my own program?</a><a class="headerlink" href="#how-do-i-run-this-on-my-own-program" title="Permalink to this heading"></a></h3>
 <p>By compiling your program to an unoptimized LLVM bitcode file. This can be done
 automatically for C/C++ programs using the <a class="reference internal" href="api.html#compiler_gym.envs.llvm.make_benchmark" title="compiler_gym.envs.llvm.make_benchmark"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.make_benchmark()</span></code></a> API, or you can do this yourself using
 clang:</p>
@@ -1874,16 +1882,16 @@ tools using the <cite>–benchmark</cite> flag, e.g.</p>
     --benchmark=file:///$PWD/myapp.bc
 </pre></div>
 </div>
-</div>
-<div class="section" id="should-i-always-try-different-actions">
-<h3><a class="toc-backref" href="#id24">Should I always try different actions?</a><a class="headerlink" href="#should-i-always-try-different-actions" title="Permalink to this headline"></a></h3>
+</section>
+<section id="should-i-always-try-different-actions">
+<h3><a class="toc-backref" href="#id24">Should I always try different actions?</a><a class="headerlink" href="#should-i-always-try-different-actions" title="Permalink to this heading"></a></h3>
 <p>Some optimization actions may be called multiple times after other actions. An
 example of this is <a class="reference external" href="https://en.wikipedia.org/wiki/Dead_code_elimination">dead code elimination</a>, which can be used to
 “clean up mess” generated from a previous action. So repeating the same action
 in different context can bring improvements.</p>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
            </div>

@@ -2,7 +2,7 @@
   Generated from CONTRIBUTING.md. Do not edit!
 
 Contributing 
-============
+=============
 
 **Table of Contents**
 

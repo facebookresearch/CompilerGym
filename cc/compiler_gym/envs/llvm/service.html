@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>compiler_gym/envs/llvm/service &mdash; CompilerGym 0.2.4 documentation</title>
+  <title>compiler_gym/envs/llvm/service &mdash; CompilerGym 0.2.5 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/custom.css" type="text/css" />
@@ -15,7 +16,9 @@
         <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="author" title="About these documents" href="../../../../about.html" />
     <link rel="index" title="Index" href="../../../../genindex.html" />
@@ -33,7 +36,7 @@
             <img src="../../../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.2.4
+                0.2.5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -43,7 +46,7 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../about.html">About</a></li>
@@ -53,14 +56,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Environments</span></p>
+<p class="caption" role="heading"><span class="caption-text">Environments</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../envs/gcc.html">GCC Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../envs/loop_tool.html">loop_tool Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../envs/mlir.html">MLIR Environment Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
@@ -74,7 +77,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/views.html">compiler_gym.views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
 </ul>
-<p class="caption"><span class="caption-text">C++ API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">C++ API Reference</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">compiler_gym/envs/llvm/service</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#actionspace-h">ActionSpace.h</a></li>
@@ -115,8 +118,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <div class="section" id="compiler-gym-envs-llvm-service">
-<h1>compiler_gym/envs/llvm/service<a class="headerlink" href="#compiler-gym-envs-llvm-service" title="Permalink to this headline"></a></h1>
+  <section id="compiler-gym-envs-llvm-service">
+<h1>compiler_gym/envs/llvm/service<a class="headerlink" href="#compiler-gym-envs-llvm-service" title="Permalink to this heading"></a></h1>
 <p>This directory contains the core C++ implementation of the LLVM environment for
 CompilerGym. The base session is implemented by a
 <code class="code docutils literal notranslate"><span class="pre">compiler_gym::llvm_service::LlvmSession</span></code> class, defined in
@@ -132,8 +135,8 @@ CompilerGym. The base session is implemented by a
 <li><p><a class="reference internal" href="#observationspaces-h" id="id7">ObservationSpaces.h</a></p></li>
 </ul>
 </div>
-<div class="section" id="actionspace-h">
-<h2><a class="toc-backref" href="#id1">ActionSpace.h</a><a class="headerlink" href="#actionspace-h" title="Permalink to this headline"></a></h2>
+<section id="actionspace-h">
+<h2><a class="toc-backref" href="#id1">ActionSpace.h</a><a class="headerlink" href="#actionspace-h" title="Permalink to this heading"></a></h2>
 <p><code class="code docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&quot;compiler_gym/envs/llvm/service/ActionSpace.h&quot;</span></code></p>
 <dl class="cpp type">
 <dt class="sig sig-object cpp" id="_CPPv412compiler_gym">
@@ -143,9 +146,9 @@ CompilerGym. The base session is implemented by a
 <span id="_CPPv3N12compiler_gym12llvm_serviceE"></span><span id="_CPPv2N12compiler_gym12llvm_serviceE"></span><span id="compiler_gym::llvm_service"></span><span class="target" id="namespacecompiler__gym_1_1llvm__service"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">llvm_service</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_serviceE" title="Permalink to this definition"></a><br /></dt>
 <dd><div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-enums">Enums</p>
-<dl class="cpp enum">
+<dl class="cpp enum-class">
 <dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service15LlvmActionSpaceE">
-<span id="_CPPv3N12compiler_gym12llvm_service15LlvmActionSpaceE"></span><span id="_CPPv2N12compiler_gym12llvm_service15LlvmActionSpaceE"></span><span class="target" id="namespacecompiler__gym_1_1llvm__service_1a8dcaf4b5adeb92a9dbb590fc9ce7cb23"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LlvmActionSpace</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service15LlvmActionSpaceE" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv3N12compiler_gym12llvm_service15LlvmActionSpaceE"></span><span id="_CPPv2N12compiler_gym12llvm_service15LlvmActionSpaceE"></span><span class="target" id="namespacecompiler__gym_1_1llvm__service_1a8dcaf4b5adeb92a9dbb590fc9ce7cb23"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LlvmActionSpace</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service15LlvmActionSpaceE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>The available action spaces for LLVM. </p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -171,9 +174,9 @@ CompilerGym. The base session is implemented by a
 
 </dd></dl>
 
-</div>
-<div class="section" id="benchmark-h">
-<h2><a class="toc-backref" href="#id2">Benchmark.h</a><a class="headerlink" href="#benchmark-h" title="Permalink to this headline"></a></h2>
+</section>
+<section id="benchmark-h">
+<h2><a class="toc-backref" href="#id2">Benchmark.h</a><a class="headerlink" href="#benchmark-h" title="Permalink to this heading"></a></h2>
 <p><code class="code docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&quot;compiler_gym/envs/llvm/service/Benchmark.h&quot;</span></code></p>
 <dl class="cpp type">
 <dt class="sig sig-object cpp">
@@ -234,7 +237,7 @@ CompilerGym. The base session is implemented by a
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service10makeModuleERN4llvm11LLVMContextERK7BitcodeRKNSt6stringEPN4grpc6StatusE">
-<span id="_CPPv3N12compiler_gym12llvm_service10makeModuleERN4llvm11LLVMContextERK7BitcodeRKNSt6stringEPN4grpc6StatusE"></span><span id="_CPPv2N12compiler_gym12llvm_service10makeModuleERN4llvm11LLVMContextERK7BitcodeRKNSt6stringEPN4grpc6StatusE"></span><span id="compiler_gym::llvm_service::makeModule__llvm::LLVMContextR.BitcodeCR.ssCR.grpc::StatusP"></span><span class="target" id="namespacecompiler__gym_1_1llvm__service_1a15f1cb65ddc3e38432fc7ce814fad6d7"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">unique_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">llvm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Module</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">makeModule</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">llvm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LLVMContext</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">context</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12compiler_gym12llvm_service7BitcodeE" title="compiler_gym::llvm_service::Bitcode"><span class="n"><span class="pre">Bitcode</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">bitcode</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="n"><span class="pre">grpc</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Status</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">status</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service10makeModuleERN4llvm11LLVMContextERK7BitcodeRKNSt6stringEPN4grpc6StatusE" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv3N12compiler_gym12llvm_service10makeModuleERN4llvm11LLVMContextERK7BitcodeRKNSt6stringEPN4grpc6StatusE"></span><span id="_CPPv2N12compiler_gym12llvm_service10makeModuleERN4llvm11LLVMContextERK7BitcodeRKNSt6stringEPN4grpc6StatusE"></span><span id="compiler_gym::llvm_service::makeModule__llvm::LLVMContextR.BitcodeCR.ssCR.grpc::StatusP"></span><span class="target" id="namespacecompiler__gym_1_1llvm__service_1ac3de6d7920cd873af6717ca5ac93e222"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">unique_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">llvm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Module</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">makeModule</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">llvm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LLVMContext</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">context</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12compiler_gym12llvm_service7BitcodeE" title="compiler_gym::llvm_service::Bitcode"><span class="n"><span class="pre">Bitcode</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">bitcode</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="n"><span class="pre">grpc</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Status</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">status</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service10makeModuleERN4llvm11LLVMContextERK7BitcodeRKNSt6stringEPN4grpc6StatusE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Construct an LLVM module from a bitcode. </p>
 <p>Parses the given bitcode into a module and strips the identifying <code class="docutils literal notranslate"><span class="pre">ModuleID</span></code> and <code class="docutils literal notranslate"><span class="pre">source_filename</span></code> attributes.</p>
 <dl class="field-list simple">
@@ -293,7 +296,9 @@ CompilerGym. The base session is implemented by a
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service9BenchmarkE">
 <span id="_CPPv3N12compiler_gym12llvm_service9BenchmarkE"></span><span id="_CPPv2N12compiler_gym12llvm_service9BenchmarkE"></span><span id="compiler_gym::llvm_service::Benchmark"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Benchmark</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service9BenchmarkE" title="Permalink to this definition"></a><br /></dt>
-<dd><em>#include &lt;Benchmark.h&gt;</em><p>An LLVM module and the LLVM context that owns it. </p>
+<dd><div class="docutils container">
+<em>#include &lt;Benchmark.h&gt;</em></div>
+<p>An LLVM module and the LLVM context that owns it. </p>
 <p>A benchmark is mutable and can be changed over the course of a session. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
@@ -316,7 +321,7 @@ CompilerGym. The base session is implemented by a
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym12llvm_service9Benchmark5cloneERKN5boost10filesystem4pathE">
-<span id="_CPPv3NK12compiler_gym12llvm_service9Benchmark5cloneERKN5boost10filesystem4pathE"></span><span id="_CPPv2NK12compiler_gym12llvm_service9Benchmark5cloneERKN5boost10filesystem4pathE"></span><span id="compiler_gym::llvm_service::Benchmark::clone__boost::filesystem::pathCRC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1a0e96dd7e0fa5fcbb70e9270579a2cd64"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">unique_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N12compiler_gym12llvm_service9BenchmarkE" title="compiler_gym::llvm_service::Benchmark"><span class="n"><span class="pre">Benchmark</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clone</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">boost</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">filesystem</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">path</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">workingDirectory</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym12llvm_service9Benchmark5cloneERKN5boost10filesystem4pathE" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv3NK12compiler_gym12llvm_service9Benchmark5cloneERKN5boost10filesystem4pathE"></span><span id="_CPPv2NK12compiler_gym12llvm_service9Benchmark5cloneERKN5boost10filesystem4pathE"></span><span id="compiler_gym::llvm_service::Benchmark::clone__boost::filesystem::pathCRC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1a75afb6b5918b28e6f47dc0eda60376bf"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">unique_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N12compiler_gym12llvm_service9BenchmarkE" title="compiler_gym::llvm_service::Benchmark"><span class="n"><span class="pre">Benchmark</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clone</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">boost</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">filesystem</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">path</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">workingDirectory</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym12llvm_service9Benchmark5cloneERKN5boost10filesystem4pathE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Make a copy of the benchmark. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -394,7 +399,7 @@ CompilerGym. The base session is implemented by a
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym12llvm_service9Benchmark4nameEv">
-<span id="_CPPv3NK12compiler_gym12llvm_service9Benchmark4nameEv"></span><span id="_CPPv2NK12compiler_gym12llvm_service9Benchmark4nameEv"></span><span id="compiler_gym::llvm_service::Benchmark::nameC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1a340f8df0ff551b2283275344120fcaad"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">name</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym12llvm_service9Benchmark4nameEv" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv3NK12compiler_gym12llvm_service9Benchmark4nameEv"></span><span id="_CPPv2NK12compiler_gym12llvm_service9Benchmark4nameEv"></span><span id="compiler_gym::llvm_service::Benchmark::nameC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1a9da444b9211f8bb958a447d18e54423e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">name</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym12llvm_service9Benchmark4nameEv" title="Permalink to this definition"></a><br /></dt>
 <dd><p>The name of the benchmark. </p>
 </dd></dl>
 
@@ -406,48 +411,48 @@ CompilerGym. The base session is implemented by a
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service9Benchmark6moduleEv">
-<span id="_CPPv3N12compiler_gym12llvm_service9Benchmark6moduleEv"></span><span id="_CPPv2N12compiler_gym12llvm_service9Benchmark6moduleEv"></span><span id="compiler_gym::llvm_service::Benchmark::module"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1a94517c1d188a57cd076aca2eab873d8f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">llvm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Module</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">module</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service9Benchmark6moduleEv" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv3N12compiler_gym12llvm_service9Benchmark6moduleEv"></span><span id="_CPPv2N12compiler_gym12llvm_service9Benchmark6moduleEv"></span><span id="compiler_gym::llvm_service::Benchmark::module"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1a153b3ee8b4200d2fb46d27286bd74b88"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">llvm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Module</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">module</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service9Benchmark6moduleEv" title="Permalink to this definition"></a><br /></dt>
 <dd><p>The underlying LLVM module. </p>
 </dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym12llvm_service9Benchmark6moduleEv">
-<span id="_CPPv3NK12compiler_gym12llvm_service9Benchmark6moduleEv"></span><span id="_CPPv2NK12compiler_gym12llvm_service9Benchmark6moduleEv"></span><span id="compiler_gym::llvm_service::Benchmark::moduleC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1afa8db6c46fe07be54b214316fc33f911"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">llvm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Module</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">module</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym12llvm_service9Benchmark6moduleEv" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv3NK12compiler_gym12llvm_service9Benchmark6moduleEv"></span><span id="_CPPv2NK12compiler_gym12llvm_service9Benchmark6moduleEv"></span><span id="compiler_gym::llvm_service::Benchmark::moduleC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1a1fa85e7bf338c2d71e855a2aacf76ee2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">llvm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Module</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">module</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym12llvm_service9Benchmark6moduleEv" title="Permalink to this definition"></a><br /></dt>
 <dd><p>The underlying LLVM module. </p>
 </dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service9Benchmark7contextEv">
-<span id="_CPPv3N12compiler_gym12llvm_service9Benchmark7contextEv"></span><span id="_CPPv2N12compiler_gym12llvm_service9Benchmark7contextEv"></span><span id="compiler_gym::llvm_service::Benchmark::context"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1a9bce97d89f0cd1f5341d9d649f648bee"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">llvm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LLVMContext</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">context</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service9Benchmark7contextEv" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv3N12compiler_gym12llvm_service9Benchmark7contextEv"></span><span id="_CPPv2N12compiler_gym12llvm_service9Benchmark7contextEv"></span><span id="compiler_gym::llvm_service::Benchmark::context"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1a2ee34e6124058902eccd79c4f3642302"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">llvm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LLVMContext</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">context</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service9Benchmark7contextEv" title="Permalink to this definition"></a><br /></dt>
 <dd><p>The underlying LLVM context. </p>
 </dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym12llvm_service9Benchmark7contextEv">
-<span id="_CPPv3NK12compiler_gym12llvm_service9Benchmark7contextEv"></span><span id="_CPPv2NK12compiler_gym12llvm_service9Benchmark7contextEv"></span><span id="compiler_gym::llvm_service::Benchmark::contextC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1a2a2666e033e87f344f7fbcdd8baf80ab"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">llvm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LLVMContext</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">context</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym12llvm_service9Benchmark7contextEv" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv3NK12compiler_gym12llvm_service9Benchmark7contextEv"></span><span id="_CPPv2NK12compiler_gym12llvm_service9Benchmark7contextEv"></span><span id="compiler_gym::llvm_service::Benchmark::contextC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1a8f77093e95fd1a7ea672596fe04e365b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">llvm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LLVMContext</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">context</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym12llvm_service9Benchmark7contextEv" title="Permalink to this definition"></a><br /></dt>
 <dd><p>The underlying LLVM context. </p>
 </dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym12llvm_service9Benchmark13baselineCostsEv">
-<span id="_CPPv3NK12compiler_gym12llvm_service9Benchmark13baselineCostsEv"></span><span id="_CPPv2NK12compiler_gym12llvm_service9Benchmark13baselineCostsEv"></span><span id="compiler_gym::llvm_service::Benchmark::baselineCostsC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1a4180fa87413545a4b4a2533339239b58"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12compiler_gym12llvm_service13BaselineCostsE" title="compiler_gym::llvm_service::BaselineCosts"><span class="n"><span class="pre">BaselineCosts</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">baselineCosts</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym12llvm_service9Benchmark13baselineCostsEv" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv3NK12compiler_gym12llvm_service9Benchmark13baselineCostsEv"></span><span id="_CPPv2NK12compiler_gym12llvm_service9Benchmark13baselineCostsEv"></span><span id="compiler_gym::llvm_service::Benchmark::baselineCostsC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1aa5fc19fb8b25182fc64a0a9908151cc6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12compiler_gym12llvm_service13BaselineCostsE" title="compiler_gym::llvm_service::BaselineCosts"><span class="n"><span class="pre">BaselineCosts</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">baselineCosts</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym12llvm_service9Benchmark13baselineCostsEv" title="Permalink to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym12llvm_service9Benchmark11context_ptrEv">
-<span id="_CPPv3NK12compiler_gym12llvm_service9Benchmark11context_ptrEv"></span><span id="_CPPv2NK12compiler_gym12llvm_service9Benchmark11context_ptrEv"></span><span id="compiler_gym::llvm_service::Benchmark::context_ptrC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1a6bcb025801d799c0a0339852471153ef"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">llvm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LLVMContext</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">context_ptr</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym12llvm_service9Benchmark11context_ptrEv" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv3NK12compiler_gym12llvm_service9Benchmark11context_ptrEv"></span><span id="_CPPv2NK12compiler_gym12llvm_service9Benchmark11context_ptrEv"></span><span id="compiler_gym::llvm_service::Benchmark::context_ptrC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1a9c6643682cd6b4c2caf12198f6909f88"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">llvm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LLVMContext</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">context_ptr</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym12llvm_service9Benchmark11context_ptrEv" title="Permalink to this definition"></a><br /></dt>
 <dd><p>A pointer to the underlying LLVM context. </p>
 </dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym12llvm_service9Benchmark10module_ptrEv">
-<span id="_CPPv3NK12compiler_gym12llvm_service9Benchmark10module_ptrEv"></span><span id="_CPPv2NK12compiler_gym12llvm_service9Benchmark10module_ptrEv"></span><span id="compiler_gym::llvm_service::Benchmark::module_ptrC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1a93b18d39853937b690613747b97c4780"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">llvm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Module</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">module_ptr</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym12llvm_service9Benchmark10module_ptrEv" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv3NK12compiler_gym12llvm_service9Benchmark10module_ptrEv"></span><span id="_CPPv2NK12compiler_gym12llvm_service9Benchmark10module_ptrEv"></span><span id="compiler_gym::llvm_service::Benchmark::module_ptrC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1a1b99ab63c1caa81be19c42965efc6e68"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">llvm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Module</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">module_ptr</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym12llvm_service9Benchmark10module_ptrEv" title="Permalink to this definition"></a><br /></dt>
 <dd><p>A pointer to the underlying LLVM module. </p>
 </dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym12llvm_service9Benchmark13dynamicConfigEv">
-<span id="_CPPv3NK12compiler_gym12llvm_service9Benchmark13dynamicConfigEv"></span><span id="_CPPv2NK12compiler_gym12llvm_service9Benchmark13dynamicConfigEv"></span><span id="compiler_gym::llvm_service::Benchmark::dynamicConfigC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1a3020723e7fdd1286e5f20c9cdb84f887"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../../../rpc.html#_CPPv422BenchmarkDynamicConfig" title="BenchmarkDynamicConfig"><span class="n"><span class="pre">BenchmarkDynamicConfig</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">dynamicConfig</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym12llvm_service9Benchmark13dynamicConfigEv" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv3NK12compiler_gym12llvm_service9Benchmark13dynamicConfigEv"></span><span id="_CPPv2NK12compiler_gym12llvm_service9Benchmark13dynamicConfigEv"></span><span id="compiler_gym::llvm_service::Benchmark::dynamicConfigC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1ad065846084764df7fe2ceef64cf878ca"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../../../rpc.html#_CPPv422BenchmarkDynamicConfig" title="BenchmarkDynamicConfig"><span class="n"><span class="pre">BenchmarkDynamicConfig</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">dynamicConfig</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym12llvm_service9Benchmark13dynamicConfigEv" title="Permalink to this definition"></a><br /></dt>
 <dd><p>A reference to the dynamic configuration object. </p>
 </dd></dl>
 
@@ -513,7 +518,7 @@ CompilerGym. The base session is implemented by a
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-functions">Private Functions</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym12llvm_service9Benchmark16scratchDirectoryEv">
-<span id="_CPPv3NK12compiler_gym12llvm_service9Benchmark16scratchDirectoryEv"></span><span id="_CPPv2NK12compiler_gym12llvm_service9Benchmark16scratchDirectoryEv"></span><span id="compiler_gym::llvm_service::Benchmark::scratchDirectoryC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1a625b1dc5c737084de189227bd489af80"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">boost</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">filesystem</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">path</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">scratchDirectory</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym12llvm_service9Benchmark16scratchDirectoryEv" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv3NK12compiler_gym12llvm_service9Benchmark16scratchDirectoryEv"></span><span id="_CPPv2NK12compiler_gym12llvm_service9Benchmark16scratchDirectoryEv"></span><span id="compiler_gym::llvm_service::Benchmark::scratchDirectoryC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1a6c63883ed81f6ac502dc79c417d4f019"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">boost</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">filesystem</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">path</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">scratchDirectory</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym12llvm_service9Benchmark16scratchDirectoryEv" title="Permalink to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">
@@ -593,9 +598,9 @@ CompilerGym. The base session is implemented by a
 
 </dd></dl>
 
-</div>
-<div class="section" id="benchmarkfactory-h">
-<h2><a class="toc-backref" href="#id3">BenchmarkFactory.h</a><a class="headerlink" href="#benchmarkfactory-h" title="Permalink to this headline"></a></h2>
+</section>
+<section id="benchmarkfactory-h">
+<h2><a class="toc-backref" href="#id3">BenchmarkFactory.h</a><a class="headerlink" href="#benchmarkfactory-h" title="Permalink to this heading"></a></h2>
 <p><code class="code docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&quot;compiler_gym/envs/llvm/service/BenchmarkFactory.h&quot;</span></code></p>
 <dl class="cpp type">
 <dt class="sig sig-object cpp">
@@ -616,11 +621,13 @@ CompilerGym. The base session is implemented by a
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service16BenchmarkFactoryE">
 <span id="_CPPv3N12compiler_gym12llvm_service16BenchmarkFactoryE"></span><span id="_CPPv2N12compiler_gym12llvm_service16BenchmarkFactoryE"></span><span id="compiler_gym::llvm_service::BenchmarkFactory"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_factory"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BenchmarkFactory</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service16BenchmarkFactoryE" title="Permalink to this definition"></a><br /></dt>
-<dd><em>#include &lt;BenchmarkFactory.h&gt;</em><p>A factory object for instantiating LLVM modules for use in optimization sessions. </p>
+<dd><div class="docutils container">
+<em>#include &lt;BenchmarkFactory.h&gt;</em></div>
+<p>A factory object for instantiating LLVM modules for use in optimization sessions. </p>
 <p>Example usage:</p>
-<p><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">BenchmarkFactory</span> <span class="n">factory</span><span class="p">;</span>
-<span class="n">auto</span> <span class="n">benchmark</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">getBenchmark</span><span class="p">(</span><span class="s2">&quot;file:////tmp/my_bitcode.bc&quot;</span><span class="p">);</span>
-<span class="o">//</span> <span class="o">...</span> <span class="n">do</span> <span class="n">fun</span> <span class="n">stuff</span>
+<p><div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">BenchmarkFactory</span><span class="w"> </span><span class="n">factory</span><span class="p">;</span><span class="w"></span>
+<span class="k">auto</span><span class="w"> </span><span class="n">benchmark</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">factory</span><span class="p">.</span><span class="n">getBenchmark</span><span class="p">(</span><span class="s">&quot;file:////tmp/my_bitcode.bc&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="c1">// ... do fun stuff</span>
 </pre></div>
 </div>
  </p>
@@ -658,7 +665,7 @@ CompilerGym. The base session is implemented by a
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-functions">Public Static Functions</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service16BenchmarkFactory12getSingletonERKN5boost10filesystem4pathENSt8optionalINSt10mt19937_64EEE6size_t">
-<span id="_CPPv3N12compiler_gym12llvm_service16BenchmarkFactory12getSingletonERKN5boost10filesystem4pathENSt8optionalINSt10mt19937_64EEE6size_t"></span><span id="_CPPv2N12compiler_gym12llvm_service16BenchmarkFactory12getSingletonERKN5boost10filesystem4pathENSt8optionalINSt10mt19937_64EEE6size_t"></span><span id="compiler_gym::llvm_service::BenchmarkFactory::getSingleton__boost::filesystem::pathCR.std::optional:std::mt19937_64:.s"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_factory_1a595c989a215a9ee6a4d94ccaca9f3607"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12compiler_gym12llvm_service16BenchmarkFactoryE" title="compiler_gym::llvm_service::BenchmarkFactory"><span class="n"><span class="pre">BenchmarkFactory</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getSingleton</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">boost</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">filesystem</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">path</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">workingDirectory</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">mt19937_64</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">rand</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">nullopt</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">maxLoadedBenchmarksCount</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12compiler_gym12llvm_service25kMaxLoadedBenchmarksCountE" title="compiler_gym::llvm_service::kMaxLoadedBenchmarksCount"><span class="n"><span class="pre">kMaxLoadedBenchmarksCount</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service16BenchmarkFactory12getSingletonERKN5boost10filesystem4pathENSt8optionalINSt10mt19937_64EEE6size_t" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv3N12compiler_gym12llvm_service16BenchmarkFactory12getSingletonERKN5boost10filesystem4pathENSt8optionalINSt10mt19937_64EEE6size_t"></span><span id="_CPPv2N12compiler_gym12llvm_service16BenchmarkFactory12getSingletonERKN5boost10filesystem4pathENSt8optionalINSt10mt19937_64EEE6size_t"></span><span id="compiler_gym::llvm_service::BenchmarkFactory::getSingleton__boost::filesystem::pathCR.std::optional:std::mt19937_64:.s"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_factory_1ade4096020b582c570d9ac300d8cb04f5"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12compiler_gym12llvm_service16BenchmarkFactoryE" title="compiler_gym::llvm_service::BenchmarkFactory"><span class="n"><span class="pre">BenchmarkFactory</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getSingleton</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">boost</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">filesystem</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">path</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">workingDirectory</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">mt19937_64</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">rand</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">nullopt</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">maxLoadedBenchmarksCount</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12compiler_gym12llvm_service25kMaxLoadedBenchmarksCountE" title="compiler_gym::llvm_service::kMaxLoadedBenchmarksCount"><span class="n"><span class="pre">kMaxLoadedBenchmarksCount</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service16BenchmarkFactory12getSingletonERKN5boost10filesystem4pathENSt8optionalINSt10mt19937_64EEE6size_t" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Return the global benchmark factory singleton. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -709,7 +716,7 @@ CompilerGym. The base session is implemented by a
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service16BenchmarkFactoryaSERK16BenchmarkFactory">
-<span id="_CPPv3N12compiler_gym12llvm_service16BenchmarkFactoryaSERK16BenchmarkFactory"></span><span id="_CPPv2N12compiler_gym12llvm_service16BenchmarkFactoryaSERK16BenchmarkFactory"></span><span id="compiler_gym::llvm_service::BenchmarkFactory::assign-operator__BenchmarkFactoryCR"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_factory_1aa33952edb5390cc78da6c1de4de416e1"></span><a class="reference internal" href="#_CPPv4N12compiler_gym12llvm_service16BenchmarkFactoryE" title="compiler_gym::llvm_service::BenchmarkFactory"><span class="n"><span class="pre">BenchmarkFactory</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12compiler_gym12llvm_service16BenchmarkFactoryE" title="compiler_gym::llvm_service::BenchmarkFactory"><span class="n"><span class="pre">BenchmarkFactory</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">delete</span></span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service16BenchmarkFactoryaSERK16BenchmarkFactory" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv3N12compiler_gym12llvm_service16BenchmarkFactoryaSERK16BenchmarkFactory"></span><span id="_CPPv2N12compiler_gym12llvm_service16BenchmarkFactoryaSERK16BenchmarkFactory"></span><span id="compiler_gym::llvm_service::BenchmarkFactory::assign-operator__BenchmarkFactoryCR"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_factory_1a028ab69b970bbb61daccc105d02ec183"></span><a class="reference internal" href="#_CPPv4N12compiler_gym12llvm_service16BenchmarkFactoryE" title="compiler_gym::llvm_service::BenchmarkFactory"><span class="n"><span class="pre">BenchmarkFactory</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12compiler_gym12llvm_service16BenchmarkFactoryE" title="compiler_gym::llvm_service::BenchmarkFactory"><span class="n"><span class="pre">BenchmarkFactory</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">delete</span></span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service16BenchmarkFactoryaSERK16BenchmarkFactory" title="Permalink to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 </div>
@@ -744,9 +751,9 @@ CompilerGym. The base session is implemented by a
 
 </dd></dl>
 
-</div>
-<div class="section" id="cost-h">
-<h2><a class="toc-backref" href="#id4">Cost.h</a><a class="headerlink" href="#cost-h" title="Permalink to this headline"></a></h2>
+</section>
+<section id="cost-h">
+<h2><a class="toc-backref" href="#id4">Cost.h</a><a class="headerlink" href="#cost-h" title="Permalink to this heading"></a></h2>
 <p><code class="code docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&quot;compiler_gym/envs/llvm/service/Cost.h&quot;</span></code></p>
 <dl class="cpp type">
 <dt class="sig sig-object cpp">
@@ -769,9 +776,9 @@ CompilerGym. The base session is implemented by a
 </div>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-enums">Enums</p>
-<dl class="cpp enum">
+<dl class="cpp enum-class">
 <dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service16LlvmCostFunctionE">
-<span id="_CPPv3N12compiler_gym12llvm_service16LlvmCostFunctionE"></span><span id="_CPPv2N12compiler_gym12llvm_service16LlvmCostFunctionE"></span><span class="target" id="namespacecompiler__gym_1_1llvm__service_1a676816b5f86330c9e319b1b073537804"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LlvmCostFunction</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service16LlvmCostFunctionE" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv3N12compiler_gym12llvm_service16LlvmCostFunctionE"></span><span id="_CPPv2N12compiler_gym12llvm_service16LlvmCostFunctionE"></span><span class="target" id="namespacecompiler__gym_1_1llvm__service_1a676816b5f86330c9e319b1b073537804"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LlvmCostFunction</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service16LlvmCostFunctionE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>A cost function for LLVM benchmarks. </p>
 <p><em>Values:</em></p>
 <dl class="cpp enumerator">
@@ -795,9 +802,9 @@ CompilerGym. The base session is implemented by a
 
 </dd></dl>
 
-<dl class="cpp enum">
+<dl class="cpp enum-class">
 <dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service18LlvmBaselinePolicyE">
-<span id="_CPPv3N12compiler_gym12llvm_service18LlvmBaselinePolicyE"></span><span id="_CPPv2N12compiler_gym12llvm_service18LlvmBaselinePolicyE"></span><span class="target" id="namespacecompiler__gym_1_1llvm__service_1a9316c5440d513198d6dc40268d1e829c"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LlvmBaselinePolicy</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service18LlvmBaselinePolicyE" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv3N12compiler_gym12llvm_service18LlvmBaselinePolicyE"></span><span id="_CPPv2N12compiler_gym12llvm_service18LlvmBaselinePolicyE"></span><span class="target" id="namespacecompiler__gym_1_1llvm__service_1a9316c5440d513198d6dc40268d1e829c"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LlvmBaselinePolicy</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service18LlvmBaselinePolicyE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>LLVM’s builtin policies. </p>
 <p><em>Values:</em></p>
 <dl class="cpp enumerator">
@@ -880,9 +887,9 @@ CompilerGym. The base session is implemented by a
 
 </dd></dl>
 
-</div>
-<div class="section" id="llvmsession-h">
-<h2><a class="toc-backref" href="#id5">LlvmSession.h</a><a class="headerlink" href="#llvmsession-h" title="Permalink to this headline"></a></h2>
+</section>
+<section id="llvmsession-h">
+<h2><a class="toc-backref" href="#id5">LlvmSession.h</a><a class="headerlink" href="#llvmsession-h" title="Permalink to this heading"></a></h2>
 <p><code class="code docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&quot;compiler_gym/envs/llvm/service/LlvmSession.h&quot;</span></code></p>
 <dl class="cpp type">
 <dt class="sig sig-object cpp">
@@ -893,7 +900,9 @@ CompilerGym. The base session is implemented by a
 <dd><dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service11LlvmSessionE">
 <span id="_CPPv3N12compiler_gym12llvm_service11LlvmSessionE"></span><span id="_CPPv2N12compiler_gym12llvm_service11LlvmSessionE"></span><span id="compiler_gym::llvm_service::LlvmSession"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_llvm_session"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LlvmSession</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv412compiler_gym" title="compiler_gym"><span class="n"><span class="pre">compiler_gym</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../service.html#_CPPv4N12compiler_gym18CompilationSessionE" title="compiler_gym::CompilationSession"><span class="n"><span class="pre">CompilationSession</span></span></a><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service11LlvmSessionE" title="Permalink to this definition"></a><br /></dt>
-<dd><em>#include &lt;LlvmSession.h&gt;</em><p>An interactive LLVM compilation session. </p>
+<dd><div class="docutils container">
+<em>#include &lt;LlvmSession.h&gt;</em></div>
+<p>An interactive LLVM compilation session. </p>
 <p>This class exposes the LLVM optimization pipeline for an LLVM module as an interactive environment. It can be used directly as a C++ API, or it can be accessed through an RPC interface using the CompilerGym RPC runtime. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
@@ -1037,12 +1046,12 @@ CompilerGym. The base session is implemented by a
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym12llvm_service11LlvmSession9benchmarkEv">
-<span id="_CPPv3NK12compiler_gym12llvm_service11LlvmSession9benchmarkEv"></span><span id="_CPPv2NK12compiler_gym12llvm_service11LlvmSession9benchmarkEv"></span><span id="compiler_gym::llvm_service::LlvmSession::benchmarkC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_llvm_session_1a7d7fd5b62a1d0d1cd128e45437f9d2bb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12compiler_gym12llvm_service9BenchmarkE" title="compiler_gym::llvm_service::Benchmark"><span class="n"><span class="pre">Benchmark</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">benchmark</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym12llvm_service11LlvmSession9benchmarkEv" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv3NK12compiler_gym12llvm_service11LlvmSession9benchmarkEv"></span><span id="_CPPv2NK12compiler_gym12llvm_service11LlvmSession9benchmarkEv"></span><span id="compiler_gym::llvm_service::LlvmSession::benchmarkC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_llvm_session_1ae27307720941f88250ba8e2445b0dd18"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12compiler_gym12llvm_service9BenchmarkE" title="compiler_gym::llvm_service::Benchmark"><span class="n"><span class="pre">Benchmark</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">benchmark</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym12llvm_service11LlvmSession9benchmarkEv" title="Permalink to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service11LlvmSession9benchmarkEv">
-<span id="_CPPv3N12compiler_gym12llvm_service11LlvmSession9benchmarkEv"></span><span id="_CPPv2N12compiler_gym12llvm_service11LlvmSession9benchmarkEv"></span><span id="compiler_gym::llvm_service::LlvmSession::benchmark"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_llvm_session_1a1384da2e1bfc612add1a6c63c6efdd3e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12compiler_gym12llvm_service9BenchmarkE" title="compiler_gym::llvm_service::Benchmark"><span class="n"><span class="pre">Benchmark</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">benchmark</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service11LlvmSession9benchmarkEv" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv3N12compiler_gym12llvm_service11LlvmSession9benchmarkEv"></span><span id="_CPPv2N12compiler_gym12llvm_service11LlvmSession9benchmarkEv"></span><span id="compiler_gym::llvm_service::LlvmSession::benchmark"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_llvm_session_1aa8257b2b70eef3c2baeba0ff34933691"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12compiler_gym12llvm_service9BenchmarkE" title="compiler_gym::llvm_service::Benchmark"><span class="n"><span class="pre">Benchmark</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">benchmark</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service11LlvmSession9benchmarkEv" title="Permalink to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">
@@ -1092,7 +1101,7 @@ CompilerGym. The base session is implemented by a
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym12llvm_service11LlvmSession4tliiEv">
-<span id="_CPPv3NK12compiler_gym12llvm_service11LlvmSession4tliiEv"></span><span id="_CPPv2NK12compiler_gym12llvm_service11LlvmSession4tliiEv"></span><span id="compiler_gym::llvm_service::LlvmSession::tliiC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_llvm_session_1ae780f0beb7796dee397335071c910190"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">llvm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">TargetLibraryInfoImpl</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">tlii</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym12llvm_service11LlvmSession4tliiEv" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv3NK12compiler_gym12llvm_service11LlvmSession4tliiEv"></span><span id="_CPPv2NK12compiler_gym12llvm_service11LlvmSession4tliiEv"></span><span id="compiler_gym::llvm_service::LlvmSession::tliiC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_llvm_session_1a68a74483fa37a547ff7afa39014b7788"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">llvm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">TargetLibraryInfoImpl</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">tlii</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym12llvm_service11LlvmSession4tliiEv" title="Permalink to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">
@@ -1131,9 +1140,9 @@ CompilerGym. The base session is implemented by a
 
 </dd></dl>
 
-</div>
-<div class="section" id="observation-h">
-<h2><a class="toc-backref" href="#id6">Observation.h</a><a class="headerlink" href="#observation-h" title="Permalink to this headline"></a></h2>
+</section>
+<section id="observation-h">
+<h2><a class="toc-backref" href="#id6">Observation.h</a><a class="headerlink" href="#observation-h" title="Permalink to this heading"></a></h2>
 <p><code class="code docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&quot;compiler_gym/envs/llvm/service/Observation.h&quot;</span></code></p>
 <dl class="cpp type">
 <dt class="sig sig-object cpp">
@@ -1167,9 +1176,9 @@ CompilerGym. The base session is implemented by a
 
 </dd></dl>
 
-</div>
-<div class="section" id="observationspaces-h">
-<h2><a class="toc-backref" href="#id7">ObservationSpaces.h</a><a class="headerlink" href="#observationspaces-h" title="Permalink to this headline"></a></h2>
+</section>
+<section id="observationspaces-h">
+<h2><a class="toc-backref" href="#id7">ObservationSpaces.h</a><a class="headerlink" href="#observationspaces-h" title="Permalink to this heading"></a></h2>
 <p><code class="code docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&quot;compiler_gym/envs/llvm/service/ObservationSpaces.h&quot;</span></code></p>
 <dl class="cpp type">
 <dt class="sig sig-object cpp">
@@ -1179,9 +1188,9 @@ CompilerGym. The base session is implemented by a
 <span class="target" id="namespacecompiler__gym_1_1llvm__service"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">llvm_service</span></span></span><br /></dt>
 <dd><div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-enums">Enums</p>
-<dl class="cpp enum">
+<dl class="cpp enum-class">
 <dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service20LlvmObservationSpaceE">
-<span id="_CPPv3N12compiler_gym12llvm_service20LlvmObservationSpaceE"></span><span id="_CPPv2N12compiler_gym12llvm_service20LlvmObservationSpaceE"></span><span class="target" id="namespacecompiler__gym_1_1llvm__service_1a447c273cfdf5fdb0474b451ab73c4c2e"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LlvmObservationSpace</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service20LlvmObservationSpaceE" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv3N12compiler_gym12llvm_service20LlvmObservationSpaceE"></span><span id="_CPPv2N12compiler_gym12llvm_service20LlvmObservationSpaceE"></span><span class="target" id="namespacecompiler__gym_1_1llvm__service_1a447c273cfdf5fdb0474b451ab73c4c2e"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LlvmObservationSpace</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service20LlvmObservationSpaceE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>The available observation spaces for LLVM. </p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -1365,6 +1374,13 @@ CompilerGym. The base session is implemented by a
 <p>Returns a list of measurments in seconds. This is not available to all benchmarks. When not available, a list of zeros are returned. </p>
 </dd></dl>
 
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service20LlvmObservationSpace8LEXED_IRE">
+<span id="_CPPv3N12compiler_gym12llvm_service20LlvmObservationSpace8LEXED_IRE"></span><span id="_CPPv2N12compiler_gym12llvm_service20LlvmObservationSpace8LEXED_IRE"></span><span class="target" id="namespacecompiler__gym_1_1llvm__service_1a447c273cfdf5fdb0474b451ab73c4c2eae0cd2737b69bc98b37438bfac838d8ba"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LEXED_IR</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service20LlvmObservationSpace8LEXED_IRE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>The LLVM-lexer token IDs of the input IR. </p>
+<p>Returns a dictionary of aligned lists (token_idx, token_kind,token_category, str_token_value) one list element for every tokenized word in the IR. </p>
+</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -1372,8 +1388,8 @@ CompilerGym. The base session is implemented by a
 
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
            </div>

@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GCC Environment Reference &mdash; CompilerGym 0.2.4 documentation</title>
+  <title>GCC Environment Reference &mdash; CompilerGym 0.2.5 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
@@ -15,7 +16,9 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="author" title="About these documents" href="../about.html" />
     <link rel="index" title="Index" href="../genindex.html" />
@@ -33,7 +36,7 @@
             <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.2.4
+                0.2.5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -43,7 +46,7 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../about.html">About</a></li>
@@ -53,7 +56,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Environments</span></p>
+<p class="caption" role="heading"><span class="caption-text">Environments</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">GCC Environment Reference</a><ul>
@@ -78,7 +81,7 @@
 <li class="toctree-l1"><a class="reference internal" href="loop_tool.html">loop_tool Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mlir.html">MLIR Environment Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
@@ -92,7 +95,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../compiler_gym/views.html">compiler_gym.views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
 </ul>
-<p class="caption"><span class="caption-text">C++ API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">C++ API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cc/compiler_gym/service.html">compiler_gym/service</a></li>
@@ -124,8 +127,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <div class="section" id="gcc-environment-reference">
-<h1>GCC Environment Reference<a class="headerlink" href="#gcc-environment-reference" title="Permalink to this headline"></a></h1>
+  <section id="gcc-environment-reference">
+<h1>GCC Environment Reference<a class="headerlink" href="#gcc-environment-reference" title="Permalink to this heading"></a></h1>
 <p><a class="reference external" href="https://gcc.gnu.org/">GCC</a> is a production-grade compiler for C and C++ used
 throughout industry. CompilerGym exposes GCC’s command line optimization flags
 for reinforcement learning through a <a class="reference internal" href="../compiler_gym/envs.html#compiler_gym.envs.GccEnv" title="compiler_gym.envs.GccEnv"><code class="xref py py-class docutils literal notranslate"><span class="pre">GccEnv</span></code></a>
@@ -153,15 +156,15 @@ environment.</p>
 <li><p><a class="reference internal" href="#action-space" id="id19">Action Space</a></p></li>
 </ul>
 </div>
-<div class="section" id="installation">
-<span id="id1"></span><h2><a class="toc-backref" href="#id8">Installation</a><a class="headerlink" href="#installation" title="Permalink to this headline"></a></h2>
+<section id="installation">
+<span id="id1"></span><h2><a class="toc-backref" href="#id8">Installation</a><a class="headerlink" href="#installation" title="Permalink to this heading"></a></h2>
 <p>The GCC environments work with any version of GCC from 5 up to and including the
 current version at time of writing, 11.2. The environment uses Docker images to
 enable hassle free install and consistency across machines. Alternatively, any
 local installation of the compiler can be used. This selection is made by simple
 string specifier of the path or docker image name.</p>
-<div class="section" id="using-docker">
-<span id="id2"></span><h3><a class="toc-backref" href="#id9">Using Docker</a><a class="headerlink" href="#using-docker" title="Permalink to this headline"></a></h3>
+<section id="using-docker">
+<span id="id2"></span><h3><a class="toc-backref" href="#id9">Using Docker</a><a class="headerlink" href="#using-docker" title="Permalink to this heading"></a></h3>
 <p>On macOS, Docker can be installed using:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">brew</span> <span class="n">install</span> <span class="n">docker</span>
 </pre></div>
@@ -197,9 +200,9 @@ not working or if an invalid image is requested:</p>
 <span class="go">See &lt;https://facebookresearch.github.io/CompilerGym/envs/gcc.html#installation&gt; for details.</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="using-a-local-gcc">
-<span id="id3"></span><h3><a class="toc-backref" href="#id10">Using a local GCC</a><a class="headerlink" href="#using-a-local-gcc" title="Permalink to this headline"></a></h3>
+</section>
+<section id="using-a-local-gcc">
+<span id="id3"></span><h3><a class="toc-backref" href="#id10">Using a local GCC</a><a class="headerlink" href="#using-a-local-gcc" title="Permalink to this heading"></a></h3>
 <p>If you would prefer to use a local GCC binary, install GCC on macOS using:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">brew</span> <span class="n">install</span> <span class="n">gcc</span>
 </pre></div>
@@ -229,10 +232,10 @@ requested binary cannot be used:</p>
 <span class="go">EnvironmentNotSupported: Failed to run GCC binary: gcc-11</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="datasets">
-<h2><a class="toc-backref" href="#id11">Datasets</a><a class="headerlink" href="#datasets" title="Permalink to this headline"></a></h2>
+</section>
+</section>
+<section id="datasets">
+<h2><a class="toc-backref" href="#id11">Datasets</a><a class="headerlink" href="#datasets" title="Permalink to this heading"></a></h2>
 <p>We provide several datasets of open-source GCC benchmarks for use:</p>
 <table class="docutils align-default">
 <colgroup>
@@ -288,9 +291,9 @@ See <a class="reference internal" href="../cli.html#module-compiler_gym.bin.vali
 <p>All of the above datasets are available for use with the GCC environment. See
 <a class="reference internal" href="../compiler_gym/envs/gcc.html#datasets"><span class="std std-ref">compiler_gym.envs.gcc.datasets</span></a> for API
 details.</p>
-</div>
-<div class="section" id="observation-spaces">
-<h2><a class="toc-backref" href="#id12">Observation Spaces</a><a class="headerlink" href="#observation-spaces" title="Permalink to this headline"></a></h2>
+</section>
+<section id="observation-spaces">
+<h2><a class="toc-backref" href="#id12">Observation Spaces</a><a class="headerlink" href="#observation-spaces" title="Permalink to this heading"></a></h2>
 <p>We provide several observation spaces for GCC.</p>
 <p>Each observation is accessible from the environment’s <cite>observation</cite> field:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="s2">&quot;asm_size&quot;</span><span class="p">]</span>
@@ -303,8 +306,8 @@ environment:</p>
 <span class="go">36102</span>
 </pre></div>
 </div>
-<div class="section" id="source-rtl-assembly-object-code">
-<h3><a class="toc-backref" href="#id13">Source, RTL, Assembly, Object Code</a><a class="headerlink" href="#source-rtl-assembly-object-code" title="Permalink to this headline"></a></h3>
+<section id="source-rtl-assembly-object-code">
+<h3><a class="toc-backref" href="#id13">Source, RTL, Assembly, Object Code</a><a class="headerlink" href="#source-rtl-assembly-object-code" title="Permalink to this heading"></a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 18%" />
@@ -338,9 +341,9 @@ environment:</p>
 </table>
 <p>These four spaces return the appropriate string or bytes representation of the
 program state.</p>
-</div>
-<div class="section" id="assembly-and-object-code-sizes">
-<h3><a class="toc-backref" href="#id14">Assembly and Object Code Sizes</a><a class="headerlink" href="#assembly-and-object-code-sizes" title="Permalink to this headline"></a></h3>
+</section>
+<section id="assembly-and-object-code-sizes">
+<h3><a class="toc-backref" href="#id14">Assembly and Object Code Sizes</a><a class="headerlink" href="#assembly-and-object-code-sizes" title="Permalink to this heading"></a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 28%" />
@@ -371,9 +374,9 @@ yourself.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="s2">&quot;asm_size&quot;</span><span class="p">]</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="assembly-and-object-code-hashes">
-<h3><a class="toc-backref" href="#id15">Assembly and Object Code Hashes</a><a class="headerlink" href="#assembly-and-object-code-hashes" title="Permalink to this headline"></a></h3>
+</section>
+<section id="assembly-and-object-code-hashes">
+<h3><a class="toc-backref" href="#id15">Assembly and Object Code Hashes</a><a class="headerlink" href="#assembly-and-object-code-hashes" title="Permalink to this heading"></a></h3>
 <p>Gets the MD5 hash the assembly and object codes.  This is more efficient than
 computing the hash of the <code class="code docutils literal notranslate"><span class="pre">asm</span></code> of <code class="code docutils literal notranslate"><span class="pre">obj</span></code> spaces yourself.</p>
 <p>Example values:</p>
@@ -381,9 +384,9 @@ computing the hash of the <code class="code docutils literal notranslate"><span 
 <span class="go">&#39;f4921de395b026a55eab3844c8fe43dd&#39;</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="instruction-counts">
-<h3><a class="toc-backref" href="#id16">Instruction Counts</a><a class="headerlink" href="#instruction-counts" title="Permalink to this headline"></a></h3>
+</section>
+<section id="instruction-counts">
+<h3><a class="toc-backref" href="#id16">Instruction Counts</a><a class="headerlink" href="#instruction-counts" title="Permalink to this heading"></a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 23%" />
@@ -420,9 +423,9 @@ then there will be no entry for that instruction type.</p>
 <span class="go"> &#39;.string&#39;: 1, &#39;je&#39;: 2, &#39;.ident&#39;: 1}</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="choices">
-<h3><a class="toc-backref" href="#id17">Choices</a><a class="headerlink" href="#choices" title="Permalink to this headline"></a></h3>
+</section>
+<section id="choices">
+<h3><a class="toc-backref" href="#id17">Choices</a><a class="headerlink" href="#choices" title="Permalink to this heading"></a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 30%" />
@@ -477,10 +480,10 @@ current optimization settings.</p>
 <span class="go">[-1, -1, -1, -1, ...]</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="reward-spaces">
-<h2><a class="toc-backref" href="#id18">Reward Spaces</a><a class="headerlink" href="#reward-spaces" title="Permalink to this headline"></a></h2>
+</section>
+</section>
+<section id="reward-spaces">
+<h2><a class="toc-backref" href="#id18">Reward Spaces</a><a class="headerlink" href="#reward-spaces" title="Permalink to this heading"></a></h2>
 <p>The reward spaces for the GCC environment in the CompilerGym are simple
 wrappers over two of the observations, namely <cite>asm_size</cite> and <cite>obj_size</cite>. The
 reward is the change in that value since the last action.</p>
@@ -517,9 +520,9 @@ reward is the change in that value since the last action.</p>
 so will produce consistent results on Linux and macOS.</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="action-space">
-<h2><a class="toc-backref" href="#id19">Action Space</a><a class="headerlink" href="#action-space" title="Permalink to this headline"></a></h2>
+</section>
+<section id="action-space">
+<h2><a class="toc-backref" href="#id19">Action Space</a><a class="headerlink" href="#action-space" title="Permalink to this heading"></a></h2>
 <p>GCC’s action space consists of all the available optimization flags and
 parameters that can be specified from the command line. The number of command
 line configurations is bounded. The command line options are automatically
@@ -554,8 +557,8 @@ this is fewer than ten, there is a corresponding action for each. Similarly,
 there are action for each of the normal GCC flags, like <code class="code docutils literal notranslate"><span class="pre">-fpeel-loops</span></code> and
 <code class="code docutils literal notranslate"><span class="pre">-fno-peel-loops</span></code>. Parameters often have more than ten options, so there
 will be actions to bump values up and down, for example, ``</p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
