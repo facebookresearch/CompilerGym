@@ -28,6 +28,7 @@ from compiler_gym.service.proto import BenchmarkDynamicConfig, Command
 from compiler_gym.third_party import llvm
 from compiler_gym.util.commands import Popen
 from compiler_gym.util.download import download
+from compiler_gym.util.filesystem import extract_tar
 from compiler_gym.util.runfiles_path import cache_path, site_data_path
 from compiler_gym.util.timer import Timer
 
@@ -242,7 +243,7 @@ def download_cBench_runtime_data() -> bool:
         tar_contents = io.BytesIO(download(url, sha256))
         with tarfile.open(fileobj=tar_contents, mode="r:bz2") as tar:
             cbench_data.parent.mkdir(parents=True, exist_ok=True)
-            tar.extractall(cbench_data.parent)
+            extract_tar(tar, cbench_data.parent)
         assert cbench_data.is_dir()
         # Create the marker file to indicate that the directory is unpacked
         # and ready to go.

@@ -15,6 +15,7 @@ from typing import Optional
 from fasteners import InterProcessLock
 
 from compiler_gym.util.download import download
+from compiler_gym.util.filesystem import extract_tar
 from compiler_gym.util.runfiles_path import cache_path, site_data_path
 
 logger = logging.getLogger(__name__)
@@ -50,7 +51,7 @@ def _download_llvm_files(destination: Path) -> Path:
     tar_contents = io.BytesIO(download(_LLVM_URL, sha256=_LLVM_SHA256))
     destination.parent.mkdir(parents=True, exist_ok=True)
     with tarfile.open(fileobj=tar_contents, mode="r:bz2") as tar:
-        tar.extractall(destination)
+        extract_tar(tar, destination)
 
     assert destination.is_dir()
     assert (destination / "LICENSE").is_file()
