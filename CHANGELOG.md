@@ -3,7 +3,7 @@
 CompilerGym v0.2.5 adds a new LLVM dataset, two new observation spaces, and
 includes numerous updates and bug fixes.
 
-## Summary of Changes
+**Summary of Changes**
 
 - [llvm] Added two new observation spaces, `LexedIr` and `LexedIrTuple`,
   providing access to a sequence of IR tokens
@@ -46,7 +46,7 @@ includes numerous updates and bug fixes.
 - Reduced verbosity and wall time of CMake builds.
 - Updates and fixes dependent package conflicts (fixes #771, #768).
 
-## Credits
+**Credits**
 
 A huge thank you to all code contributors!
 
