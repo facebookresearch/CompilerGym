@@ -28,6 +28,7 @@ from compiler_gym.service.proto import BenchmarkDynamicConfig, Command
 from compiler_gym.third_party import llvm
 from compiler_gym.util.commands import Popen
 from compiler_gym.util.download import download
+from compiler_gym.util.filesystem import extract_tar
 from compiler_gym.util.runfiles_path import cache_path, site_data_path
 from compiler_gym.util.timer import Timer
 
@@ -242,26 +243,7 @@ def download_cBench_runtime_data() -> bool:
         tar_contents = io.BytesIO(download(url, sha256))
         with tarfile.open(fileobj=tar_contents, mode="r:bz2") as tar:
             cbench_data.parent.mkdir(parents=True, exist_ok=True)
-            def is_within_directory(directory, target):
-                
-                abs_directory = os.path.abspath(directory)
-                abs_target = os.path.abspath(target)
-            
-                prefix = os.path.commonprefix([abs_directory, abs_target])
-                
-                return prefix == abs_directory
-            
-            def safe_extract(tar, path=".", members=None, *, numeric_owner=False):
-            
-                for member in tar.getmembers():
-                    member_path = os.path.join(path, member.name)
-                    if not is_within_directory(path, member_path):
-                        raise Exception("Attempted Path Traversal in Tar File")
-            
-                tar.extractall(path, members, numeric_owner=numeric_owner) 
-                
-            
-            safe_extract(tar, cbench_data.parent)
+            extract_tar(tar, cbench_data.parent)
         assert cbench_data.is_dir()
         # Create the marker file to indicate that the directory is unpacked
         # and ready to go.

@@ -28,6 +28,7 @@ from torch.utils.data import DataLoader
 
 import compiler_gym.util.flags.nproc  # noqa flag definition
 from compiler_gym.util.download import download
+from compiler_gym.util.filesystem import extract_tar
 from compiler_gym.util.runfiles_path import cache_path, transient_cache_path
 from compiler_gym.util.timer import Timer, humanize_duration
 
@@ -145,29 +146,7 @@ def download_and_unpack_database(db: str, sha256: str) -> Path:
             local_dir.mkdir(parents=True, exist_ok=True)
             logger.info("Unpacking database to %s ...", local_dir)
             with tarfile.open(fileobj=tar_data, mode="r:bz2") as arc:
-                
-                import os
-                
-                def is_within_directory(directory, target):
-                    
-                    abs_directory = os.path.abspath(directory)
-                    abs_target = os.path.abspath(target)
-                
-                    prefix = os.path.commonprefix([abs_directory, abs_target])
-                    
-                    return prefix == abs_directory
-                
-                def safe_extract(tar, path=".", members=None, *, numeric_owner=False):
-                
-                    for member in tar.getmembers():
-                        member_path = os.path.join(path, member.name)
-                        if not is_within_directory(path, member_path):
-                            raise Exception("Attempted Path Traversal in Tar File")
-                
-                    tar.extractall(path, members, numeric_owner=numeric_owner) 
-                    
-                
-                safe_extract(arc, str(local_dir))
+                extract_tar(arc, str(local_dir))
 
             (local_dir / ".installed").touch()
 
