@@ -230,6 +230,7 @@ cg_cc_library(
       ::ObservationSpaces
       compiler_gym::service::proto::compiler_gym_service_cc_grpc
       compiler_gym::third_party::autophase::InstCount
+      compiler_gym::third_party::LexedIr::LexedIr
       compiler_gym::util::GrpcStatusMacros
     ABS_DEPS
       CpuInfo::cpuinfo

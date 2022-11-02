@@ -40,6 +40,8 @@ We provide several datasets of open-source LLVM-IR benchmarks for use:
 +----------------------------+--------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------+
 | benchmark://github-v0      | 49,738                   | Compile-only C/C++ objects from GitHub [`Paper <https://arxiv.org/pdf/2012.01470.pdf>`__]                                                                                                                          | No                   |
 +----------------------------+--------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------+
+| benchmark://jotaibench-v0  | 18,761                   | Compile-only C/C++ functions extracted from GitHub [`Homepage <https://github.com/lac-dcc/jotai-benchmarks>`__]                                                                                                    | No                   |
++----------------------------+--------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------+
 | benchmark://linux-v0       | 13,894                   | Compile-only object files from C Linux kernel [`Homepage <https://www.linux.org/>`__]                                                                                                                              | No                   |
 +----------------------------+--------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------+
 | benchmark://mibench-v1     | 40                       | C benchmarks [`Paper <http://vhosts.eecs.umich.edu/mibench/Publications/MiBench.pdf>`__]                                                                                                                           | No                   |
@@ -56,7 +58,7 @@ We provide several datasets of open-source LLVM-IR benchmarks for use:
 +----------------------------+--------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------+
 | generator://llvm-stress-v0 | ∞                        | Randomly generated LLVM-IR [`Documentation <https://llvm.org/docs/CommandGuide/llvm-stress.html>`__]                                                                                                               | No                   |
 +----------------------------+--------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------+
-| Total                      | 1,158,701                |                                                                                                                                                                                                                    |                      |
+| Total                      | 1,177,462                |                                                                                                                                                                                                                    |                      |
 +----------------------------+--------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------+
 
 .. [#f1] Values are for the Linux datasets. Some of the datasets contain fewer
@@ -73,8 +75,8 @@ All of the above datasets are available for use with the LLVM environment. See
 
 We characterize the datasets below in radial plots which show, clockwise from
 the top: the average number of instructions per benchmark, the density of
-branching instructions, the density of arithmetic instructions, and the density
-of memory operations. For example, comparing blas-v0 and cbench-v1 shows that
+branching instructions, the density of memory operations, and the density of
+arithmetic instructions. For example, comparing blas-v0 and cbench-v1 shows that
 blas-v0 consists of smaller programs with a similar density of branches, a
 higher density of arithmetic operations and relatively few memory operations.
 cbench-v1, in contrast to the small linear algebra kernels of blas-v0, contains

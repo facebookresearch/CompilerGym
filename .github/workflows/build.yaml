@@ -19,14 +19,14 @@ jobs:
             matrix:
                 os: [macos-latest, ubuntu-latest]
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v3
 
             - name: Evaluate artifact name
               run: |
                   echo "ARTIFACT=compiler_gym-$(cat VERSION)" >> $GITHUB_ENV
                   echo "Artifact name is $ARTIFACT"
 
-            - uses: actions/setup-python@v2
+            - uses: actions/setup-python@v4
               with:
                   python-version: 3.9
 
@@ -60,9 +60,9 @@ jobs:
             fail-fast: false
             matrix:
                 os: [macos-latest, ubuntu-latest]
-                python: [3.6, 3.7, 3.8, 3.9]
+                python: [3.7, 3.8, 3.9, '3.10']
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v3
 
             - name: Evaluate artifact name
               run: |
@@ -70,7 +70,7 @@ jobs:
                   echo "Artifact name is $ARTIFACT"
 
             - name: Set up Python ${{ matrix.python }}
-              uses: actions/setup-python@v2
+              uses: actions/setup-python@v4
               with:
                   python-version: ${{ matrix.python }}
 
@@ -94,4 +94,4 @@ jobs:
               uses: ./.github/actions/install-runtime-dependencies
 
             - name: Run the examples tests
-              run: make -C examples test
+              run: make -C examples test PYTEST_ARGS="--ignore loop_optimizations_service --ignore example_unrolling_service"

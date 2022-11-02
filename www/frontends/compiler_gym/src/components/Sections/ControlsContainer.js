@@ -34,7 +34,8 @@ const ControlsContainer = () => {
     layer: 1,
   });
   const [locationKeys, setLocationKeys] = useState([]);
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
+  const [isRunning, setIsRunning] = useState(false);
 
   const children =
     compilerGym.actions &&
@@ -91,6 +92,13 @@ const ControlsContainer = () => {
       }
     });
   }, [locationKeys]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  /**
+   * Helper function to reset the actions tracker.
+   */
+  const handleResetActionsTracker = React.useCallback(() => {
+    setActionsTracker({ activeNode: "x", actionsTaken: [], layer: 1 });
+  }, []);
 
   /**
    * This functions makes an API call to replay a session with new parameters
@@ -201,6 +209,28 @@ const ControlsContainer = () => {
   };
 
   /**
+   * Invokes API getActions to reset all actions taken in the session.
+   */
+  const resetAllActions = async () => {
+    try {
+      const response = await api.getActions(
+        `${params.dataset}/${params.datasetUri}`,
+        params.reward,
+        "",
+        ""
+      );
+      setSession(response);
+      setTreeData(
+        makeSessionTreeData(response.states, children, response.commandline)
+      );
+      searchParams.set("actions", "");
+      history.push({ ...location, search: searchParams.toString() });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  /**
    * A function that makes an API call to replay an episode of actions
    * when a node between the root and last children is clicked in the tree.
    * It also updates the url parameters to keep the history of current session.
@@ -244,18 +274,34 @@ const ControlsContainer = () => {
   const handleNodeClick = async (nodeDatum) => {
     let nodeActionID = nodeDatum.action_id.split(".")[0];
     let nodeDepth = nodeDatum.__rd3t.depth;
+    setIsRunning(true)
+
+    // Push parameters to URL only when there are not parameters set.
+    if (!location.search) {
+      searchParams.set("dataset", params.dataset);
+      searchParams.set("dataset_uri", params.datasetUri);
+      searchParams.set("reward", params.reward);
+      history.push({ ...location, search: searchParams.toString() });
+    }
+
+    // Reset all actions when root node is clicked.
+    if (nodeDepth === 0) {
+      await resetAllActions();
+      handleResetActionsTracker();
+      setIsRunning(false)
+    }
 
     if (nodeDatum !== undefined && nodeDepth !== 0) {
       try {
-        // Verifies it is one of the last children.
-        if (nodeDepth === session.states.length) {
+        if (nodeDepth === session.states.length) { // level of node clicked is last level of tree.
           await submitStep(nodeActionID);
           setActionsTracker({
             activeNode: nodeDatum.action_id,
             actionsTaken: [...actionsTracker.actionsTaken, nodeDatum.action_id],
             layer: actionsTracker.layer + 1,
           });
-        } else if (nodeDepth === session.states.length - 1 && nodeDepth > 1) {
+          setIsRunning(false)
+        } else if (nodeDepth === session.states.length - 1 && nodeDepth > 1) { // level of node clicked is one previous to last level of tree.
           await undoStep();
           setActionsTracker({
             activeNode:
@@ -267,7 +313,8 @@ const ControlsContainer = () => {
             actionsTaken: actionsTracker.actionsTaken.slice(0, -1),
             layer: actionsTracker.layer - 1,
           });
-        } else if (nodeDepth < session.states.length && nodeDepth > 0) {
+          setIsRunning(false)
+        } else if (nodeDepth < session.states.length && nodeDepth > 0) { // level of node clicked is between root and last children.
           let actionIds = actionsTracker.actionsTaken
             .map((i) => i.split(".")[0])
             .slice(); // get a copy of actionsTaken
@@ -277,6 +324,7 @@ const ControlsContainer = () => {
             nodeActionID
           ); // modify the array of actions adding the node clicked and removing ones on the right side of array.
           await replicateSteps(actionIds);
+          setIsRunning(false)
         } else {
           return;
         }
@@ -331,11 +379,7 @@ const ControlsContainer = () => {
     setTreeData(updateNode(treeData, actionsTracker.activeNode, e));
   };
 
-  const handleResetActionsTracker = () => {
-    setActionsTracker({ activeNode: "x", actionsTaken: [], layer: 1 });
-  };
-
-  const handleMouseOverTree = (nodeData) => {
+  const handleMouseOverTree = React.useCallback((nodeData) => {
     let nodeDescription =
       ActionsDict.find((i) => i.Action === nodeData.name)?.Description || "";
     if (nodeData.active) {
@@ -345,15 +389,15 @@ const ControlsContainer = () => {
         nodeDescription: nodeDescription,
       });
     } else {
-      setHighlightedPoint({
-        ...highlightedPoint,
+      setHighlightedPoint((prev) => ({
+        ...prev,
         point: nodeData.__rd3t.depth,
         nodeDescription: nodeDescription,
-      });
+      }));
     }
-  };
+  }, []);
 
-  const handleMouseOutTree = (nodeData) => {
+  const handleMouseOutTree = React.useCallback((nodeData) => {
     if (nodeData.active) {
       setHighlightedPoint({
         point: nodeData.__rd3t.depth,
@@ -361,13 +405,13 @@ const ControlsContainer = () => {
         nodeDescription: "",
       });
     } else {
-      setHighlightedPoint({
-        ...highlightedPoint,
+      setHighlightedPoint((prev) => ({
+        ...prev,
         nodeDescription: "",
         point: null,
-      });
+      }));
     }
-  };
+  }, []);
 
   /**
    * a setter that listens to a click on the historial reward chart.
@@ -415,6 +459,7 @@ const ControlsContainer = () => {
       <RewardsSection
         session={session}
         highlightedPoint={highlightedPoint}
+        isRunning={isRunning}
         handleClickOnChart={handleClickOnChart}
       />
     </div>

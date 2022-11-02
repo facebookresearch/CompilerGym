@@ -16,6 +16,7 @@ import numpy as np
 import utils
 
 import compiler_gym.third_party.llvm as llvm
+from compiler_gym.envs.llvm.llvm_benchmark import get_system_library_flags
 from compiler_gym.service import CompilationSession
 from compiler_gym.service.proto import (
     ActionSpace,
@@ -141,7 +142,8 @@ class UnrollingCompilationSession(CompilationSession):
                 self._src_path,
                 "-o",
                 self._llvm_path,
-            ],
+            ]
+            + get_system_library_flags(),
             timeout=30,
         )
 
@@ -250,7 +252,8 @@ class UnrollingCompilationSession(CompilationSession):
                     "-O3",
                     "-o",
                     self._exe_path,
-                ],
+                ]
+                + get_system_library_flags(),
                 timeout=30,
             )
 
@@ -294,7 +297,8 @@ class UnrollingCompilationSession(CompilationSession):
                     "-Oz",
                     "-o",
                     self._exe_path,
-                ],
+                ]
+                + get_system_library_flags(),
                 timeout=30,
             )
             binary_size = os.path.getsize(self._exe_path)

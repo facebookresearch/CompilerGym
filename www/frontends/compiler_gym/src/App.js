@@ -10,20 +10,18 @@ import "./assets/scss/custom.scss";
 import ApiService from "./api/ApiService";
 import ApiContext from "./context/ApiContext";
 import ThemeContext from "./context/ThemeContext";
+import useThemeDetector from "./hooks/useThemeDetector";
 import SplashPage from "./components/Pages/SplashPage";
 import MainPage from "./components/Pages/MainPage";
+import { INITIAL_SETTINGS } from "./utils/Helpers";
 
 const api = new ApiService();
-const INITIAL_SETTINGS = {
-  reward: "IrInstructionCountOz",
-  dataset: "benchmark://cbench-v1",
-  datasetUri: "adpcm",
-};
 
 function App() {
+  const isDarkTheme = useThemeDetector();
   const [compilerGym, setCompilerGym] = useState({});
   const [session, setSession] = useState({});
-  const [darkTheme, setDarkTheme] = useState(false);
+  const [darkTheme, setDarkTheme] = useState(isDarkTheme);
   const [isLoading, setIsLoading] = useState(false);
   const [params, setParams] = useState({
     reward: INITIAL_SETTINGS.reward,

@@ -58,6 +58,14 @@ cg_py_library(
 
 cg_py_library(
   NAME
+    lexed_ir
+  SRCS
+    "lexed_ir.py"
+  PUBLIC
+)
+
+cg_py_library(
+  NAME
     llvm_env
   SRCS
     "llvm_env.py"

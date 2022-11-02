@@ -2,7 +2,6 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-import warnings
 from typing import List, Optional, Tuple, Union
 
 import numpy as np
@@ -27,22 +26,9 @@ class Reward(Scalar):
     signals based on observation values computed by the backend service.
     """
 
-    __slots__ = [
-        "name",
-        "observation_spaces",
-        "default_value",
-        "default_negates_returns",
-        "success_threshold",
-        "deterministic",
-        "platform_dependent",
-    ]
-
     def __init__(
         self,
-        # NOTE(github.com/facebookresearch/CompilerGym/issues/381): Once `id`
-        # argument has been removed, the default value for `name` can be
-        # removed.
-        name: str = None,
+        name: str,
         observation_spaces: Optional[List[str]] = None,
         default_value: RewardType = 0,
         min: Optional[RewardType] = None,
@@ -51,10 +37,6 @@ class Reward(Scalar):
         success_threshold: Optional[RewardType] = None,
         deterministic: bool = False,
         platform_dependent: bool = True,
-        # NOTE(github.com/facebookresearch/CompilerGym/issues/381): Backwards
-        # compatability workaround for deprecated parameter, will be removed in
-        # v0.2.4.
-        id: Optional[str] = None,
     ):
         """Constructor.
 
@@ -83,10 +65,6 @@ class Reward(Scalar):
         :param deterministic: Whether the reward space is deterministic.
         :param platform_dependent: Whether the reward values depend on the
             execution environment of the service.
-        :param id: The name of the reward space.
-
-            .. deprecated:: 0.2.3
-                Use :code:`name` instead.
         """
         super().__init__(
             name=name,
@@ -95,19 +73,7 @@ class Reward(Scalar):
             dtype=np.float64,
         )
 
-        # NOTE(github.com/facebookresearch/CompilerGym/issues/381): Backwards
-        # compatability workaround for deprecated parameter, will be removed in
-        # v0.2.4.
-        if id is not None:
-            warnings.warn(
-                "The `id` argument of "
-                "compiler_gym.spaces.Reward.__init__() "
-                "has been renamed `name`. This will break in a future release, "
-                "please update your code.",
-                DeprecationWarning,
-            )
         self.name = name or id
-        self.id = self.name
         if not self.name:
             raise TypeError("No name given")
 

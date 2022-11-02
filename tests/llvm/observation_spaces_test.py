@@ -5,7 +5,7 @@
 """Integrations tests for the LLVM CompilerGym environments."""
 import os
 import sys
-from typing import Any, Dict, List
+from typing import Any, Dict, List, NamedTuple
 
 import gym
 import networkx as nx
@@ -62,6 +62,8 @@ def test_observation_spaces(env: LlvmEnv):
         "IrSha1",
         "IsBuildable",
         "IsRunnable",
+        "LexedIr",
+        "LexedIrTuple",
         "ObjectTextSizeBytes",
         "ObjectTextSizeO0",
         "ObjectTextSizeO3",
@@ -405,6 +407,33 @@ def test_autophase_dict_observation_space(env: LlvmEnv):
     value: Dict[str, int] = env.observation[key]
     print(value)  # For debugging in case of error.
     assert len(value) == 56
+
+    assert space.deterministic
+    assert not space.platform_dependent
+
+
+def test_lexed_ir_observation_space(env: LlvmEnv):
+    env.reset("cbench-v1/crc32")
+    key = "LexedIr"
+    space = env.observation.spaces[key]
+    print(type(space.space))
+    print(space.space)
+    assert isinstance(space.space, Sequence)
+    value: Dict[str, np.array] = env.observation[key]
+    print(value)  # For debugging in case of error
+    assert len(value) == 4
+
+    assert space.deterministic
+    assert not space.platform_dependent
+
+
+def test_lexed_ir_tuple_observation_space(env: LlvmEnv):
+    env.reset("cbench-v1/crc32")
+    key = "LexedIrTuple"
+    space = env.observation.spaces[key]
+    assert isinstance(space.space, Sequence)
+    value: List[NamedTuple] = env.observation[key]
+    print(value)  # For debugging in case of error
 
     assert space.deterministic
     assert not space.platform_dependent
@@ -1421,15 +1450,12 @@ def test_is_buildable_observation_space_not_buildable(env: LlvmEnv):
 
 def test_add_derived_space(env: LlvmEnv):
     env.reset()
-    with pytest.deprecated_call(
-        match="Use the derived_observation_spaces argument to CompilerEnv constructor."
-    ):
-        env.observation.add_derived_space(
-            id="IrLen",
-            base_id="Ir",
-            space=Box(name="IrLen", low=0, high=float("inf"), shape=(1,), dtype=int),
-            translate=lambda base: [15],
-        )
+    env.observation.add_derived_space(
+        id="IrLen",
+        base_id="Ir",
+        space=Box(name="IrLen", low=0, high=float("inf"), shape=(1,), dtype=int),
+        translate=lambda base: [15],
+    )
 
     value = env.observation["IrLen"]
     assert isinstance(value, list)

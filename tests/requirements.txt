@@ -1,3 +1,4 @@
+coverage<6.0  # Implicit dependency of pytest-cov, fix version < 6.x for Py3.6 support.
 flaky==3.7.0
 psutil==5.8.0  # Implicit dependency of pytest-xdist
 pytest==6.2.5

@@ -24,7 +24,7 @@ issue](https://github.com/facebookresearch/CompilerGym/issues/new/choose).
   * `ir` which returns the string "Hello, world!".
   * `features` which returns an `int64_tensor` of `[0, 0, 0]`.
 * A single reward space `runtime` which returns 0.
-* It has a single dataset "benchmark://example-v0" with two programs "foo" and
+* It has a single dataset "benchmark://example-compiler-v0" with two programs "foo" and
   "bar".
 
 

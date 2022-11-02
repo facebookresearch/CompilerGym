@@ -63,7 +63,6 @@ if(COMPILER_GYM_ENABLE_LLVM_ENV)
         "random_search_test.py"
       DEPS
         compiler_gym::compiler_gym
-        compiler_gym::random_replay
         compiler_gym::random_search
         tests::pytest_plugins::common
         tests::test_main
@@ -155,12 +154,7 @@ file(
     "${CMAKE_CURRENT_SOURCE_DIR}"
 )
 set(_TESTS_BIN_DIR "${CMAKE_CURRENT_BINARY_DIR}/py_pkg")
-string(
-    CONCAT
-    _CMD
-    "cd \"${CMAKE_CURRENT_SOURCE_DIR}/..\""
-    " && make install-test"
-)
+string(CONCAT _CMD "cd \"${CMAKE_CURRENT_SOURCE_DIR}/..\"" " && make test")
 cg_genrule(
   NAME python_package_tests
   COMMAND "${_CMD}"

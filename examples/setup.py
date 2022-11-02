@@ -31,10 +31,14 @@ setuptools.setup(
         "llvm_rl.model",
     ],
     package_data={
+        "llvm_autotuning": [
+            "config/*.yaml",
+            "config/**/*.yaml",
+        ],
         "llvm_rl": [
             "config/*.yaml",
             "config/**/*.yaml",
-        ]
+        ],
     },
     python_requires=">=3.8",
     platforms=[distutils.util.get_platform()],

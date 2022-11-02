@@ -16,11 +16,10 @@ pytest_plugins = ["tests.pytest_plugins.common"]
 
 
 def test_benchmark_attribute_outside_init():
-    """Test that new attributes cannot be added to Benchmark."""
+    """Test that new attributes can be added to Benchmark."""
     benchmark = Benchmark(None)
-    with pytest.raises(AttributeError):
-        # pylint: disable=assigning-non-slot
-        benchmark.foobar = 123  # noqa
+    benchmark.foobar = 123  # pylint: disable=attribute-defined-outside-init
+    assert benchmark.foobar == 123
 
 
 def test_benchmark_subclass_attribute_outside_init():
@@ -36,14 +35,16 @@ def test_benchmark_subclass_attribute_outside_init():
 
 def test_benchmark_properties():
     """Test benchmark properties."""
-    benchmark = Benchmark(BenchmarkProto(uri="benchmark://example-v0/foobar"))
-    assert benchmark.uri == "benchmark://example-v0/foobar"
-    assert benchmark.proto == BenchmarkProto(uri="benchmark://example-v0/foobar")
+    benchmark = Benchmark(BenchmarkProto(uri="benchmark://example-compiler-v0/foobar"))
+    assert benchmark.uri == "benchmark://example-compiler-v0/foobar"
+    assert benchmark.proto == BenchmarkProto(
+        uri="benchmark://example-compiler-v0/foobar"
+    )
 
 
 def test_benchmark_immutable():
     """Test that benchmark properties are immutable."""
-    benchmark = Benchmark(BenchmarkProto(uri="benchmark://example-v0/foobar"))
+    benchmark = Benchmark(BenchmarkProto(uri="benchmark://example-compiler-v0/foobar"))
     with pytest.raises(AttributeError):
         benchmark.uri = 123
     with pytest.raises(AttributeError):
@@ -56,7 +57,7 @@ def test_add_validation_callbacks_values():
     def a(env):
         pass
 
-    benchmark = Benchmark(BenchmarkProto(uri="benchmark://example-v0/foobar"))
+    benchmark = Benchmark(BenchmarkProto(uri="benchmark://example-compiler-v0/foobar"))
     assert benchmark.validation_callbacks() == []
     assert not benchmark.is_validatable()
 
@@ -81,7 +82,7 @@ def test_add_validation_callbacks_call_count():
         nonlocal b_call_count
         b_call_count += 1
 
-    benchmark = Benchmark(BenchmarkProto(uri="benchmark://example-v0/foobar"))
+    benchmark = Benchmark(BenchmarkProto(uri="benchmark://example-compiler-v0/foobar"))
     benchmark.add_validation_callback(a)
 
     errors = benchmark.validate(env=None)
@@ -103,7 +104,7 @@ def test_validation_callback_error():
         yield ValidationError(type="Compilation Error")
         yield ValidationError(type="Runtime Error")
 
-    benchmark = Benchmark(BenchmarkProto(uri="benchmark://example-v0/foobar"))
+    benchmark = Benchmark(BenchmarkProto(uri="benchmark://example-compiler-v0/foobar"))
     benchmark.add_validation_callback(a)
 
     errors = benchmark.validate(env=None)
@@ -120,7 +121,7 @@ def test_validation_callback_error_iter():
         yield ValidationError(type="Compilation Error")
         yield ValidationError(type="Runtime Error")
 
-    benchmark = Benchmark(BenchmarkProto(uri="benchmark://example-v0/foobar"))
+    benchmark = Benchmark(BenchmarkProto(uri="benchmark://example-compiler-v0/foobar"))
     benchmark.add_validation_callback(a)
 
     errors = benchmark.ivalidate(env=None)
@@ -138,7 +139,7 @@ def test_validation_callback_flaky():
         if flaky:
             yield ValidationError(type="Runtime Error")
 
-    benchmark = Benchmark(BenchmarkProto(uri="benchmark://example-v0/foobar"))
+    benchmark = Benchmark(BenchmarkProto(uri="benchmark://example-compiler-v0/foobar"))
     benchmark.add_validation_callback(a)
 
     errors = benchmark.validate(env=None)
@@ -152,36 +153,36 @@ def test_validation_callback_flaky():
 
 
 def test_eq_benchmarks():
-    a = Benchmark(BenchmarkProto(uri="benchmark://example-v0/foo"))
-    b = Benchmark(BenchmarkProto(uri="benchmark://example-v0/foo"))
+    a = Benchmark(BenchmarkProto(uri="benchmark://example-compiler-v0/foo"))
+    b = Benchmark(BenchmarkProto(uri="benchmark://example-compiler-v0/foo"))
 
     assert a == b
 
 
 def test_eq_strings():
-    a = Benchmark(BenchmarkProto(uri="benchmark://example-v0/foo"))
-    b = "benchmark://example-v0/foo"
+    a = Benchmark(BenchmarkProto(uri="benchmark://example-compiler-v0/foo"))
+    b = "benchmark://example-compiler-v0/foo"
 
     assert a == b
 
 
 def test_ne_benchmarks():
-    a = Benchmark(BenchmarkProto(uri="benchmark://example-v0/foo"))
-    b = Benchmark(BenchmarkProto(uri="benchmark://example-v0/bar"))
+    a = Benchmark(BenchmarkProto(uri="benchmark://example-compiler-v0/foo"))
+    b = Benchmark(BenchmarkProto(uri="benchmark://example-compiler-v0/bar"))
 
     assert a != b
 
 
 def test_ne_strings():
-    a = Benchmark(BenchmarkProto(uri="benchmark://example-v0/foo"))
-    b = "benchmark://example-v0/bar"
+    a = Benchmark(BenchmarkProto(uri="benchmark://example-compiler-v0/foo"))
+    b = "benchmark://example-compiler-v0/bar"
 
     assert a != b
 
 
 def test_benchmark_sources(tmpwd: Path):
     a = Benchmark(
-        BenchmarkProto(uri="benchmark://example-v0/foo"),
+        BenchmarkProto(uri="benchmark://example-compiler-v0/foo"),
         sources=[("example.py", "Hello, world!".encode("utf-8"))],
     )
     a.add_source(BenchmarkSource(filename="foo.py", contents="Hi".encode("utf-8")))
@@ -203,21 +204,21 @@ def test_benchmark_from_file(tmpwd: Path):
     path = tmpwd / "foo.txt"
     with open(path, "w") as f:
         f.write("Hello, world!")
-    benchmark = Benchmark.from_file("benchmark://example-v0/foo", path)
+    benchmark = Benchmark.from_file("benchmark://example-compiler-v0/foo", path)
     assert benchmark.proto.program.contents.decode("utf-8") == "Hello, world!"
 
 
 def test_benchmark_from_file_not_found(tmpwd: Path):
     path = tmpwd / "foo.txt"
     with pytest.raises(FileNotFoundError, match=str(path)):
-        Benchmark.from_file("benchmark://example-v0/foo", path)
+        Benchmark.from_file("benchmark://example-compiler-v0/foo", path)
 
 
 def test_dataset_equality_and_sorting():
     """Test comparison operators between datasets."""
-    a = Benchmark(BenchmarkProto(uri="benchmark://example-v0/a"))
-    a2 = Benchmark(BenchmarkProto(uri="benchmark://example-v0/a"))
-    b = Benchmark(BenchmarkProto(uri="benchmark://example-v0/b"))
+    a = Benchmark(BenchmarkProto(uri="benchmark://example-compiler-v0/a"))
+    a2 = Benchmark(BenchmarkProto(uri="benchmark://example-compiler-v0/a"))
+    b = Benchmark(BenchmarkProto(uri="benchmark://example-compiler-v0/b"))
 
     assert a == a2
     assert a != b
@@ -227,15 +228,15 @@ def test_dataset_equality_and_sorting():
     assert b >= a
 
     # String comparisons
-    assert a == "benchmark://example-v0/a"
-    assert a != "benchmark://example-v0/b"
-    assert a < "benchmark://example-v0/b"
+    assert a == "benchmark://example-compiler-v0/a"
+    assert a != "benchmark://example-compiler-v0/b"
+    assert a < "benchmark://example-compiler-v0/b"
 
     # Sorting
     assert sorted([a2, b, a]) == [
-        "benchmark://example-v0/a",
-        "benchmark://example-v0/a",
-        "benchmark://example-v0/b",
+        "benchmark://example-compiler-v0/a",
+        "benchmark://example-compiler-v0/a",
+        "benchmark://example-compiler-v0/b",
     ]
 
 

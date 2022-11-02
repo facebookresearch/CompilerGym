@@ -39,7 +39,6 @@ class GccEnv(ClientServiceCompilerEnv):
         benchmark: Union[str, Benchmark] = "benchmark://chstone-v0/adpcm",
         datasets_site_path: Optional[Path] = None,
         connection_settings: Optional[ConnectionOpts] = None,
-        timeout: Optional[int] = None,
         **kwargs,
     ):
         """Create an environment.
@@ -55,8 +54,6 @@ class GccEnv(ClientServiceCompilerEnv):
             default benchmark is used.
 
         :param connection_settings: The connection settings to use.
-
-        :param timeout: The timeout to use when compiling.
 
         :raises EnvironmentNotSupported: If the runtime requirements for the GCC
             environment have not been met.
@@ -86,7 +83,6 @@ class GccEnv(ClientServiceCompilerEnv):
             rewards=[AsmSizeReward(), ObjSizeReward()],
             connection_settings=connection_settings,
         )
-        self._timeout = timeout
 
     def reset(
         self,
@@ -105,8 +101,6 @@ class GccEnv(ClientServiceCompilerEnv):
             observation_space=observation_space,
             reward_space=reward_space,
         )
-        if self._timeout:
-            self.send_param("timeout", str(self._timeout))
         return observation
 
     def commandline(self) -> str:
@@ -115,17 +109,6 @@ class GccEnv(ClientServiceCompilerEnv):
         :return: A string.
         """
         return self.observation["command_line"]
-
-    @property
-    def timeout(self) -> Optional[int]:
-        """Get the current compilation timeout"""
-        return self._timeout
-
-    @timeout.setter
-    def timeout(self, value: Optional[int]):
-        """Tell the service what the compilation timeout is."""
-        self._timeout = value
-        self.send_param("timeout", str(value) if value else "")
 
     @memoized_property
     def gcc_spec(self) -> GccSpec:

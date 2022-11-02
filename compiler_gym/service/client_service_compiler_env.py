@@ -15,7 +15,6 @@ from time import time
 from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
 
 import numpy as np
-from deprecated.sphinx import deprecated
 from gym.spaces import Space
 
 from compiler_gym.compiler_env_state import CompilerEnvState
@@ -49,7 +48,8 @@ from compiler_gym.service.proto import (
     StepRequest,
     py_converters,
 )
-from compiler_gym.spaces import DefaultRewardFromObservation, NamedDiscrete, Reward
+from compiler_gym.spaces import DefaultRewardFromObservation, Reward
+from compiler_gym.util.decorators import memoized_property
 from compiler_gym.util.gym_type_hints import (
     ActionType,
     ObservationType,
@@ -64,18 +64,13 @@ from compiler_gym.views import ObservationSpaceSpec, ObservationView, RewardView
 
 logger = logging.getLogger(__name__)
 
-# NOTE(cummins): This is only required to prevent a name conflict with the now
-# deprecated ClientServiceCompilerEnv.logger attribute. This can be removed once the logger
-# attribute is removed, scheduled for release 0.2.3.
-_logger = logger
-
 
 def _wrapped_step(
-    service: CompilerGymServiceConnection, request: StepRequest
+    service: CompilerGymServiceConnection, request: StepRequest, timeout: float
 ) -> StepReply:
     """Call the Step() RPC endpoint."""
     try:
-        return service(service.stub.Step, request)
+        return service(service.stub.Step, request, timeout=timeout)
     except FileNotFoundError as e:
         if str(e).startswith("Session not found"):
             raise SessionNotFound(str(e))
@@ -138,7 +133,6 @@ class ClientServiceCompilerEnv(CompilerEnv):
         service_message_converters: ServiceMessageConverters = None,
         connection_settings: Optional[ConnectionOpts] = None,
         service_connection: Optional[CompilerGymServiceConnection] = None,
-        logger: Optional[logging.Logger] = None,
     ):
         """Construct and initialize a CompilerGym environment.
 
@@ -200,16 +194,6 @@ class ClientServiceCompilerEnv(CompilerEnv):
         :raises TimeoutError: If the compiler service fails to initialize within
             the parameters provided in :code:`connection_settings`.
         """
-        # NOTE(cummins): Logger argument deprecated and scheduled to be removed
-        # in release 0.2.3.
-        if logger:
-            warnings.warn(
-                "The `logger` argument is deprecated on ClientServiceCompilerEnv.__init__() "
-                "and will be removed in a future release. All ClientServiceCompilerEnv "
-                "instances share a logger named compiler_gym.service.client_service_compiler_env",
-                DeprecationWarning,
-            )
-
         self.metadata = {"render.modes": ["human", "ansi"]}
 
         # A compiler service supports multiple simultaneous environments. This
@@ -218,6 +202,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
 
         self._service_endpoint: Union[str, Path] = service
         self._connection_settings = connection_settings or ConnectionOpts()
+        self._params_to_send_on_reset: List[SessionParameter] = []
 
         self.service = service_connection or CompilerGymServiceConnection(
             endpoint=self._service_endpoint,
@@ -252,7 +237,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
         # constructor-time benchmark as otherwise the behavior of the benchmark
         # property is counter-intuitive:
         #
-        #     >>> env = gym.make("example-v0", benchmark="foo")
+        #     >>> env = gym.make("example-compiler-v0", benchmark="foo")
         #     >>> env.benchmark
         #     None
         #     >>> env.reset()
@@ -292,10 +277,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
         # Register any derived observation spaces now so that the observation
         # space can be set below.
         for derived_observation_space in derived_observation_spaces or []:
-            self.observation.add_derived_space_internal(**derived_observation_space)
-
-        # Lazily evaluated version strings.
-        self._versions: Optional[GetVersionReply] = None
+            self.observation.add_derived_space(**derived_observation_space)
 
         self.action_space: Optional[Space] = None
         self.observation_space: Optional[Space] = None
@@ -358,25 +340,10 @@ class ClientServiceCompilerEnv(CompilerEnv):
     def actions(self) -> List[ActionType]:
         return self._actions
 
-    @property
-    @deprecated(
-        version="0.2.1",
-        reason=(
-            "The `ClientServiceCompilerEnv.logger` attribute is deprecated. All ClientServiceCompilerEnv "
-            "instances share a logger named compiler_gym.service.client_service_compiler_env"
-        ),
-    )
-    def logger(self):
-        return _logger
-
-    @property
+    @memoized_property
     def versions(self) -> GetVersionReply:
         """Get the version numbers from the compiler service."""
-        if self._versions is None:
-            self._versions = self.service(
-                self.service.stub.GetVersion, GetVersionRequest()
-            )
-        return self._versions
+        return self.service(self.service.stub.GetVersion, GetVersionRequest())
 
     @property
     def version(self) -> str:
@@ -416,18 +383,18 @@ class ClientServiceCompilerEnv(CompilerEnv):
         )
 
     @property
-    def action_space(self) -> Space:
+    def action_space(self) -> ActionSpace:
         return self._action_space
 
     @action_space.setter
-    def action_space(self, action_space: Optional[str]):
+    def action_space(self, action_space: Optional[str]) -> None:
         self.action_space_name = action_space
         index = (
             [a.name for a in self.action_spaces].index(action_space)
             if self.action_space_name
             else 0
         )
-        self._action_space: NamedDiscrete = self.action_spaces[index]
+        self._action_space: ActionSpace = self.action_spaces[index]
 
     @property
     def action_spaces(self) -> List[str]:
@@ -652,12 +619,14 @@ class ClientServiceCompilerEnv(CompilerEnv):
         observation_space: Union[
             OptionalArgumentValue, str, ObservationSpaceSpec
         ] = OptionalArgumentValue.UNCHANGED,
+        timeout: float = 300,
     ) -> Optional[ObservationType]:
         return self._reset(
             benchmark=benchmark,
             action_space=action_space,
             observation_space=observation_space,
             reward_space=reward_space,
+            timeout=timeout,
             retry_count=0,
         )
 
@@ -667,6 +636,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
         action_space: Optional[str],
         observation_space: Union[OptionalArgumentValue, str, ObservationSpaceSpec],
         reward_space: Union[OptionalArgumentValue, str, Reward],
+        timeout: float,
         retry_count: int,
     ) -> Optional[ObservationType]:
         """Private implementation detail. Call `reset()`, not this."""
@@ -713,6 +683,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
                     action_space=action_space,
                     observation_space=observation_space,
                     reward_space=reward_space,
+                    timeout=timeout,
                     retry_count=retry_count + 1,
                 )
 
@@ -814,9 +785,15 @@ class ClientServiceCompilerEnv(CompilerEnv):
 
         # If the action space has changed, update it.
         if reply.HasField("new_action_space"):
-            self.action_space = self.service_message_converters.action_space_converter(
+            self._action_space = self.service_message_converters.action_space_converter(
                 reply.new_action_space
             )
+
+        # Re-send any session parameters that we marked as needing to be
+        # re-sent on reset(). Do this before any other initialization as they
+        # may affect the behavior of subsequent service calls.
+        if self._params_to_send_on_reset:
+            self.send_params(*[(p.key, p.value) for p in self._params_to_send_on_reset])
 
         self.reward.reset(benchmark=self.benchmark, observation_view=self.observation)
         if self.reward_space:
@@ -836,6 +813,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
         actions: Iterable[ActionType],
         observation_spaces: List[ObservationSpaceSpec],
         reward_spaces: List[Reward],
+        timeout: float = 300,
     ) -> StepType:
         """Take a step.
 
@@ -893,7 +871,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
             ],
         )
         try:
-            reply = _wrapped_step(self.service, request)
+            reply = _wrapped_step(self.service, request, timeout)
         except (
             ServiceError,
             ServiceTransportError,
@@ -931,7 +909,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
 
         # If the action space has changed, update it.
         if reply.HasField("new_action_space"):
-            self.action_space = self.service_message_converters.action_space_converter(
+            self._action_space = self.service_message_converters.action_space_converter(
                 reply.new_action_space
             )
 
@@ -985,6 +963,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
         reward_spaces: Optional[Iterable[Union[str, Reward]]] = None,
         observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
         rewards: Optional[Iterable[Union[str, Reward]]] = None,
+        timeout: float = 300,
     ) -> StepType:
         """:raises SessionNotFound: If :meth:`reset()
         <compiler_gym.envs.ClientServiceCompilerEnv.reset>` has not been called.
@@ -1016,7 +995,12 @@ class ClientServiceCompilerEnv(CompilerEnv):
                 category=DeprecationWarning,
             )
             reward_spaces = rewards
-        return self.multistep([action], observation_spaces, reward_spaces)
+        return self.multistep(
+            actions=[action],
+            observation_spaces=observation_spaces,
+            reward_spaces=reward_spaces,
+            timeout=timeout,
+        )
 
     def multistep(
         self,
@@ -1025,6 +1009,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
         reward_spaces: Optional[Iterable[Union[str, Reward]]] = None,
         observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
         rewards: Optional[Iterable[Union[str, Reward]]] = None,
+        timeout: float = 300,
     ):
         """:raises SessionNotFound: If :meth:`reset()
         <compiler_gym.envs.ClientServiceCompilerEnv.reset>` has not been called.
@@ -1072,7 +1057,10 @@ class ClientServiceCompilerEnv(CompilerEnv):
 
         # Perform the underlying environment step.
         observation_values, reward_values, done, info = self.raw_step(
-            actions, observation_spaces_to_compute, reward_spaces_to_compute
+            actions,
+            observation_spaces_to_compute,
+            reward_spaces_to_compute,
+            timeout=timeout,
         )
 
         # Translate observations lists back to the appropriate types.
@@ -1255,7 +1243,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
             **validation,
         )
 
-    def send_param(self, key: str, value: str) -> str:
+    def send_param(self, key: str, value: str, resend_on_reset: bool = False) -> str:
         """Send a single <key, value> parameter to the compiler service.
 
         See :meth:`send_params() <compiler_gym.envs.ClientServiceCompilerEnv.send_params>`
@@ -1265,14 +1253,19 @@ class ClientServiceCompilerEnv(CompilerEnv):
 
         :param value: The parameter value.
 
+        :param resend_on_reset: Whether to resend this parameter to the compiler
+            service on :code:`reset()`.
+
         :return: The response from the compiler service.
 
         :raises SessionNotFound: If called before :meth:`reset()
             <compiler_gym.envs.ClientServiceCompilerEnv.reset>`.
         """
-        return self.send_params((key, value))[0]
+        return self.send_params((key, value), resend_on_reset=resend_on_reset)[0]
 
-    def send_params(self, *params: Iterable[Tuple[str, str]]) -> List[str]:
+    def send_params(
+        self, *params: Iterable[Tuple[str, str]], resend_on_reset: bool = False
+    ) -> List[str]:
         """Send a list of <key, value> parameters to the compiler service.
 
         This provides a mechanism to send messages to the backend compilation
@@ -1289,17 +1282,25 @@ class ClientServiceCompilerEnv(CompilerEnv):
         :param params: A list of parameters, where each parameter is a
             :code:`(key, value)` tuple.
 
+        :param resend_on_reset: Whether to resend this parameter to the compiler
+            service on :code:`reset()`.
+
         :return: A list of string responses, one per parameter.
 
         :raises SessionNotFound: If called before :meth:`reset()
             <compiler_gym.envs.ClientServiceCompilerEnv.reset>`.
         """
+        params_to_send = [SessionParameter(key=k, value=v) for (k, v) in params]
+
+        if resend_on_reset:
+            self._params_to_send_on_reset += params_to_send
+
         if not self.in_episode:
             raise SessionNotFound("Must call reset() before send_params()")
 
         request = SendSessionParameterRequest(
             session_id=self._session_id,
-            parameter=[SessionParameter(key=k, value=v) for (k, v) in params],
+            parameter=params_to_send,
         )
         reply: SendSessionParameterReply = self.service(
             self.service.stub.SendSessionParameter, request

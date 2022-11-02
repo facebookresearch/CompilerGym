@@ -17,6 +17,7 @@ import numpy as np
 from compiler_gym.datasets import Benchmark, Dataset
 from compiler_gym.envs.llvm.benchmark_from_command_line import BenchmarkFromCommandLine
 from compiler_gym.envs.llvm.datasets import get_llvm_datasets
+from compiler_gym.envs.llvm.lexed_ir import LexedToken
 from compiler_gym.envs.llvm.llvm_benchmark import (
     ClangInvocation,
     get_system_library_flags,
@@ -27,7 +28,7 @@ from compiler_gym.envs.llvm.llvm_rewards import (
     CostFunctionReward,
     NormalizedReward,
 )
-from compiler_gym.errors import BenchmarkInitError
+from compiler_gym.errors import BenchmarkInitError, SessionNotFound
 from compiler_gym.service.client_service_compiler_env import ClientServiceCompilerEnv
 from compiler_gym.spaces import Box, Commandline
 from compiler_gym.spaces import Dict as DictSpace
@@ -309,6 +310,30 @@ class LlvmEnv(ClientServiceCompilerEnv):
                         for name, val in zip(AUTOPHASE_FEATURE_NAMES, base_observation)
                     },
                 },
+                {
+                    "id": "LexedIrTuple",
+                    "base_id": "LexedIr",
+                    "space": Sequence(
+                        name="LexedToken",
+                        size_range=(0, None),
+                        dtype=LexedToken,
+                    ),
+                    "translate": lambda base_observation: [
+                        LexedToken(tid, kind, cat, val)
+                        for tid, kind, cat, val in zip(
+                            base_observation["token_id"],
+                            base_observation["token_kind"],
+                            base_observation["token_category"],
+                            base_observation["token_value"],
+                        )
+                    ],
+                    "default_value": {
+                        "token_id": [],
+                        "token_kind": [],
+                        "token_category": [],
+                        "token_value": [],
+                    },
+                },
             ],
         )
 
@@ -338,7 +363,7 @@ class LlvmEnv(ClientServiceCompilerEnv):
 
     def reset(self, *args, **kwargs):
         try:
-            observation = super().reset(*args, **kwargs)
+            return super().reset(*args, **kwargs)
         except ValueError as e:
             # Catch and re-raise some known benchmark initialization errors with
             # a more informative error type.
@@ -353,15 +378,6 @@ class LlvmEnv(ClientServiceCompilerEnv):
             ):
                 raise BenchmarkInitError(str(e)) from e
             raise
-
-        # Resend the runtimes-per-observation session parameter, if it is a
-        # non-default value.
-        if self._runtimes_per_observation_count is not None:
-            self.runtime_observation_count = self._runtimes_per_observation_count
-        if self._runtimes_warmup_per_observation_count is not None:
-            self.runtime_warmup_runs_count = self._runtimes_warmup_per_observation_count
-
-        return observation
 
     def make_benchmark(
         self,
@@ -587,10 +603,12 @@ class LlvmEnv(ClientServiceCompilerEnv):
 
     @runtime_observation_count.setter
     def runtime_observation_count(self, n: int) -> None:
-        if self.in_episode:
-            self.send_param("llvm.set_runtimes_per_observation_count", str(n))
-        # NOTE(cummins): Keep this after the send_param() call because
-        # send_param() will raise an error if the valid is invalid.
+        try:
+            self.send_param(
+                "llvm.set_runtimes_per_observation_count", str(n), resend_on_reset=True
+            )
+        except SessionNotFound:
+            pass  # Not in session yet, will be sent on reset().
         self._runtimes_per_observation_count = n
 
     @property
@@ -623,12 +641,14 @@ class LlvmEnv(ClientServiceCompilerEnv):
 
     @runtime_warmup_runs_count.setter
     def runtime_warmup_runs_count(self, n: int) -> None:
-        if self.in_episode:
+        try:
             self.send_param(
-                "llvm.set_warmup_runs_count_per_runtime_observation", str(n)
+                "llvm.set_warmup_runs_count_per_runtime_observation",
+                str(n),
+                resend_on_reset=True,
             )
-        # NOTE(cummins): Keep this after the send_param() call because
-        # send_param() will raise an error if the valid is invalid.
+        except SessionNotFound:
+            pass  # Not in session yet, will be sent on reset().
         self._runtimes_warmup_per_observation_count = n
 
     def fork(self):

@@ -10,7 +10,7 @@ name: Pip install test
 on:
     workflow_dispatch:
     schedule:
-        - cron: 0 0 * * *  # daily
+        - cron: 0 0 * * * # daily
 
 jobs:
     test:
@@ -20,10 +20,10 @@ jobs:
             fail-fast: false
             matrix:
                 os: [ubuntu-latest, macos-latest]
-                python: [3.6, 3.7, 3.8, 3.9]
+                python: [3.7, 3.8, 3.9]
 
         steps:
-            - uses: actions/setup-python@v2
+            - uses: actions/setup-python@v4
               with:
                   python-version: ${{ matrix.python }}
 

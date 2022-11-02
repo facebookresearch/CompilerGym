@@ -3,48 +3,10 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """This module contains utility code for working with URIs."""
-import re
 from typing import Dict, List, Union
 from urllib.parse import ParseResult, parse_qs, urlencode, urlparse, urlunparse
 
-from deprecated.sphinx import deprecated
 from pydantic import BaseModel
-
-# === BEGIN DEPRECATED DECLARATIONS ===
-#
-# The following regular expression definitions have been deprecated and will be
-# removed in a future release! Please update your code to use the new
-# BenchmarkUri class defined in this file.
-
-# Regular expression that matches the full two-part URI prefix of a dataset:
-#     {{scheme}}://{{dataset}}
-#
-# An optional trailing slash is permitted.
-#
-# Example matches: "benchmark://foo-v0", "generator://bar-v0/".
-DATASET_NAME_PATTERN = r"(?P<dataset>(?P<dataset_protocol>[a-zA-z0-9-_]+)://(?P<dataset_name>[a-zA-z0-9-_]+-v(?P<dataset_version>[0-9]+)))/?"
-DATASET_NAME_RE = re.compile(DATASET_NAME_PATTERN)
-
-# Regular expression that matches the full three-part format of a benchmark URI:
-#     {{sceme}}://{{dataset}}/{{id}}
-#
-# Example matches: "benchmark://foo-v0/foo" or "generator://bar-v1/foo/bar.txt".
-BENCHMARK_URI_PATTERN = r"(?P<dataset>(?P<dataset_protocol>[a-zA-z0-9-_]+)://(?P<dataset_name>[a-zA-z0-9-_]+-v(?P<dataset_version>[0-9]+)))/(?P<benchmark_name>.+)$"
-BENCHMARK_URI_RE = re.compile(BENCHMARK_URI_PATTERN)
-
-# === END DEPRECATED DECLARATIONS ===
-
-
-@deprecated(
-    version="0.2.2",
-    reason=("Use compiler_gym.datasets.BenchmarkUri.canonicalize()"),
-)
-def resolve_uri_protocol(uri: str) -> str:
-    """Require that the URI has a scheme by applying a default "benchmark"
-    scheme if none is set."""
-    if "://" not in uri:
-        return f"benchmark://{uri}"
-    return uri
 
 
 class BenchmarkUri(BaseModel):

@@ -7,7 +7,6 @@ from abc import ABC, abstractmethod
 from typing import Iterable, List, Optional, Tuple, Union
 
 import gym
-from deprecated.sphinx import deprecated
 from gym.spaces import Space
 
 from compiler_gym.compiler_env_state import CompilerEnvState
@@ -184,14 +183,6 @@ class CompilerEnv(gym.Env, ABC):
 
     @property
     @abstractmethod
-    @deprecated(
-        version="0.2.1",
-    )
-    def logger(self):
-        raise NotImplementedError("abstract method")
-
-    @property
-    @abstractmethod
     def version(self) -> str:
         """The version string of the compiler service."""
         raise NotImplementedError("abstract method")
@@ -330,6 +321,13 @@ class CompilerEnv(gym.Env, ABC):
             >>> new_env.step(1) == env.step(1)
             True
 
+        .. note::
+
+            The client/service implementation of CompilerGym means that the
+            forked and base environments share a common backend resource. This
+            means that if either of them crash, such as due to a compiler
+            assertion, both environments must be reset.
+
         :return: A new environment instance.
         """
         raise NotImplementedError("abstract method")
@@ -345,6 +343,7 @@ class CompilerEnv(gym.Env, ABC):
         reward_space: Union[
             OptionalArgumentValue, str, Reward
         ] = OptionalArgumentValue.UNCHANGED,
+        timeout: float = 300,
     ) -> Optional[ObservationType]:
         """Reset the environment state.
 
@@ -381,9 +380,14 @@ class CompilerEnv(gym.Env, ABC):
             available spaces, see :class:`env.reward.spaces
             <compiler_gym.views.RewardView>`.
 
+        :param timeout: The maximum number of seconds to wait for reset to
+            succeed.
+
         :return: The initial observation.
 
-        :raises BenchmarkInitError: If the benchmark is invalid. In this case,
+        :raises BenchmarkInitError: If the benchmark is invalid. This can happen
+            if the benchmark contains code that the compiler does not support,
+            or because of some internal error within the compiler. In this case,
             another benchmark must be used.
 
         :raises TypeError: If no benchmark has been set, and the environment
@@ -399,6 +403,7 @@ class CompilerEnv(gym.Env, ABC):
         reward_spaces: Optional[Iterable[Union[str, Reward]]] = None,
         observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
         rewards: Optional[Iterable[Union[str, Reward]]] = None,
+        timeout: float = 300,
     ) -> StepType:
         """Take a step.
 
@@ -410,10 +415,13 @@ class CompilerEnv(gym.Env, ABC):
             requested spaces. The default :code:`env.observation_space` is not
             returned.
 
-        :param reward_spaces: A list of reward spaces to compute rewards from. If
-            provided, this changes the :code:`reward` element of the return
+        :param reward_spaces: A list of reward spaces to compute rewards from.
+            If provided, this changes the :code:`reward` element of the return
             tuple to be a list of rewards from the requested spaces. The default
             :code:`env.reward_space` is not returned.
+
+        :param timeout: The maximum number of seconds to wait for the step to
+            succeed. Accepts a float value. The default is 300 seconds.
 
         :return: A tuple of observation, reward, done, and info. Observation and
             reward are None if default observation/reward is not set.
@@ -428,6 +436,7 @@ class CompilerEnv(gym.Env, ABC):
         reward_spaces: Optional[Iterable[Union[str, Reward]]] = None,
         observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
         rewards: Optional[Iterable[Union[str, Reward]]] = None,
+        timeout: float = 300,
     ):
         """Take a sequence of steps and return the final observation and reward.
 
@@ -439,10 +448,13 @@ class CompilerEnv(gym.Env, ABC):
             requested spaces. The default :code:`env.observation_space` is not
             returned.
 
-        :param reward_spaces: A list of reward spaces to compute rewards from. If
-            provided, this changes the :code:`reward` element of the return
+        :param reward_spaces: A list of reward spaces to compute rewards from.
+            If provided, this changes the :code:`reward` element of the return
             tuple to be a list of rewards from the requested spaces. The default
             :code:`env.reward_space` is not returned.
+
+        :param timeout: The maximum number of seconds to wait for the steps to
+            succeed. Accepts a float value. The default is 300 seconds.
 
         :return: A tuple of observation, reward, done, and info. Observation and
             reward are None if default observation/reward is not set.

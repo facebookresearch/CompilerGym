@@ -4,7 +4,7 @@ Install the latest CompilerGym release using:
 
     pip install -U compiler_gym
 
-CompilerGym requires Python >= 3.6. The binary works on macOS and Linux (on
+CompilerGym requires Python >= 3.7. The binary works on macOS and Linux (on
 Ubuntu 18.04, Fedora 28, Debian 10 or newer equivalents).
 
 # Building from Source
@@ -31,7 +31,7 @@ Now proceed to [All platforms](#all-platforms) below.
 On debian-based linux systems, install the required toolchain using:
 
 ```sh
-sudo apt install -y clang-9 clang-format golang libjpeg-dev \
+sudo apt install -y clang clang-format golang libjpeg-dev \
   libtinfo5 m4 make patch zlib1g-dev tar bzip2 wget
 mkdir -pv ~/.local/bin
 wget https://github.com/bazelbuild/bazelisk/releases/download/v1.7.5/bazelisk-linux-amd64 -O ~/.local/bin/bazel
@@ -61,31 +61,31 @@ Then clone the CompilerGym source code using:
     git clone https://github.com/facebookresearch/CompilerGym.git
     cd CompilerGym
 
-There are two primary git branches: `stable` tracks the latest release;
-`development` is for bleeding edge features that may not yet be mature. Checkout
-your preferred branch and install the python development dependencies using:
+If you plan to contribute to CompilerGym, install the development environment
+requirements using:
 
-    git checkout stable
-    make init
+    make dev-init
 
-The `make init` target only needs to be run on initial setup and after pulling
-remote changes to the CompilerGym repository.
 
-## Building from source with Bazel
-
-It is recomended to build with Bazel.
-
-Run the test suite to confirm that everything is working:
-
-    make test
+### Building from source with Bazel
 
 To build and install the `compiler_gym` python package, run:
 
     make install
 
+Once this has completed, run the test suite on the installed package using:
+
+    make test
+
+This may take a while. There are a number of options to `make test`, see `make
+help` for more information.
+
+Each time you modify the sources it is necessary to rerun `make install` before
+`make test`.
+
 **NOTE:** To use the `compiler_gym` package that is installed by `make install`
 you must leave the root directory of this repository. Attempting to import
-`compiler_gym` while in the root of this repository will cause import errors.
+`compiler_gym` while in the root of this repository will cause an import error.
 
 When you are finished, you can deactivate and delete the conda
 environment using:
@@ -93,27 +93,26 @@ environment using:
     conda deactivate
     conda env remove -n compiler_gym
 
-## Building from source with CMake
+### Building from source with CMake
 
-Building with CMake is still experimental. Darwin is not supported with CMake.
+Building with CMake is experimental and supports only Linux.
 
-### Dependency instructions for Ubuntu
+Install the dependencies using:
 
-```bash
+```sh
 sudo apt-get install g++ lld \
   autoconf libtool ninja-build ccache git \
 ```
 
 Requires CMake (>=3.20).
 
-```bash
+```sh
 wget https://github.com/Kitware/CMake/releases/download/v3.20.5/cmake-3.20.5-linux-x86_64.sh -O cmake.sh
 bash cmake.sh --prefix=$HOME/.local --exclude-subdir --skip-license
 rm cmake.sh
 export PATH=$HOME/.local/bin:$PATH
 ```
 
-### Dependency Arguments
 By default most dependencies are built together with Compiler Gym. To search for a dependency instead use:
 
 ```
@@ -129,10 +128,10 @@ By default most dependencies are built together with Compiler Gym. To search for
 * `COMPILER_GYM_NLOHMANN_JSON_PROVIDER`
 * `COMPILER_GYM_PROTOBUF_PROVIDER`
 
-```bash
+```sh
 cmake \
-  -DCMAKE_C_COMPILER=clang-9 \
-  -DCMAKE_CXX_COMPILER=clang++-9 \
+  -DCMAKE_C_COMPILER=clang \
+  -DCMAKE_CXX_COMPILER=clang++ \
   -S "<path to source directory>" \
   -B "<path to build directory>"
 
@@ -145,30 +144,30 @@ Additional optional configuration arguments:
 
 * Enables testing.
 
-    ```bash
-    -DCOMPILER_GYM_BUILD_TESTS=ON
-    ```
+```sh
+-DCOMPILER_GYM_BUILD_TESTS=ON
+```
 
 * Builds additional tools required by some examples.
 
-    ```bash
-    -DCOMPILER_GYM_BUILD_EXAMPLES=ON
-    ```
+```sh
+-DCOMPILER_GYM_BUILD_EXAMPLES=ON
+```
 
 * For faster rebuilds.
 
-    ```bash
-    -DCMAKE_C_COMPILER_LAUNCHER=ccache
-    -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
-    ```
+```sh
+-DCMAKE_C_COMPILER_LAUNCHER=ccache
+-DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+```
 
 * For faster linking.
 
-    ```bash
-    -DCMAKE_EXE_LINKER_FLAGS_INIT="-fuse-ld=lld-9"
-    -DCMAKE_MODULE_LINKER_FLAGS_INIT="-fuse-ld=lld-9"
-    -DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=lld-9"
-    ```
+```sh
+-DCMAKE_EXE_LINKER_FLAGS_INIT="-fuse-ld=lld"
+-DCMAKE_MODULE_LINKER_FLAGS_INIT="-fuse-ld=lld"
+-DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=lld"
+```
 
 By default, CompilerGym builds LLVM from source. This takes a long time and a
 lot of compute resources. To prevent this, download a pre-compiled clang+llvm
@@ -177,7 +176,7 @@ page](https://github.com/llvm/llvm-project/releases/tag/llvmorg-10.0.0), unpack
 it, and pass path of the `lib/cmake/llvm` subdirectory in the archive you just
 extracted to `LLVM_DIR`:
 
-```
+```sh
 $ cmake ... \
     -DCOMPILER_GYM_LLVM_PROVIDER=external \
     -DLLVM_DIR=/path/to/llvm/lib/cmake/llvm

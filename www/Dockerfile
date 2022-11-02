@@ -17,7 +17,10 @@ RUN ln -s /lib/x86_64-linux-gnu/libtinfo.so.5 /lib/x86_64-linux-gnu/libtinfo.so
 
 # Install www dependencies.
 COPY requirements.txt requirements.txt
+
 RUN pip3 install --no-cache-dir -r requirements.txt
+# Intsall stable version of protobuf
+RUN pip3 install --no-cache-dir protobuf==3.13.0
 
 # Run the LLVM environment now to warm the CompilerGym caches.
 RUN python3 -m compiler_gym.bin.service --env=llvm-v0

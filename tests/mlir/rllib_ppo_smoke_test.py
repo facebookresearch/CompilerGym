@@ -3,11 +3,11 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 import random
+import warnings
 
 import gym
 import numpy as np
 import pytest
-import ray
 import torch
 from flaky import flaky
 from ray.rllib.agents.ppo import PPOTrainer
@@ -15,6 +15,11 @@ from ray.tune.registry import register_env
 
 from compiler_gym.wrappers.mlir import make_mlir_rl_wrapper_env
 from tests.test_main import main
+
+# Ignore import deprecation warnings from ray.
+with warnings.catch_warnings():
+    warnings.filterwarnings("ignore", category=DeprecationWarning)
+    import ray
 
 
 @flaky(max_runs=3, min_passes=1)
@@ -49,7 +54,10 @@ def test_rllib_ppo_smoke():
         "rollout_fragment_length": 2,
     }
     trainer = PPOTrainer(config=config)
-    trainer.train()
+    with warnings.catch_warnings():
+        # Ignore deprecation warnings from internal rllib implementation.
+        warnings.filterwarnings("ignore", category=DeprecationWarning)
+        trainer.train()
     ray.shutdown()
 
 

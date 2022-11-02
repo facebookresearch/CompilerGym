@@ -27,3 +27,43 @@ def memoized_property(func: Callable[..., Any]) -> Callable[..., Any]:
         return getattr(self, attribute_name)
 
     return decorator
+
+
+def frozen_class(cls):
+    """Prevents setting attributes on a class after construction.
+
+    Wrap a class definition to declare it frozen:
+
+        @frozen_class class MyClass:
+            def __init__(self):
+                self.foo = 0
+
+    Any attempt to set an attribute outside of construction will then raise an
+    error:
+
+        >>> c = MyClass()
+        >>> c.foo = 5
+        >>> c.bar = 10
+        TypeError
+    """
+    cls._frozen = False
+
+    def frozen_setattr(self, key, value):
+        if self._frozen and not hasattr(self, key):
+            raise TypeError(
+                f"Cannot set attribute {key} on frozen class {cls.__name__}"
+            )
+        object.__setattr__(self, key, value)
+
+    def init_decorator(func):
+        @functools.wraps(func)
+        def wrapper(self, *args, **kwargs):
+            func(self, *args, **kwargs)
+            self.__frozen = True
+
+        return wrapper
+
+    cls.__setattr__ = frozen_setattr
+    cls.__init__ = init_decorator(cls.__init__)
+
+    return cls

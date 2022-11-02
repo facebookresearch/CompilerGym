@@ -28,7 +28,7 @@ PYTHON ?= python3
 PYTEST_ARGS ?=
 
 # The path of the XML pytest coverage report to generate when running the
-# install-test-cov target.
+# test-cov target.
 COV_REPORT ?= $(ROOT)/coverage.xml
 
 DISTTOOLS_OUTS := \
@@ -54,8 +54,12 @@ uninstall:
 dgl-init:
 	python3 -c 'import dgl; print(dgl.__version__)' &>/dev/null || true
 
+# The target to use. This is a relative file path of the directory or file to
+# test. If not provided, all tests will be run
+TEST_TARGET ?= .
+
 test: dgl-init
-	pytest --no-success-flaky-report --benchmark-disable -n auto --durations=5 . --cov=compiler_gym --cov-report=xml:$(COV_REPORT) $(PYTEST_ARGS)
+	pytest --no-success-flaky-report --benchmark-disable -n auto --durations=5 $(TEST_TARGET) --cov=compiler_gym --cov-report=xml:$(COV_REPORT) $(PYTEST_ARGS)
 
 clean:
 	rm -rf $(DISTTOOLS_OUTS)

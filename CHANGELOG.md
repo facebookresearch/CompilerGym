@@ -1,3 +1,79 @@
+## Release 0.2.5 (2022-11-01)
+
+CompilerGym v0.2.5 adds a new LLVM dataset, two new observation spaces, and
+includes numerous updates and bug fixes.
+
+## Summary of Changes
+
+- [llvm] Added two new observation spaces, `LexedIr` and `LexedIrTuple`,
+  providing access to a sequence of IR tokens
+  ([#742](https://github.com/facebookresearch/CompilerGym/pull/742), thanks
+  @fivosts!).
+- [llvm] Added the "Jotaibench" benchmark suite, providing 18,761 new executable
+  C programs extracted from handwritten code on GitHub
+  ([#705](https://github.com/facebookresearch/CompilerGym/pull/705), thanks
+  @canesche!).
+- Added support for Python 3.10.
+- [llvm] Fixed a bug with non-terminating subprocesses
+  ([#741](https://github.com/facebookresearch/CompilerGym/pull/741), thanks
+  @thecoblack!).
+- [llvm] Fixed a bug where the incorrect number of runtimes were reported by
+  `reset()` ([#761](https://github.com/facebookresearch/CompilerGym/pull/761)),
+  and an incorrect number of warm up runs were being performed
+  ([#717](https://github.com/facebookresearch/CompilerGym/pull/717), thanks
+  @lqwk!).
+- [llvm] New leaderboard submission using GATv2 and DD-PPO
+  ([#728](https://github.com/facebookresearch/CompilerGym/pull/728), thanks
+  @anthony0727!).
+- Added the ability to set timeout on each of the individual environment
+  operations ([#716](https://github.com/facebookresearch/CompilerGym/pull/716),
+  thanks @ricardoprins!).
+* Added support for loading URLs in `CompilerEnvStateReader.read_paths()`
+  ([#692](https://github.com/facebookresearch/CompilerGym/pull/692), thanks
+  @thecoblack!).
+- Simplified Makefile rules: renamed `install-test` to `test` and deprecated
+  bazel test rules.
+- Fixed a bug where the `TimeLimit` wrapper would interfere with benchmark
+  iterator wrappers
+  ([#739](https://github.com/facebookresearch/CompilerGym/pull/739), thanks
+  @nluu175!).
+- [ci] Added CI test coverage of example services
+  ([#695](https://github.com/facebookresearch/CompilerGym/pull/695),
+  [#642](https://github.com/facebookresearch/CompilerGym/pull/642),
+  [#699](https://github.com/facebookresearch/CompilerGym/pull/699), thanks
+  @mostafaelhoushi!).
+- [ci] Updated Github actions to use Node v16.
+- Reduced verbosity and wall time of CMake builds.
+- Updates and fixes dependent package conflicts (fixes #771, #768).
+
+## Credits
+
+A huge thank you to all code contributors!
+
+* @anthony0727
+* @canesche made their first contribution in
+  [#705](https://github.com/facebookresearch/CompilerGym/pull/705)
+* @fivosts made their first contribution in
+  [#742](https://github.com/facebookresearch/CompilerGym/pull/742)
+* @jaopaulolc made their first contribution in
+  [#738](https://github.com/facebookresearch/CompilerGym/pull/738)
+* @lqwk made their first contribution in
+  [#717](https://github.com/facebookresearch/CompilerGym/pull/717)
+* @mostafaelhoushi
+* @nluu175 made their first contribution in
+  [#739](https://github.com/facebookresearch/CompilerGym/pull/739)
+* @ricardoprins made their first contribution in
+  [#716](https://github.com/facebookresearch/CompilerGym/pull/716)
+* @ryanrussell made their first contribution in
+  [#755](https://github.com/facebookresearch/CompilerGym/pull/755)
+* @sahirgomez1
+* @thecoblack
+* @youweiliang made their first contribution in
+  [#751](https://github.com/facebookresearch/CompilerGym/pull/751)
+
+**Full Changelog**:
+[v0.2.4...v0.2.5](https://github.com/facebookresearch/CompilerGym/compare/v0.2.4...v0.2.5)
+
 ## Release 0.2.4 (2022-05-24)
 
 This release adds a new compiler environment, new APIs, and a suite of backend

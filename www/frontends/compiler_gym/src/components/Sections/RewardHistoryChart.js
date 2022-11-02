@@ -49,6 +49,7 @@ const RewardHistoryChart = ({ session, highlightedPoint, handleClickOnChart }) =
       height: 18 + "%",
       width: panel.current?.clientWidth,
       animation: false,
+      style: { fontFamily: "'Menlo', sans-serif" },
     },
     title: {
       text: "Rewards",
