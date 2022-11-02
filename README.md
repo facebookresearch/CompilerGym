@@ -67,8 +67,12 @@ For a glimpse of what's to come, check out [our
 roadmap](https://github.com/facebookresearch/CompilerGym/projects/1).
 
 
-## News & Events
+## News
 
+- November 2022: CompilerGym v0.2.5 adds support for Python 3.10 and drops
+  support for 3.7. See [release
+  notes](https://github.com/facebookresearch/CompilerGym/releases/tag/v0.2.5)
+  for full details.
 - April 2022: ⭐️ CompilerGym wins the **distinguished paper award** at
   [CGO'22](https://conf.researchr.org/home/cgo-2022)! You can read our work
   [here](https://arxiv.org/pdf/2109.08267.pdf).
