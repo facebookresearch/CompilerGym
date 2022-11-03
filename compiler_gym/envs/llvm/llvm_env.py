@@ -30,9 +30,6 @@ from compiler_gym.envs.llvm.llvm_rewards import (
     NormalizedReward,
 )
 from compiler_gym.errors import BenchmarkInitError, SessionNotFound
-from compiler_gym.service.client_service_compiler_env import ClientServiceCompilerEnv
-from compiler_gym.spaces import Box
-from compiler_gym.errors import BenchmarkInitError
 from compiler_gym.service.client_service_compiler_env import (
     ClientServiceCompilerEnv,
     ServiceMessageConverters,
