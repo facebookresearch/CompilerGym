@@ -15,6 +15,12 @@ Constructing Benchmarks
 
 .. autofunction:: make_benchmark
 
+.. autofunction:: make_benchmark_from_source
+
+.. autofunction:: split_benchmark_by_function
+
+.. autofunction:: merge_benchmarks
+
 .. autoclass:: BenchmarkFromCommandLine
    :members:
 

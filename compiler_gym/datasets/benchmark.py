@@ -6,14 +6,13 @@ from concurrent.futures import as_completed
 from pathlib import Path
 from typing import Callable, Iterable, List, NamedTuple, Optional, Union
 
-from compiler_gym.util.decorators import frozen_class
 import compiler_gym.errors
 from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.errors import ValidationError
 from compiler_gym.service.proto import Benchmark as BenchmarkProto
 from compiler_gym.service.proto import File
 from compiler_gym.util import thread_pool
-from compiler_gym.util.decorators import memoized_property
+from compiler_gym.util.decorators import frozen_class, memoized_property
 
 # A validation callback is a function that takes a single CompilerEnv instance
 # as its argument and returns an iterable sequence of zero or more
