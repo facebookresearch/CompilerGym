@@ -3,7 +3,7 @@ type: ApexTrainer
 args:
     hiddens: [256]
     num_workers: 16  # NOTE(cummins): Device specific
-    framework: tf
+    framework: torch
     horizon: 45
     evaluation_config:
         explore: false

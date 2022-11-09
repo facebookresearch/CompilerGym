@@ -223,7 +223,7 @@ jobs:
             - name: Run the test suite
               run: |
                   make test-cov \
-                  PYTEST_ARGS="--ignore tests/llvm --ignore tests/gcc --ignore tests/loop_tool --ignore tests/mlir"
+                  PYTEST_ARGS="--ignore tests/llvm --ignore tests/gcc --ignore tests/loop_tool"
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
@@ -353,7 +353,7 @@ jobs:
               run: |
                   make test-cov \
                   CI=1 \
-                  PYTEST_ARGS="--ignore tests/llvm --ignore tests/gcc --ignore tests/loop_tool --ignore tests/mlir"
+                  PYTEST_ARGS="--ignore tests/llvm --ignore tests/gcc --ignore tests/loop_tool"
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2

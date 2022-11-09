@@ -13,6 +13,7 @@ import pytest
 import compiler_gym.envs.llvm  # noqa register environments
 from compiler_gym.envs.llvm import LlvmEnv
 from compiler_gym.envs.llvm.datasets import POJ104Dataset
+from compiler_gym.errors import BenchmarkInitError
 from tests.pytest_plugins.common import skip_on_ci
 from tests.test_main import main
 
@@ -34,7 +35,7 @@ def test_poj104_size(poj104_dataset: POJ104Dataset):
 
 
 @skip_on_ci
-@pytest.mark.parametrize("index", range(250))
+@pytest.mark.parametrize("index", range(100))
 def test_poj104_random_select(
     env: LlvmEnv, poj104_dataset: POJ104Dataset, index: int, tmpwd: Path
 ):
@@ -52,6 +53,21 @@ def test_poj104_random_benchmark(env: LlvmEnv, poj104_dataset: POJ104Dataset):
     benchmark = poj104_dataset.random_benchmark()
     env.reset(benchmark=benchmark)
     assert benchmark.source
+
+
+@pytest.mark.parametrize(
+    "uri",
+    [
+        "benchmark://poj104-v1/1/1486",
+    ],
+)
+def test_poj104_known_bad_bitcodes(env: LlvmEnv, uri: str):
+    # This test is intentionally structured in a way that if the benchmark does
+    # not raise an error, it still passes.
+    try:
+        env.reset(benchmark=uri)
+    except BenchmarkInitError as e:
+        assert "Failed to parse LLVM bitcode" in str(e)
 
 
 if __name__ == "__main__":

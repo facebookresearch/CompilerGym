@@ -4,7 +4,7 @@ args:
     model:
         fcnet_hiddens: [256, 256]
         fcnet_activation: relu
-    framework: tf
+    framework: torch
     horizon: 45
     evaluation_config:
         explore: false
