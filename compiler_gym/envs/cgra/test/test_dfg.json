@@ -1,0 +1,54 @@
+{
+	"entry_points": ["n3", "n5"],
+	"nodes": [{
+		"operation": "add",
+		"name": "n1"
+	},
+	{"operation": "mul",
+	"name": "n2"},
+	{
+		"operation": "load",
+		"name": "n3"
+	},
+	{
+		"operation": "store",
+		"name": "n4"
+	},
+	{
+		"operation": "load",
+		"name": "n5"
+	}
+	],
+	"edges": [
+		{
+			"name": "e1",
+			"from": "n3",
+			"to": "n1",
+			"type": "data"
+		},
+		{
+			"name": "e2",
+			"from": "n5",
+			"to": "n1",
+			"type": "data"
+		},
+		{
+			"name": "e3",
+			"from": "n1",
+			"to": "n2",
+			"type": "data"
+		},
+		{
+			"name": "e4",
+			"from": "n3",
+			"to": "n2",
+			"type": "data"
+		},
+		{
+			"name": "e5",
+			"from": "n2",
+			"to": "n4",
+			"type": "data"
+		}
+	]
+}

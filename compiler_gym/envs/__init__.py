@@ -5,6 +5,7 @@
 from compiler_gym import config
 from compiler_gym.envs.compiler_env import CompilerEnv
 from compiler_gym.envs.gcc import GccEnv
+from compiler_gym.envs.cgra import CgraEnv
 
 if config.enable_llvm_env:
     from compiler_gym.envs.llvm.llvm_env import LlvmEnv  # noqa: F401
@@ -18,6 +19,7 @@ __all__ = [
     "COMPILER_GYM_ENVS",
     "CompilerEnv",
     "GccEnv",
+    "CgraEnv",
     "LoopToolEnv",
 ]
 

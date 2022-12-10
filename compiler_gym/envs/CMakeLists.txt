@@ -8,6 +8,7 @@ cg_add_all_subdirs()
 set(ENVS_DEPS
     ::compiler_env
     compiler_gym::envs::gcc::gcc
+    compiler_gym::envs::cgra::cgra
     compiler_gym::envs::loop_tool::loop_tool
 )
 if(COMPILER_GYM_ENABLE_LLVM_ENV)
