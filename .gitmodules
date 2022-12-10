@@ -1,0 +1,3 @@
+[submodule "examples/loop_tune"]
+	path = examples/loop_tune
+	url = https://github.com/loopstack/loop_tune.git
