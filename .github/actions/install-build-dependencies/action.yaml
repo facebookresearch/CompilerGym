@@ -12,6 +12,8 @@ runs:
                   curl -L "https://github.com/bazelbuild/bazelisk/releases/download/v1.6.1/bazelisk-linux-amd64" > bazel
                   chmod +x bazel
                   sudo mv bazel /usr/local/bin/bazel
+                  wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+                  sudo apt-get update
                   sudo apt-get install -y clang-9 patchelf
               fi
               python -m pip install -U pip wheel
