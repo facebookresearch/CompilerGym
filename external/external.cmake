@@ -214,7 +214,7 @@ if(COMPILER_GYM_GRPC_PROVIDER STREQUAL "internal")
         "${CMAKE_CURRENT_BINARY_DIR}/external/grpc"
         GIT_REPOSITORY "https://github.com/grpc/grpc.git"
         GIT_TAG
-            b39ffcc425ea990a537f98ec6fe6a1dcb90470d7 # v1.45.2
+            0e34ec3396726ba44a7aaf752eccac0e998beaa8 # v1.49.2
         GIT_SUBMODULES ${_gRPC_GIT_SUBMODULES}
     )
     fetchcontent_makeavailable(grpc)
