@@ -176,13 +176,9 @@ bazel-fetch:
 		fi; \
 	done
 
-# NOTE(cummins): Workaround for grpc++ build failure caused by --cxxopt in
-# .bazelrc not being used. See: https://github.com/bazelbuild/bazel/issues/16371
-_BAZEL_CXXOPTS = "-std=c++17"
-
 bazel-build: bazel-fetch
 	$(PYTHON) -m pip install -r compiler_gym/requirements.txt -r compiler_gym/requirements_build.txt
-	BAZEL_CXXOPTS=$(_BAZEL_CXXOPTS) $(BAZEL) $(BAZEL_OPTS) build $(BAZEL_BUILD_OPTS) $(BUILD_TARGET)
+	$(BAZEL) $(BAZEL_OPTS) build $(BAZEL_BUILD_OPTS) $(BUILD_TARGET)
 
 bdist_wheel: bazel-build
 	$(PYTHON) setup.py bdist_wheel
