@@ -12,7 +12,7 @@ externalproject_add(
     cpuinfo
     PREFIX "${CMAKE_CURRENT_BINARY_DIR}/cpuinfo"
     GIT_REPOSITORY "https://github.com/pytorch/cpuinfo.git"
-    GIT_TAG 2e79955ecaec85da13ac8f1245a8b2afa10d31c2
+    GIT_TAG de2fa78ebb431db98489e78603e4f77c1f6c5c57
     CMAKE_ARGS
         -C "${CMAKE_CURRENT_BINARY_DIR}/cpuinfo_initial_cache.cmake"
         "-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}"

@@ -255,11 +255,10 @@ http_file(
 # === C++ cpuinfo ===
 
 http_archive(
-    name = "cpuinfo",
-    build_file_content = all_content,
-    sha256 = "b9874dbb2f9436c9d0d7f42aaf3f94f1af3da37bc0b250268760ada2507ca543",
-    strip_prefix = "cpuinfo-2e79955ecaec85da13ac8f1245a8b2afa10d31c2",
-    urls = ["https://github.com/pytorch/cpuinfo/archive/2e79955ecaec85da13ac8f1245a8b2afa10d31c2.tar.gz"],
+    name = "org_pytorch_cpuinfo",
+    sha256 = "0936848904943381b2c01321101614776e43d583840ee0f3ceeea1e3fb7405f7",
+    strip_prefix = "cpuinfo-de2fa78ebb431db98489e78603e4f77c1f6c5c57",
+    urls = ["https://github.com/pytorch/cpuinfo/archive/de2fa78ebb431db98489e78603e4f77c1f6c5c57.tar.gz"],
 )
 
 # === Csmith ===
