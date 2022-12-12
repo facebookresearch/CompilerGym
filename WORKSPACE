@@ -13,15 +13,6 @@ http_archive(
     ],
 )
 
-# === Google benchmark ===
-
-http_archive(
-    name = "com_github_google_benchmark",
-    sha256 = "6132883bc8c9b0df5375b16ab520fac1a85dc9e4cf5be59480448ece74b278d4",
-    strip_prefix = "benchmark-1.6.1",
-    url = "https://github.com/google/benchmark/archive/v1.6.1.tar.gz",
-)
-
 # === Google flags ===
 
 http_archive(
