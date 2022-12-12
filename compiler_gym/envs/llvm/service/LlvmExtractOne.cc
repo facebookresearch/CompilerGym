@@ -137,7 +137,6 @@ int main(int argc, char** argv) {
   }
   legacy::PassManager Passes;
   Passes.add(createGVExtractionPass(GVs));      // Extract the one function
-  Passes.add(createGlobalDCEPass());            // Delete unreachable globals
   Passes.add(createStripDeadDebugInfoPass());   // Remove dead debug info
   Passes.add(createStripDeadPrototypesPass());  // Remove dead func decls
 
