@@ -18,9 +18,7 @@ jobs:
               run: |
                   wget --quiet -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
                   sudo apt-get update
-                  sudo apt-get install clang-format-10
-                  sudo rm -f /usr/bin/clang-format
-                  sudo ln -s /usr/bin/clang-format-10 /usr/bin/clang-format
+                  sudo apt-get install clang-format
                   clang-format --version
 
             - name: Install go
@@ -57,7 +55,7 @@ jobs:
                   python3 -m pre_commit --version
 
             - name: Run pre-commit checks
-              # TODO(github.com/facebookresearch/CompilerGym/issues/1): Disable
-              # isort due to inconsistent results when run locally versus in
-              # the GitHub Actions environment.
+        # TODO(github.com/facebookresearch/CompilerGym/issues/1): Disable
+        # isort due to inconsistent results when run locally versus in
+        # the GitHub Actions environment.
               run: SKIP=isort python3 -m pre_commit run --all-files --show-diff-on-failure
