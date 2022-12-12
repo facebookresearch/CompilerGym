@@ -100,8 +100,7 @@ Building with CMake is experimental and supports only Linux.
 Install the dependencies using:
 
 ```sh
-sudo apt-get install g++ lld \
-  autoconf libtool ninja-build ccache git \
+sudo apt-get install g++ lld autoconf libtool ninja-build ccache git
 ```
 
 Requires CMake (>=3.20).
