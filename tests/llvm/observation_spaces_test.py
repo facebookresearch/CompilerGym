@@ -1196,6 +1196,7 @@ def test_object_text_size_observation_spaces(env: LlvmEnv):
 
     # Expected .text sizes for this benchmark: -O0, -O3, -Oz.
     crc32_code_sizes = {"darwin": [1171, 3825, 3289], "linux": [1183, 3961, 3286]}
+    actual_code_sizes = []
 
     key = "ObjectTextSizeBytes"
     space = env.observation.spaces[key]
@@ -1203,9 +1204,8 @@ def test_object_text_size_observation_spaces(env: LlvmEnv):
     assert space.deterministic
     assert space.platform_dependent
     value: int = env.observation[key]
-    print(value)  # For debugging in case of error.
     assert isinstance(value, int)
-    assert value == crc32_code_sizes[sys.platform][0]
+    actual_code_sizes.append(value)
 
     key = "ObjectTextSizeO0"
     space = env.observation.spaces[key]
@@ -1213,9 +1213,7 @@ def test_object_text_size_observation_spaces(env: LlvmEnv):
     assert space.deterministic
     assert space.platform_dependent
     value: int = env.observation[key]
-    print(value)  # For debugging in case of error.
     assert isinstance(value, int)
-    assert value == crc32_code_sizes[sys.platform][0]
 
     key = "ObjectTextSizeO3"
     space = env.observation.spaces[key]
@@ -1223,9 +1221,8 @@ def test_object_text_size_observation_spaces(env: LlvmEnv):
     assert space.deterministic
     assert space.platform_dependent
     value: int = env.observation[key]
-    print(value)  # For debugging in case of error.
     assert isinstance(value, int)
-    assert value == crc32_code_sizes[sys.platform][1]
+    actual_code_sizes.append(value)
 
     key = "ObjectTextSizeOz"
     space = env.observation.spaces[key]
@@ -1233,9 +1230,13 @@ def test_object_text_size_observation_spaces(env: LlvmEnv):
     assert space.deterministic
     assert space.platform_dependent
     value: int = env.observation[key]
-    print(value)  # For debugging in case of error.
     assert isinstance(value, int)
-    assert value == crc32_code_sizes[sys.platform][2]
+    actual_code_sizes.append(value)
+
+    # For debugging in case of error:
+    print("Expected code sizes:", crc32_code_sizes[sys.platform])
+    print("Actual code sizes:", actual_code_sizes)
+    assert crc32_code_sizes == actual_code_sizes
 
 
 def test_text_size_observation_spaces(env: LlvmEnv):
