@@ -14,7 +14,7 @@ runs:
                   sudo mv bazel /usr/local/bin/bazel
                   wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
                   sudo apt-get update
-                  sudo apt-get install -y clang patchelf
+                  sudo apt-get install -y clang patchelf libtinfo5
               fi
               python -m pip install -U pip wheel
               python -m pip install -r compiler_gym/requirements_build.txt -r compiler_gym/requirements.txt
