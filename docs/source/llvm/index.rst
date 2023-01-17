@@ -6,8 +6,8 @@ industry. It defines a machine independent intermediate representation (IR), and
 comprises a family of tools with frontends for C, C++, OpenCL, and many other
 languages.
 
-CompilerGym exposes the LLVM IR optimizer for reinforcement learning through an
-:class:`LlvmEnv <compiler_gym.envs.LlvmEnv>` environment.
+CompilerGym exposes the LLVM 10.0.0 IR optimizer for reinforcement learning
+through an :class:`LlvmEnv <compiler_gym.envs.LlvmEnv>` environment.
 
 .. contents:: Overview:
     :local:
@@ -16,8 +16,9 @@ CompilerGym exposes the LLVM IR optimizer for reinforcement learning through an
 Installation
 ------------
 
-The LLVM environments are self-installing and work out of the box. A pack of
-required runtime data is downloaded and cached on first use of the environments.
+The LLVM environments work out of the box and require no additional installation
+steps. On first-run, the environment downloads and caches runtime data, which
+takes a few moments. This requires a network connection.
 
 
 Datasets
