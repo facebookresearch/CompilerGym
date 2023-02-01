@@ -49,6 +49,7 @@ extensions = [
     "sphinx.ext.autosectionlabel",
     "sphinxemoji.sphinxemoji",
     "breathe",
+    "sphinx_reredirects",
 ]
 
 autosectionlabel_prefix_document = True
@@ -87,3 +88,7 @@ html_favicon = "_static/img/favicon.png"
 breathe_default_project = "CompilerGym"
 
 breathe_projects = {"CompilerGym": "../doxygen/xml"}
+
+redirects = {
+    "explorer/index.html": "https://compilergym.metademolab.com/",
+}
