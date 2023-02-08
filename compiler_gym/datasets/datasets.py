@@ -159,7 +159,7 @@ class Datasets:
     @staticmethod
     def _dataset_key_from_uri(uri: BenchmarkUri) -> str:
         if not (uri.scheme and uri.dataset):
-            raise ValueError(f"Invalid benchmark URI: '{uri}'")
+            raise LookupError(f"Invalid benchmark URI: '{uri}'")
         return f"{uri.scheme}://{uri.dataset}"
 
     def __getitem__(self, dataset: str) -> Dataset:

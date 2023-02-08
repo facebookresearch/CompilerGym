@@ -138,6 +138,11 @@ def test_datasets_get_item():
     assert datasets.dataset("benchmark://foo-v0") == da
     assert datasets["benchmark://foo-v0"] == da
 
+def test_datasets_contains():
+    da = MockDataset("benchmark://foo-v0")
+    datasets = Datasets([da])
+
+    assert "benchmark://foo-v0" in datasets
 
 def test_datasets_get_item_default_scheme():
     da = MockDataset("benchmark://foo-v0")
@@ -156,6 +161,12 @@ def test_datasets_get_item_lookup_miss():
 
     with pytest.raises(LookupError, match=r"^Dataset not found: benchmark://bar-v0$"):
         _ = datasets["benchmark://bar-v0"]
+
+def test_datasets_contains_lookup_miss():
+    da = MockDataset("benchmark://foo-v0")
+    datasets = Datasets([da])
+
+    assert "benchmark://bar-v0" not in datasets
 
 
 def test_benchmark_lookup_by_uri():
