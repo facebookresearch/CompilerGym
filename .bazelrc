@@ -4,6 +4,11 @@
 build --cxxopt='-std=c++17'
 test --cxxopt='-std=c++17'
 
+# Duplicate the `--cxxopt` flag here to workaround gRPC build issue. See:
+# https://github.com/bazelbuild/bazel/issues/16371
+build --host_cxxopt='-std=c++17'
+test --host_cxxopt='-std=c++17'
+
 # Workaround for broken grpc build on macOS.
 # See: https://github.com/bazelbuild/bazel/issues/4341
 build --copt -DGRPC_BAZEL_BUILD

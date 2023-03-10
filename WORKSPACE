@@ -13,15 +13,6 @@ http_archive(
     ],
 )
 
-# === Google benchmark ===
-
-http_archive(
-    name = "com_github_google_benchmark",
-    sha256 = "6132883bc8c9b0df5375b16ab520fac1a85dc9e4cf5be59480448ece74b278d4",
-    strip_prefix = "benchmark-1.6.1",
-    url = "https://github.com/google/benchmark/archive/v1.6.1.tar.gz",
-)
-
 # === Google flags ===
 
 http_archive(
@@ -102,10 +93,10 @@ rules_proto_toolchains()
 # Version should be kept in step with compiler_gym/requirements.txt.
 http_archive(
     name = "com_github_grpc_grpc",
-    sha256 = "e18b16f7976aab9a36c14c38180f042bb0fd196b75c9fd6a20a2b5f934876ad6",
-    strip_prefix = "grpc-1.45.2",
+    sha256 = "cdeb805385fba23242bf87073e68d590c446751e09089f26e5e0b3f655b0f089",
+    strip_prefix = "grpc-1.49.2",
     urls = [
-        "https://github.com/grpc/grpc/archive/v1.45.2.tar.gz",
+        "https://github.com/grpc/grpc/archive/v1.49.2.tar.gz",
     ],
 )
 
@@ -264,11 +255,10 @@ http_file(
 # === C++ cpuinfo ===
 
 http_archive(
-    name = "cpuinfo",
-    build_file_content = all_content,
-    sha256 = "b9874dbb2f9436c9d0d7f42aaf3f94f1af3da37bc0b250268760ada2507ca543",
-    strip_prefix = "cpuinfo-2e79955ecaec85da13ac8f1245a8b2afa10d31c2",
-    urls = ["https://github.com/pytorch/cpuinfo/archive/2e79955ecaec85da13ac8f1245a8b2afa10d31c2.tar.gz"],
+    name = "org_pytorch_cpuinfo",
+    sha256 = "0936848904943381b2c01321101614776e43d583840ee0f3ceeea1e3fb7405f7",
+    strip_prefix = "cpuinfo-de2fa78ebb431db98489e78603e4f77c1f6c5c57",
+    urls = ["https://github.com/pytorch/cpuinfo/archive/de2fa78ebb431db98489e78603e4f77c1f6c5c57.tar.gz"],
 )
 
 # === Csmith ===

@@ -8,6 +8,8 @@ runs:
           run: |
               if [ "$(uname)" = "Darwin" ]; then
                   brew install zlib
+              else
+                  sudo apt-get install libtinfo5
               fi
               python -m pip install -U pip wheel
           shell: bash

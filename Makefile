@@ -381,7 +381,6 @@ distclean: clean
 
 uninstall:
 	$(PYTHON) -m pip uninstall -y compiler_gym
-	$(MAKE) -C examples uninstall
 
 purge: distclean uninstall
 	rm -rf $(COMPILER_GYM_DATA_FILE_LOCATIONS)
