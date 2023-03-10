@@ -284,6 +284,16 @@ cg_py_test(
 
 cg_py_test(
   NAME
+    split_merge_integration_test
+  SRCS
+    "split_merge_integration_test.py"
+  DEPS
+    compiler_gym::compiler_gym
+    tests::test_main
+)
+
+cg_py_test(
+  NAME
     threading_test
   SRCS
     "threading_test.py"

@@ -1152,9 +1152,13 @@ class ClientServiceCompilerEnv(CompilerEnv):
         if state:
             self.reset(benchmark=state.benchmark)
             in_place = False
+            benchmark: str = state.benchmark
         else:
             state = self.state
             in_place = True
+            # Record the actual benchmark object to accommodate custom
+            # benchmarks.
+            benchmark: Benchmark = self.benchmark
 
         assert self.in_episode
 
@@ -1172,7 +1176,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
         try:
             with Timer() as walltime:
                 replay_target = self if in_place else fkd
-                replay_target.reset(benchmark=state.benchmark)
+                replay_target.reset(benchmark=benchmark)
                 # Use a while loop here so that we can `break` early out of the
                 # validation process in case a step fails.
                 while True:

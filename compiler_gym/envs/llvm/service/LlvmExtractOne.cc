@@ -40,6 +40,9 @@ static cl::opt<int> Nth("n", cl::desc("Extract the n-th function"), cl::value_de
                         cl::init(-1), cl::cat(ExtractOneOptions));
 static cl::opt<bool> CountOnly("count-only", cl::desc("Only count the number of funtions"),
                                cl::init(false), cl::cat(ExtractOneOptions));
+static cl::opt<bool> ConstInits("const-inits",
+                                cl::desc("Keep constant initializers (and export no functions)"),
+                                cl::init(false), cl::cat(ExtractOneOptions));
 static cl::opt<bool> Force("f", cl::desc("Enable binary output on terminals"),
                            cl::cat(ExtractOneOptions));
 static cl::opt<bool> OutputAssembly("S", cl::desc("Write output as LLVM assembly"), cl::Hidden,
@@ -98,21 +101,42 @@ int main(int argc, char** argv) {
     return 0;
   }
 
-  if (Functions.empty()) {
-    errs() << "No suitable functions\n";
-    return 1;
-  }
-  // Choose one
-  int keeperIndex = (Nth == -1 ? std::rand() : Nth) % Functions.size();
-  Function* Keeper = Functions[keeperIndex];
+  // List of GlobalValues to keep
+  std::vector<GlobalValue*> GVs = {};
+  // Comment to put at the top of the assembly file
+  std::string comment = "";
 
-  // Extract the function
-  ExitOnError ExitOnErr(std::string(*argv) + ": extracting function : ");
-  ExitOnErr(Keeper->materialize());
+  if (ConstInits) {
+    // Keep all the constants
+    for (GlobalVariable& GV : Module->globals()) {
+      if (GV.hasInitializer()) {
+        GVs.push_back(&GV);
+      }
+    }
+    // Set the comment
+    comment = "Keep Const Inits";
+  } else {
+    // Work out which function to extract
+    if (Functions.empty()) {
+      errs() << "No suitable functions\n";
+      return 1;
+    }
+    // Choose one
+    int keeperIndex = (Nth == -1 ? std::rand() : Nth) % Functions.size();
+    Function* Keeper = Functions[keeperIndex];
+
+    // Extract the function
+    ExitOnError ExitOnErr(std::string(*argv) + ": extracting function : ");
+    ExitOnErr(Keeper->materialize());
+
+    // Put it on the list
+    GVs.push_back(Keeper);
+
+    // Set the comment
+    comment = "KeeperIndex = " + std::to_string(keeperIndex);
+  }
   legacy::PassManager Passes;
-  std::vector<GlobalValue*> GVs = {Keeper};
   Passes.add(createGVExtractionPass(GVs));      // Extract the one function
-  Passes.add(createGlobalDCEPass());            // Delete unreachable globals
   Passes.add(createStripDeadDebugInfoPass());   // Remove dead debug info
   Passes.add(createStripDeadPrototypesPass());  // Remove dead func decls
 
@@ -128,7 +152,7 @@ int main(int argc, char** argv) {
   }
 
   if (OutputAssembly) {
-    Out.os() << "; KeeperIndex = " << keeperIndex << '\n';
+    Out.os() << "; " << comment << '\n';
     Passes.add(createPrintModulePass(Out.os(), "", PreserveAssemblyUseListOrder));
   } else if (Force || !CheckBitcodeOutputToConsole(Out.os())) {
     Passes.add(createBitcodeWriterPass(Out.os(), PreserveBitcodeUseListOrder));

@@ -281,6 +281,18 @@ py_test(
 )
 
 py_test(
+    name = "split_merge_integration_test",
+    timeout = "eternal",
+    srcs = ["split_merge_integration_test.py"],
+    flaky = 1,
+    shard_count = 8,
+    deps = [
+        "//compiler_gym",
+        "//tests:test_main",
+    ],
+)
+
+py_test(
     name = "threading_test",
     timeout = "short",
     srcs = ["threading_test.py"],

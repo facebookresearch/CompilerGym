@@ -568,8 +568,27 @@ def split_benchmark_by_function(
     if number_of_functions <= 0:
         raise ValueError("No functions found!")
 
-    # Iterate over the number of functions, extracting each one in turn.
     split_benchmarks: List[Benchmark] = []
+
+    # Extract all of the global initializers into a standalone benchmark.
+    with Popen(
+        [str(llvm.llvm_extract_one_path()), "-", "-const-inits", "-o", "-"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        stdin=subprocess.PIPE,
+    ) as p:
+        stdout, stderr = p.communicate(original_bitcode, timeout=timeout)
+        if p.returncode:
+            raise ValueError(
+                "Failed to extract constant initializers: " f"{stderr.decode('utf-8')}"
+            )
+        original_uri.params["function"] = "<constant initializers>"
+        split_benchmarks.append(
+            Benchmark.from_file_contents(uri=original_uri, data=stdout)
+        )
+        logger.debug("Extracted %s", original_uri)
+
+    # Iterate over the number of functions, extracting each one in turn.
     n = min(number_of_functions, maximum_function_count or number_of_functions)
     for i in range(n):
         with Popen(
