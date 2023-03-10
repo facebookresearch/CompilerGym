@@ -16,7 +16,7 @@ from flaky import flaky
 import examples.example_compiler_gym_service as example
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.errors import SessionNotFound
-from compiler_gym.spaces import Box, NamedDiscrete, Scalar, Sequence
+from compiler_gym.spaces import ActionSpace, Box, NamedDiscrete, Scalar, Sequence
 from compiler_gym.util.commands import Popen
 from tests.test_main import main
 
@@ -72,9 +72,11 @@ def test_versions(env: CompilerEnv):
 def test_action_space(env: CompilerEnv):
     """Test that the environment reports the service's action spaces."""
     assert env.action_spaces == [
-        NamedDiscrete(
-            name="default",
-            items=["a", "b", "c"],
+        ActionSpace(
+            NamedDiscrete(
+                name="default",
+                items=["a", "b", "c"],
+            )
         )
     ]
 

@@ -68,18 +68,13 @@ class NamedDiscrete(Discrete):
         else:
             return self.names[values]
 
-    def from_string(
-        self, values: Union[str, Iterable[str]]
-    ) -> Union[ActionType, List[ActionType]]:
+    def from_string(self, string: str) -> Union[ActionType, List[ActionType]]:
         """Convert a name, or list of names, to numeric values.
 
         :param values: A name, or list of names.
         :return: A numeric value, or list of numeric values.
         """
-        if isinstance(values, str):
-            return self.names.index(values)
-        else:
-            return [self.names.index(v) for v in values]
+        return [self.names.index(v) for v in string.split(" ")]
 
     def __eq__(self, other) -> bool:
         return (

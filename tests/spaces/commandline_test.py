@@ -36,7 +36,7 @@ def test_contains():
     assert not space.contains(4)
 
 
-def test_commandline():
+def test_to_and_from_string():
     space = Commandline(
         [
             CommandlineFlag(name="a", flag="-a", description=""),
@@ -46,8 +46,8 @@ def test_commandline():
         name="test",
     )
 
-    assert space.commandline([0, 1, 2]) == "-a -b -c"
-    assert space.from_commandline(space.commandline([0, 1, 2])) == [0, 1, 2]
+    assert space.to_string([0, 1, 2]) == "-a -b -c"
+    assert space.from_string(space.to_string([0, 1, 2])) == [0, 1, 2]
 
 
 if __name__ == "__main__":

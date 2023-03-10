@@ -16,6 +16,7 @@ from compiler_gym.envs.llvm.llvm_benchmark import (
     merge_benchmarks,
     split_benchmark_by_function,
 )
+from compiler_gym.envs.llvm.llvm_command_line import LlvmCommandLine
 from compiler_gym.envs.llvm.llvm_env import LlvmEnv
 
 # TODO(github.com/facebookresearch/CompilerGym/issues/506): Tidy up.
@@ -27,6 +28,7 @@ from compiler_gym.util.runfiles_path import runfiles_path
 
 __all__ = [
     "BenchmarkFromCommandLine",
+    "LlvmCommandLine",
     "ClangInvocation",
     "compute_observation",
     "get_system_library_flags",

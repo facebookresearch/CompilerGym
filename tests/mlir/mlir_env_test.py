@@ -14,6 +14,7 @@ from compiler_gym.envs import CompilerEnv, mlir
 from compiler_gym.envs.mlir import MlirEnv
 from compiler_gym.service.connection import CompilerGymServiceConnection
 from compiler_gym.spaces import (
+    ActionSpace,
     Box,
     Dict,
     Discrete,
@@ -57,56 +58,60 @@ def test_action_spaces_names(env: MlirEnv):
 
 
 def test_action_space(env: MlirEnv):
-    expected_action_space = SpaceSequence(
-        name="MatrixMultiplication",
-        size_range=[1, 4],
-        space=Dict(
-            name=None,
-            spaces={
-                "tile_options": Dict(
-                    name=None,
-                    spaces={
-                        "interchange_vector": Permutation(
-                            name=None,
-                            scalar_range=Scalar(name=None, min=0, max=2, dtype=int),
-                        ),
-                        "tile_sizes": Box(
-                            name=None,
-                            low=np.array([1] * 3, dtype=int),
-                            high=np.array([2**32] * 3, dtype=int),
-                            dtype=np.int64,
-                        ),
-                        "promote": Scalar(name=None, min=False, max=True, dtype=bool),
-                        "promote_full_tile": Scalar(
-                            name=None, min=False, max=True, dtype=bool
-                        ),
-                        "loop_type": NamedDiscrete(
-                            name=None,
-                            items=["loops", "affine_loops"],
-                        ),
-                    },
-                ),
-                "vectorize_options": Dict(
-                    name=None,
-                    spaces={
-                        "vectorize_to": NamedDiscrete(
-                            name=None,
-                            items=["dot", "matmul", "outer_product"],
-                        ),
-                        "vector_transfer_split": NamedDiscrete(
-                            name=None,
-                            items=["none", "linalg_copy", "vector_transfer"],
-                        ),
-                        "unroll_vector_transfers": Scalar(
-                            name=None,
-                            min=False,
-                            max=True,
-                            dtype=bool,
-                        ),
-                    },
-                ),
-            },
-        ),
+    expected_action_space = ActionSpace(
+        SpaceSequence(
+            name="MatrixMultiplication",
+            size_range=[1, 4],
+            space=Dict(
+                name=None,
+                spaces={
+                    "tile_options": Dict(
+                        name=None,
+                        spaces={
+                            "interchange_vector": Permutation(
+                                name=None,
+                                scalar_range=Scalar(name=None, min=0, max=2, dtype=int),
+                            ),
+                            "tile_sizes": Box(
+                                name=None,
+                                low=np.array([1] * 3, dtype=int),
+                                high=np.array([2**32] * 3, dtype=int),
+                                dtype=np.int64,
+                            ),
+                            "promote": Scalar(
+                                name=None, min=False, max=True, dtype=bool
+                            ),
+                            "promote_full_tile": Scalar(
+                                name=None, min=False, max=True, dtype=bool
+                            ),
+                            "loop_type": NamedDiscrete(
+                                name=None,
+                                items=["loops", "affine_loops"],
+                            ),
+                        },
+                    ),
+                    "vectorize_options": Dict(
+                        name=None,
+                        spaces={
+                            "vectorize_to": NamedDiscrete(
+                                name=None,
+                                items=["dot", "matmul", "outer_product"],
+                            ),
+                            "vector_transfer_split": NamedDiscrete(
+                                name=None,
+                                items=["none", "linalg_copy", "vector_transfer"],
+                            ),
+                            "unroll_vector_transfers": Scalar(
+                                name=None,
+                                min=False,
+                                max=True,
+                                dtype=bool,
+                            ),
+                        },
+                    ),
+                },
+            ),
+        )
     )
     assert expected_action_space == env.action_space
 

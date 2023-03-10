@@ -9,18 +9,21 @@ from tests.test_main import main
 pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 
-def test_commandline_no_actions(env: LlvmEnv):
+def test_to_and_from_string_no_actions(env: LlvmEnv):
     env.reset(benchmark="cbench-v1/crc32")
-    assert env.commandline() == "opt  input.bc -o output.bc"
-    assert env.commandline_to_actions(env.commandline()) == []
+    assert env.action_space.to_string(env.actions) == "opt  input.bc -o output.bc"
+    assert env.action_space.from_string(env.action_space.to_string(env.actions)) == []
 
 
-def test_commandline(env: LlvmEnv):
+def test_to_and_from_string(env: LlvmEnv):
     env.reset(benchmark="cbench-v1/crc32")
     env.step(env.action_space.flags.index("-mem2reg"))
     env.step(env.action_space.flags.index("-reg2mem"))
-    assert env.commandline() == "opt -mem2reg -reg2mem input.bc -o output.bc"
-    assert env.commandline_to_actions(env.commandline()) == [
+    assert (
+        env.action_space.to_string(env.actions)
+        == "opt -mem2reg -reg2mem input.bc -o output.bc"
+    )
+    assert env.action_space.from_string(env.action_space.to_string(env.actions)) == [
         env.action_space.flags.index("-mem2reg"),
         env.action_space.flags.index("-reg2mem"),
     ]

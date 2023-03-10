@@ -7,6 +7,16 @@ cg_add_all_subdirs()
 
 cg_py_test(
   NAME
+    action_space_test
+  SRCS
+    "action_space_test.py"
+  DEPS
+    compiler_gym::spaces::spaces
+    tests::test_main
+)
+
+cg_py_test(
+  NAME
     box_test
   SRCS
     "box_test.py"

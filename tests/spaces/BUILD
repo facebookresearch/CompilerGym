@@ -5,6 +5,16 @@
 load("@rules_python//python:defs.bzl", "py_test")
 
 py_test(
+    name = "action_space_test",
+    timeout = "short",
+    srcs = ["action_space_test.py"],
+    deps = [
+        "//compiler_gym/spaces",
+        "//tests:test_main",
+    ],
+)
+
+py_test(
     name = "box_test",
     timeout = "short",
     srcs = ["box_test.py"],

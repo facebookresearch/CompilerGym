@@ -97,7 +97,7 @@ class Autotuner(BaseModel):
 
         return CompilerEnvState(
             benchmark=env.benchmark.uri,
-            commandline=env.commandline(),
+            commandline=env.action_space.to_string(env.actions),
             walltime=timer.time,
             reward=self.optimization_target.final_reward(env),
         )

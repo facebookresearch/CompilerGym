@@ -83,7 +83,7 @@ class LoopToolCPUDataset(Dataset):
 
 register(
     id="loop_tool-v0",
-    entry_point="compiler_gym.envs.loop_tool.loop_tool_env:LoopToolEnv",
+    entry_point="compiler_gym.service.client_service_compiler_env:ClientServiceCompilerEnv",
     kwargs={
         "datasets": [LoopToolCPUDataset(), LoopToolCUDADataset()],
         "observation_space": "action_state",

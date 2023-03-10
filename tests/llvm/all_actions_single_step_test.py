@@ -19,7 +19,10 @@ def test_step(env: CompilerEnv, action_name: str):
     env.reward_space = "IrInstructionCount"
     env.observation_space = "Autophase"
     env.reset(benchmark="cbench-v1/crc32")
-    observation, reward, done, _ = env.step(env.action_space.from_string(action_name))
+
+    action = env.action_space.from_string(action_name)[0]
+
+    observation, reward, done, _ = env.step(action)
 
     assert isinstance(observation, np.ndarray)
     assert observation.shape == (AUTOPHASE_FEATURE_DIM,)

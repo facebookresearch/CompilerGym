@@ -166,10 +166,10 @@ def test_split_benchmark_by_function_repeated_split_single_function(env: Compile
     benchmark = llvm.make_benchmark_from_source("int A() {return 0;}", lang="c")
     for _ in range(10):
         benchmarks = llvm.split_benchmark_by_function(benchmark)
-        assert len(benchmarks) == 1
-        env.reset(benchmark=benchmarks[0])
+        assert len(benchmarks) == 2  # global initializers + extracted function
+        env.reset(benchmark=benchmarks[-1])
         assert is_defined("i32 @A()", env.ir)
-        benchmark = benchmarks[0]
+        benchmark = benchmarks[-1]
 
 
 def test_split_benchmark_by_function_multiple_functions(env: CompilerEnv):
@@ -182,8 +182,8 @@ int B() {return A();}
     )
 
     benchmarks = llvm.split_benchmark_by_function(benchmark)
-    assert len(benchmarks) == 2
-    A, B = benchmarks
+    assert len(benchmarks) == 3
+    _, A, B = benchmarks
 
     env.reset(benchmark=A)
     assert is_defined("i32 @A()", env.ir)
@@ -213,9 +213,9 @@ int B() {return A();}
         benchmark,
         maximum_function_count=1,
     )
-    assert len(benchmarks) == 1
+    assert len(benchmarks) == 2  # global initializers + extracted function
 
-    env.reset(benchmark=benchmarks[0])
+    env.reset(benchmark=benchmarks[1])
     assert is_defined("i32 @A()", env.ir)
 
 

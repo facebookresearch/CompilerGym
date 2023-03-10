@@ -7,11 +7,12 @@ from abc import ABC, abstractmethod
 from typing import Iterable, List, Optional, Tuple, Union
 
 import gym
+from deprecated.sphinx import deprecated
 from gym.spaces import Space
 
 from compiler_gym.compiler_env_state import CompilerEnvState
 from compiler_gym.datasets import Benchmark, BenchmarkUri, Dataset
-from compiler_gym.spaces import Reward
+from compiler_gym.spaces import ActionSpace, Reward
 from compiler_gym.util.gym_type_hints import (
     ActionType,
     ObservationType,
@@ -201,7 +202,7 @@ class CompilerEnv(gym.Env, ABC):
 
     @property
     @abstractmethod
-    def action_space(self) -> Space:
+    def action_space(self) -> ActionSpace:
         """The current action space.
 
         :getter: Get the current action space.
@@ -218,7 +219,7 @@ class CompilerEnv(gym.Env, ABC):
 
     @property
     @abstractmethod
-    def action_spaces(self) -> List[str]:
+    def action_spaces(self) -> List[ActionSpace]:
         """A list of supported action space names."""
         raise NotImplementedError("abstract method")
 
@@ -474,7 +475,9 @@ class CompilerEnv(gym.Env, ABC):
         """
         raise NotImplementedError("abstract method")
 
-    @abstractmethod
+    @deprecated(
+        version="0.2.5", reason="Use env.action_space.to_string(env.actions) instead"
+    )
     def commandline(self) -> str:
         """Interface for :class:`CompilerEnv <compiler_gym.envs.CompilerEnv>`
         subclasses to provide an equivalent commandline invocation to the
@@ -487,7 +490,9 @@ class CompilerEnv(gym.Env, ABC):
         """
         raise NotImplementedError("abstract method")
 
-    @abstractmethod
+    @deprecated(
+        version="0.2.5", reason='Use env.action_space.from_string("...") instead'
+    )
     def commandline_to_actions(self, commandline: str) -> List[ActionType]:
         """Interface for :class:`CompilerEnv <compiler_gym.envs.CompilerEnv>`
         subclasses to convert from a commandline invocation to a sequence of
