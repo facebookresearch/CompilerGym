@@ -1236,7 +1236,7 @@ def test_object_text_size_observation_spaces(env: LlvmEnv):
     # For debugging in case of error:
     print("Expected code sizes:", crc32_code_sizes[sys.platform])
     print("Actual code sizes:", actual_code_sizes)
-    assert crc32_code_sizes == actual_code_sizes
+    assert crc32_code_sizes[sys.platform] == actual_code_sizes
 
 
 def test_text_size_observation_spaces(env: LlvmEnv):
