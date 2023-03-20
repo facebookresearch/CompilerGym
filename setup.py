@@ -152,6 +152,7 @@ setup_kwargs = {
             "third_party/csmith/csmith/bin/csmith",
             "third_party/csmith/csmith/include/csmith-2.3.0/*.h",
             "third_party/inst2vec/*.pickle",
+            "third_party/ir2vec/*.txt",
         ]
     },
     "install_requires": requirements,

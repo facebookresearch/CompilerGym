@@ -109,6 +109,25 @@ else()
     find_package(glog REQUIRED)
 endif()
 
+# === IR2Vec ===
+# https://github.com/IITH-Compilers/IR2Vec
+
+set(COMPILER_GYM_IR2VEC_PROVIDER "internal"
+    CACHE STRING "Find or build IR2Vec together with Compiler Gym."
+)
+set_property(
+    CACHE COMPILER_GYM_IR2VEC_PROVIDER
+    PROPERTY STRINGS "internal" "external"
+)
+if(COMPILER_GYM_IR2VEC_PROVIDER STREQUAL "internal")
+    build_external_cmake_project(
+      NAME ir2vec
+      SRC_DIR     "${CMAKE_CURRENT_LIST_DIR}/ir2vec"
+    )
+else()
+    find_package(ir2vec REQUIRED)
+endif()
+
 # === LLVM ===
 
 set(COMPILER_GYM_LLVM_PROVIDER "internal"
@@ -434,6 +453,30 @@ if(COMPILER_GYM_ENABLE_LLVM_ENV)
     )
     find_package(Labm8 REQUIRED)
     find_package(ProGraML REQUIRED)
+endif()
+
+# === Eigen ===
+# https://eigen.tuxfamily.org/index.php?title=Main_Page
+
+set(COMPILER_GYM_EIGEN_PROVIDER "internal"
+    CACHE STRING "Find or build eigen together with Compiler Gym."
+)
+set_property(
+    CACHE COMPILER_GYM_EIGEN_PROVIDER
+    PROPERTY STRINGS "internal" "external"
+)
+if(COMPILER_GYM_EIGEN_PROVIDER STREQUAL "internal")
+    fetchcontent_declare(
+        eigen
+        PREFIX
+        "${CMAKE_CURRENT_BINARY_DIR}/external/eigen"
+        GIT_REPOSITORY "https://gitlab.com/libeigen/eigen.git"
+        GIT_TAG
+            21ae2afd4edaa1b69782c67a54182d34efe43f9c #tag: v3.3.7
+    )
+    list(APPEND FETCH_CONTENT_LIST eigen)
+else()
+    find_package(eigen REQUIRED)
 endif()
 
 fetchcontent_makeavailable(${FETCH_CONTENT_LIST})
