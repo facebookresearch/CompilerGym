@@ -60,7 +60,7 @@ int main(int argc, char** argv) {
   google::InitGoogleLogging(argv[0]);
 
   const fs::path workingDirectory{"."};
-  auto& benchmarkFactory = BenchmarkFactory::getSingleton(workingDirectory);
+  BenchmarkFactory benchmarkFactory(workingDirectory);
 
   for (int i = 1; i < argc; ++i) {
     stripOptNoneAttributesOrDie(argv[i], benchmarkFactory);

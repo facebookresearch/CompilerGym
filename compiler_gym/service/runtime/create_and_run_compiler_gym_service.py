@@ -18,7 +18,7 @@ from typing import Type
 import grpc
 from absl import app, flags, logging
 
-from compiler_gym.service import connection
+from compiler_gym.service import CompilerGymServiceContext, connection
 from compiler_gym.service.compilation_session import CompilationSession
 from compiler_gym.service.proto import compiler_gym_service_pb2_grpc
 from compiler_gym.service.runtime.compiler_gym_service import CompilerGymService
@@ -51,6 +51,9 @@ def _shutdown_handler(signal_number, stack_frame):  # pragma: no cover
 
 def create_and_run_compiler_gym_service(
     compilation_session_type: Type[CompilationSession],
+    compiler_gym_service_context_type: Type[
+        CompilerGymServiceContext
+    ] = CompilerGymServiceContext,
 ):  # pragma: no cover
     """Create and run an RPC service for the given compilation session.
 
@@ -92,52 +95,57 @@ def create_and_run_compiler_gym_service(
         logging.get_absl_handler().use_absl_log_file()
         logging.set_verbosity(dbg.get_logging_level())
 
-        # Create the service.
-        server = grpc.server(
-            futures.ThreadPoolExecutor(max_workers=FLAGS.rpc_service_threads),
-            options=connection.GRPC_CHANNEL_OPTIONS,
-        )
-        service = CompilerGymService(
-            working_directory=working_dir,
-            compilation_session_type=compilation_session_type,
-        )
-        compiler_gym_service_pb2_grpc.add_CompilerGymServiceServicer_to_server(
-            service, server
-        )
-
-        address = f"0.0.0.0:{FLAGS.port}" if FLAGS.port else "0.0.0.0:0"
-        port = server.add_insecure_port(address)
-
-        with atomic_file_write(working_dir / "port.txt", fileobj=True, mode="w") as f:
-            f.write(str(port))
-
-        with atomic_file_write(working_dir / "pid.txt", fileobj=True, mode="w") as f:
-            f.write(str(os.getpid()))
-
-        logging.info(
-            "Service %s listening on %d, PID = %d", working_dir, port, os.getpid()
-        )
-
-        server.start()
-
-        # Block on the RPC service in a separate thread. This enables the
-        # current thread to handle the shutdown routine.
-        server_thread = Thread(target=server.wait_for_termination)
-        server_thread.start()
-
-        # Block until the shutdown signal is received.
-        shutdown_signal.wait()
-        logging.info("Shutting down the RPC service")
-        server.stop(60).wait()
-        server_thread.join()
-        logging.info("Service closed")
-
-        if len(service.sessions):
-            print(
-                "ERROR: Killing a service with",
-                plural(len(service.session), "active session", "active sessions"),
-                file=sys.stderr,
+        with compiler_gym_service_context_type(working_dir) as context:
+            # Create the service.
+            server = grpc.server(
+                futures.ThreadPoolExecutor(max_workers=FLAGS.rpc_service_threads),
+                options=connection.GRPC_CHANNEL_OPTIONS,
             )
-            sys.exit(6)
+            service = CompilerGymService(
+                compilation_session_type=compilation_session_type,
+                context=context,
+            )
+            compiler_gym_service_pb2_grpc.add_CompilerGymServiceServicer_to_server(
+                service, server
+            )
+
+            address = f"0.0.0.0:{FLAGS.port}" if FLAGS.port else "0.0.0.0:0"
+            port = server.add_insecure_port(address)
+
+            with atomic_file_write(
+                working_dir / "port.txt", fileobj=True, mode="w"
+            ) as f:
+                f.write(str(port))
+
+            with atomic_file_write(
+                working_dir / "pid.txt", fileobj=True, mode="w"
+            ) as f:
+                f.write(str(os.getpid()))
+
+            logging.info(
+                "Service %s listening on %d, PID = %d", working_dir, port, os.getpid()
+            )
+
+            server.start()
+
+            # Block on the RPC service in a separate thread. This enables the
+            # current thread to handle the shutdown routine.
+            server_thread = Thread(target=server.wait_for_termination)
+            server_thread.start()
+
+            # Block until the shutdown signal is received.
+            shutdown_signal.wait()
+            logging.info("Shutting down the RPC service")
+            server.stop(60).wait()
+            server_thread.join()
+            logging.info("Service closed")
+
+            if len(service.sessions):
+                print(
+                    "ERROR: Killing a service with",
+                    plural(len(service.session), "active session", "active sessions"),
+                    file=sys.stderr,
+                )
+                sys.exit(6)
 
     app.run(main)

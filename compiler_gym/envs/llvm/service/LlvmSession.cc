@@ -20,6 +20,7 @@
 #include "compiler_gym/envs/llvm/service/Benchmark.h"
 #include "compiler_gym/envs/llvm/service/BenchmarkFactory.h"
 #include "compiler_gym/envs/llvm/service/Cost.h"
+#include "compiler_gym/envs/llvm/service/LlvmServiceContext.h"
 #include "compiler_gym/envs/llvm/service/Observation.h"
 #include "compiler_gym/envs/llvm/service/ObservationSpaces.h"
 #include "compiler_gym/envs/llvm/service/passes/10.0.0/ActionHeaders.h"
@@ -76,18 +77,19 @@ std::vector<ObservationSpace> LlvmSession::getObservationSpaces() const {
   return getLlvmObservationSpaceList();
 }
 
-LlvmSession::LlvmSession(const boost::filesystem::path& workingDirectory)
-    : CompilationSession(workingDirectory),
+LlvmSession::LlvmSession(CompilerGymServiceContext* const context)
+    : CompilationSession(context),
       observationSpaceNames_(util::createPascalCaseToEnumLookupTable<LlvmObservationSpace>()) {
+  // TODO: Move CPUInfo initialize to context setup!
   cpuinfo_initialize();
 }
 
 Status LlvmSession::init(const ActionSpace& actionSpace, const BenchmarkProto& benchmark) {
-  BenchmarkFactory& benchmarkFactory = BenchmarkFactory::getSingleton(workingDirectory());
+  LlvmServiceContext* const ctx = static_cast<LlvmServiceContext*>(context());
 
   // Get the benchmark or return an error.
   std::unique_ptr<Benchmark> llvmBenchmark;
-  RETURN_IF_ERROR(benchmarkFactory.getBenchmark(benchmark, &llvmBenchmark));
+  RETURN_IF_ERROR(ctx->benchmarkFactory().getBenchmark(benchmark, &llvmBenchmark));
 
   // Verify the benchmark now to catch errors early.
   RETURN_IF_ERROR(llvmBenchmark->verify_module());
@@ -101,7 +103,8 @@ Status LlvmSession::init(const ActionSpace& actionSpace, const BenchmarkProto& b
 Status LlvmSession::init(CompilationSession* other) {
   // TODO: Static cast?
   auto llvmOther = static_cast<LlvmSession*>(other);
-  return init(llvmOther->actionSpace(), llvmOther->benchmark().clone(workingDirectory()));
+  return init(llvmOther->actionSpace(),
+              llvmOther->benchmark().clone(context()->workingDirectory()));
 }
 
 Status LlvmSession::init(const LlvmActionSpace& actionSpace, std::unique_ptr<Benchmark> benchmark) {
@@ -156,7 +159,8 @@ Status LlvmSession::computeObservation(const ObservationSpace& observationSpace,
   }
   const LlvmObservationSpace observationSpaceEnum = it->second;
 
-  return setObservation(observationSpaceEnum, workingDirectory(), benchmark(), observation);
+  return setObservation(observationSpaceEnum, context()->workingDirectory(), benchmark(),
+                        observation);
 }
 
 Status LlvmSession::handleSessionParameter(const std::string& key, const std::string& value,
@@ -256,8 +260,8 @@ bool LlvmSession::runPass(llvm::FunctionPass* pass) {
 
 Status LlvmSession::runOptWithArgs(const std::vector<std::string>& optArgs) {
   // Create temporary files for `opt` to read from and write to.
-  const auto before_path = fs::unique_path(workingDirectory() / "module-%%%%%%%%.bc");
-  const auto after_path = fs::unique_path(workingDirectory() / "module-%%%%%%%%.bc");
+  const auto before_path = fs::unique_path(context()->workingDirectory() / "module-%%%%%%%%.bc");
+  const auto after_path = fs::unique_path(context()->workingDirectory() / "module-%%%%%%%%.bc");
   RETURN_IF_ERROR(writeBitcodeFile(benchmark().module(), before_path));
 
   // Build a command line invocation: `opt input.bc -o output.bc <optArgs...>`.

@@ -39,7 +39,7 @@ int main(int argc, char** argv) {
   benchmarkMessage.set_uri("user");
   benchmarkMessage.mutable_program()->set_uri(fmt::format("file:///{}", argv[2]));
 
-  auto& benchmarkFactory = BenchmarkFactory::getSingleton(workingDirectory);
+  BenchmarkFactory benchmarkFactory{workingDirectory};
   std::unique_ptr<::llvm_service::Benchmark> benchmark;
   {
     const auto status = benchmarkFactory.getBenchmark(benchmarkMessage, &benchmark);

@@ -46,21 +46,22 @@ constexpr size_t kMaxLoadedBenchmarksCount = 128;
 class BenchmarkFactory {
  public:
   /**
-   * Return the global benchmark factory singleton.
+   * Construct a benchmark factory.
    *
-   * @param workingDirectory The working directory.
-   * @param rand An optional random number generator. This is used for cache
-   *     evictions.
-   * @param maxLoadedBenchmarksCount The maximum number of benchmarks to cache.
-   * @return The benchmark factory singleton instance.
+   * @param workingDirectory A filesystem directory to use for storing temporary
+   *    files.
+   * @param rand is a random seed used to control the selection of random
+   *    benchmarks.
+   * @param maxLoadedBenchmarksCount is the maximum combined size of the bitcodes
+   *    that may be cached in memory. Once this size is reached, benchmarks are
+   *    offloaded so that they must be re-read from disk.
    */
-  static BenchmarkFactory& getSingleton(
-      const boost::filesystem::path& workingDirectory,
-      std::optional<std::mt19937_64> rand = std::nullopt,
-      size_t maxLoadedBenchmarksCount = kMaxLoadedBenchmarksCount) {
-    static BenchmarkFactory instance(workingDirectory, rand, maxLoadedBenchmarksCount);
-    return instance;
-  }
+  BenchmarkFactory(const boost::filesystem::path& workingDirectory,
+                   std::optional<std::mt19937_64> rand = std::nullopt,
+                   size_t maxLoadedBenchmarksCount = kMaxLoadedBenchmarksCount);
+
+  BenchmarkFactory(const BenchmarkFactory&) = delete;
+  BenchmarkFactory& operator=(const BenchmarkFactory&) = delete;
 
   ~BenchmarkFactory();
 
@@ -85,23 +86,6 @@ class BenchmarkFactory {
   [[nodiscard]] grpc::Status addBitcode(
       const std::string& uri, const boost::filesystem::path& path,
       std::optional<compiler_gym::BenchmarkDynamicConfig> dynamicConfig = std::nullopt);
-
-  /**
-   * Construct a benchmark factory.
-   *
-   * @param workingDirectory A filesystem directory to use for storing temporary
-   *    files.
-   * @param rand is a random seed used to control the selection of random
-   *    benchmarks.
-   * @param maxLoadedBenchmarksCount is the maximum combined size of the bitcodes
-   *    that may be cached in memory. Once this size is reached, benchmarks are
-   *    offloaded so that they must be re-read from disk.
-   */
-  BenchmarkFactory(const boost::filesystem::path& workingDirectory,
-                   std::optional<std::mt19937_64> rand, size_t maxLoadedBenchmarksCount);
-
-  BenchmarkFactory(const BenchmarkFactory&) = delete;
-  BenchmarkFactory& operator=(const BenchmarkFactory&) = delete;
 
   /**
    * A mapping from URI to benchmarks which have been loaded into memory.

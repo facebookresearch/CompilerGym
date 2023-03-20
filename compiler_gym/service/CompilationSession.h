@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "boost/filesystem.hpp"
+#include "compiler_gym/service/CompilerGymServiceContext.h"
 #include "compiler_gym/service/proto/compiler_gym_service.pb.h"
 
 namespace compiler_gym {
@@ -115,7 +116,7 @@ class CompilationSession {
   [[nodiscard]] virtual grpc::Status endOfStep(bool actionHadNoEffect, bool& endOfEpisode,
                                                std::optional<ActionSpace>& newActionSpace);
 
-  CompilationSession(const boost::filesystem::path& workingDirectory);
+  CompilationSession(CompilerGymServiceContext* const context);
 
   virtual ~CompilationSession() = default;
 
@@ -155,12 +156,16 @@ class CompilationSession {
    *    CompilationSession instances. Do not assume that you have exclusive
    *    access.
    *
+   * \deprecated Please use context()->workingDirectory() instead.
+   *
    * @return A path.
    */
-  inline const boost::filesystem::path& workingDirectory() { return workingDirectory_; }
+  inline const boost::filesystem::path& workingDirectory() { return context()->workingDirectory(); }
+
+  inline CompilerGymServiceContext* const context() const { return context_; }
 
  private:
-  const boost::filesystem::path workingDirectory_;
+  CompilerGymServiceContext* const context_;
 };
 
 }  // namespace compiler_gym

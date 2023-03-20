@@ -105,6 +105,7 @@ cc_library(
     hdrs = ["CreateAndRunCompilerGymServiceImpl.h"],
     deps = [
         ":CompilerGymService",
+        "//compiler_gym/service:CompilerGymServiceContext",
         "//compiler_gym/util:GrpcStatusMacros",
         "@boost//:filesystem",
         "@com_github_grpc_grpc//:grpc++",
