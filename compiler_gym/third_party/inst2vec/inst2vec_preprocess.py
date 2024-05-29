@@ -34,6 +34,21 @@ from compiler_gym.third_party.inst2vec import rgx_utils as rgx
 
 
 ########################################################################################################################
+# Helper functions: list and stmt handling
+########################################################################################################################
+def string_of_items(dic):
+    """
+    Return a string containing all keys of a dictionary, separated by a comma
+    (Helper function for structure inlining)
+    :param dic: dictionary [key=string: value=string]
+    :return: string constructed of the dictionaries' keys
+    """
+    s = ''
+    for k, v in dic.items():
+        s += k + ': ' + v + '\n'
+    return s
+
+########################################################################################################################
 # LLVM IR preprocessing
 ########################################################################################################################
 def GetFunctionsDeclaredInFile(bytecode_lines):
