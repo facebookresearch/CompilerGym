@@ -63,7 +63,7 @@ cc_binary(
     name = "compiler_gym-llvm-service-prelinked",
     srcs = ["RunService.cc"],
     deps = [
-        ":BenchmarkFactory",
+        ":LlvmServiceContext",
         ":LlvmSession",
         "//compiler_gym/service/runtime:cc_runtime",
     ],
@@ -251,6 +251,18 @@ genrule(
 )
 
 cc_library(
+    name = "LlvmServiceContext",
+    srcs = ["LlvmServiceContext.cc"],
+    hdrs = ["LlvmServiceContext.h"],
+    deps = [
+        ":BenchmarkFactory",
+        "//compiler_gym/service:CompilerGymServiceContext",
+        "//compiler_gym/util:GrpcStatusMacros",
+        "@llvm//10.0.0",
+    ],
+)
+
+cc_library(
     name = "LlvmSession",
     srcs = ["LlvmSession.cc"],
     hdrs = [
@@ -267,6 +279,7 @@ cc_library(
         ":Benchmark",
         ":BenchmarkFactory",
         ":Cost",
+        ":LlvmServiceContext",
         ":Observation",
         ":ObservationSpaces",
         "//compiler_gym/service:CompilationSession",
