@@ -295,7 +295,6 @@ cc_library(
     name = "fmt",
     srcs = glob(["src/*.cc"]),
     hdrs = glob(["include/fmt/*.h"]),
-    copts = ["-Iexternal/fmt/include"],
     strip_include_prefix = "include",
     visibility = ["//visibility:public"],
 )
@@ -332,3 +331,50 @@ http_archive(
 load("@programl//tools:bzl/deps.bzl", "programl_deps")
 
 programl_deps()
+
+# === IR2Vec ===
+# https://github.com/IITH-Compilers/IR2Vec
+
+http_archive(
+    name = "ir2vec",
+    build_file_content = """
+genrule(
+    name = "version",
+    outs = ["version.h"],
+    cmd = "echo '#define IR2VEC_VERSION \\"1\\"' > $@",
+)
+
+cc_library(
+    name = "ir2vec",
+    srcs = glob(["src/*.cpp"]) + [":version.h"],
+    hdrs = glob(["src/include/*.h"]),
+    copts = ["-Iexternal/ir2vec/src/include"],
+    strip_include_prefix = "src/include",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@eigen//:eigen",
+        "@llvm//10.0.0",
+    ],
+)
+""",
+    sha256 = "f6c5af059840889e584c13331fabc6a469c40cdf0e44b3284e7db4fe9093289c",
+    strip_prefix = "IR2Vec-828e50584b9c8bc305208e22d2cca272bdb1ab64",
+    urls = ["https://github.com/ChrisCummins/IR2Vec/archive/828e50584b9c8bc305208e22d2cca272bdb1ab64.tar.gz"],
+)
+
+# === Eigen ===
+# https://eigen.tuxfamily.org/index.php?title=Main_Page
+
+http_archive(
+    name = "eigen",
+    build_file_content = """
+cc_library(
+    name = "eigen",
+    hdrs = glob(["Eigen/**/*"]),
+    visibility = ["//visibility:public"],
+)
+""",
+    sha256 = "d56fbad95abf993f8af608484729e3d87ef611dd85b3380a8bad1d5cbc373a57",
+    strip_prefix = "eigen-3.3.7",
+    urls = ["https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.tar.gz"],
+)

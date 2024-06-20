@@ -17,6 +17,8 @@ filegroup(
     name = "service",
     srcs = [
         ":compiler_gym-llvm-service",
+        # Runtime data dependencies:
+        "//compiler_gym/third_party/ir2vec:embeddings",
     ] + select({
         "@llvm//:darwin": [],
         "//conditions:default": [
@@ -303,6 +305,7 @@ cc_library(
         "//compiler_gym/util:GrpcStatusMacros",
         "@boost//:filesystem",
         "@glog",
+        "@ir2vec",
         "@llvm//10.0.0",
         "@magic_enum",
         "@nlohmann_json//:json",
