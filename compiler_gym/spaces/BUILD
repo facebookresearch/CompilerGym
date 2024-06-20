@@ -21,6 +21,7 @@ py_library(
         ":permutation",
         ":reward",
         ":runtime_reward",
+        ":runtime_series_reward",
         ":scalar",
         ":sequence",
         ":space_sequence",
@@ -86,6 +87,16 @@ py_library(
 py_library(
     name = "runtime_reward",
     srcs = ["runtime_reward.py"],
+    deps = [
+        ":reward",
+        "//compiler_gym/errors",
+        "//compiler_gym/util",
+    ],
+)
+
+py_library(
+    name = "runtime_series_reward",
+    srcs = ["runtime_series_reward.py"],
     deps = [
         ":reward",
         "//compiler_gym/errors",
