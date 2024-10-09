@@ -102,6 +102,17 @@ def test_populated_dataset_benchmark_lookup_not_found(populated_dataset: FilesDa
         populated_dataset.benchmark("benchmark://test-v0/not/a/file")
 
 
+@pytest.mark.parametrize("bad_path", (
+        "../../file.txt",
+        "subdir/../../../../file.txt",
+))
+def test_populated_dataset_benchmark_lookup_parent_directory(populated_dataset: FilesDataset, bad_path: str):
+    with pytest.raises(
+        LookupError, match=F"Invalid URL: benchmark://test-v0/{bad_path}"
+    ):
+        populated_dataset.benchmark(f"benchmark://test-v0/{bad_path}")
+
+
 def test_populated_dataset_with_file_extension_filter(populated_dataset: FilesDataset):
     populated_dataset.benchmark_file_suffix = ".jpg"
     assert list(populated_dataset.benchmark_uris()) == [

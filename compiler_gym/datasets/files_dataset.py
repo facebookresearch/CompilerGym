@@ -122,6 +122,10 @@ class FilesDataset(Dataset):
                 f"{self.dataset_root}/{uri.path}{self.benchmark_file_suffix}"
             )
         )
+        # Limit file access to within dataset root. E.g. error on
+        # `../../parent.txt`.
+        if not os.path.realpath(path).startswith(os.path.realpath(self.dataset_root)):
+            raise LookupError(f"Invalid URL: {uri.path}")
         if not path.is_file():
             raise LookupError(f"Benchmark not found: {uri} (file not found: {path})")
         return self.benchmark_class.from_file(uri, path)
