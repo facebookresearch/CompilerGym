@@ -17,27 +17,26 @@ namespace compiler_gym::runtime {
 
 template <typename CompilationSessionType>
 CompilerGymService<CompilationSessionType>::CompilerGymService(
-    const boost::filesystem::path& workingDirectory, std::unique_ptr<BenchmarkCache> benchmarks)
-    : workingDirectory_(workingDirectory),
-      actionSpaces_(CompilationSessionType(workingDirectory).getActionSpaces()),
-      observationSpaces_(CompilationSessionType(workingDirectory).getObservationSpaces()),
+    CompilerGymServiceContext* const context, std::unique_ptr<BenchmarkCache> benchmarks)
+    : context_(context),
+      actionSpaces_(CompilationSessionType(context).getActionSpaces()),
+      observationSpaces_(CompilationSessionType(context).getObservationSpaces()),
       benchmarks_(benchmarks ? std::move(benchmarks) : std::make_unique<BenchmarkCache>()),
       nextSessionId_(0) {}
 
 template <typename CompilationSessionType>
 grpc::Status CompilerGymService<CompilationSessionType>::GetVersion(
-    grpc::ServerContext* context, const GetVersionRequest* request, GetVersionReply* reply) {
+    grpc::ServerContext* serverContext, const GetVersionRequest* request, GetVersionReply* reply) {
   VLOG(2) << "GetVersion()";
   reply->set_service_version(COMPILER_GYM_VERSION);
-  CompilationSessionType environment(workingDirectory());
+  CompilationSessionType environment(context());
   reply->set_compiler_version(environment.getCompilerVersion());
   return grpc::Status::OK;
 }
 
 template <typename CompilationSessionType>
-grpc::Status CompilerGymService<CompilationSessionType>::GetSpaces(grpc::ServerContext* context,
-                                                                   const GetSpacesRequest* request,
-                                                                   GetSpacesReply* reply) {
+grpc::Status CompilerGymService<CompilationSessionType>::GetSpaces(
+    grpc::ServerContext* serverContext, const GetSpacesRequest* request, GetSpacesReply* reply) {
   VLOG(2) << "GetSpaces()";
   for (const auto& actionSpace : actionSpaces_) {
     *reply->add_action_space_list() = actionSpace;
@@ -50,7 +49,8 @@ grpc::Status CompilerGymService<CompilationSessionType>::GetSpaces(grpc::ServerC
 
 template <typename CompilationSessionType>
 grpc::Status CompilerGymService<CompilationSessionType>::StartSession(
-    grpc::ServerContext* context, const StartSessionRequest* request, StartSessionReply* reply) {
+    grpc::ServerContext* serverContext, const StartSessionRequest* request,
+    StartSessionReply* reply) {
   if (!request->benchmark().uri().size()) {
     return grpc::Status(grpc::StatusCode::INVALID_ARGUMENT,
                         "No benchmark URI set for StartSession()");
@@ -72,7 +72,7 @@ grpc::Status CompilerGymService<CompilationSessionType>::StartSession(
   }
 
   // Construct the new session.
-  auto environment = std::make_unique<CompilationSessionType>(workingDirectory());
+  auto environment = std::make_unique<CompilationSessionType>(context());
 
   // Resolve the action space.
   const ActionSpace* actionSpace;
@@ -96,7 +96,8 @@ grpc::Status CompilerGymService<CompilationSessionType>::StartSession(
 
 template <typename CompilationSessionType>
 grpc::Status CompilerGymService<CompilationSessionType>::ForkSession(
-    grpc::ServerContext* context, const ForkSessionRequest* request, ForkSessionReply* reply) {
+    grpc::ServerContext* serverContext, const ForkSessionRequest* request,
+    ForkSessionReply* reply) {
   const std::lock_guard<std::mutex> lock(sessionsMutex_);
 
   CompilationSession* baseSession;
@@ -104,7 +105,7 @@ grpc::Status CompilerGymService<CompilationSessionType>::ForkSession(
   VLOG(1) << "ForkSession(" << request->session_id() << "), [" << nextSessionId_ << "]";
 
   // Construct the new session.
-  auto forked = std::make_unique<CompilationSessionType>(workingDirectory());
+  auto forked = std::make_unique<CompilationSessionType>(context());
 
   // Initialize from the base environment.
   RETURN_IF_ERROR(forked->init(baseSession));
@@ -116,7 +117,7 @@ grpc::Status CompilerGymService<CompilationSessionType>::ForkSession(
 
 template <typename CompilationSessionType>
 grpc::Status CompilerGymService<CompilationSessionType>::EndSession(
-    grpc::ServerContext* context, const EndSessionRequest* request, EndSessionReply* reply) {
+    grpc::ServerContext* serverContext, const EndSessionRequest* request, EndSessionReply* reply) {
   VLOG(1) << "EndSession(id=" << request->session_id() << "), " << sessionCount() - 1
           << " sessions remaining";
 
@@ -135,7 +136,7 @@ grpc::Status CompilerGymService<CompilationSessionType>::EndSession(
 }
 
 template <typename CompilationSessionType>
-grpc::Status CompilerGymService<CompilationSessionType>::Step(grpc::ServerContext* context,
+grpc::Status CompilerGymService<CompilationSessionType>::Step(grpc::ServerContext* serverContext,
                                                               const StepRequest* request,
                                                               StepReply* reply) {
   CompilationSession* environment;
@@ -184,7 +185,8 @@ grpc::Status CompilerGymService<CompilationSessionType>::Step(grpc::ServerContex
 
 template <typename CompilationSessionType>
 grpc::Status CompilerGymService<CompilationSessionType>::AddBenchmark(
-    grpc::ServerContext* context, const AddBenchmarkRequest* request, AddBenchmarkReply* reply) {
+    grpc::ServerContext* serverContext, const AddBenchmarkRequest* request,
+    AddBenchmarkReply* reply) {
   // We need to grab the sessions lock here to ensure thread safe access to the
   // benchmarks cache.
   const std::lock_guard<std::mutex> lock(sessionsMutex_);
@@ -199,7 +201,7 @@ grpc::Status CompilerGymService<CompilationSessionType>::AddBenchmark(
 
 template <typename CompilationSessionType>
 grpc::Status CompilerGymService<CompilationSessionType>::SendSessionParameter(
-    grpc::ServerContext* context, const SendSessionParameterRequest* request,
+    grpc::ServerContext* serverContext, const SendSessionParameterRequest* request,
     SendSessionParameterReply* reply) {
   CompilationSession* environment;
   RETURN_IF_ERROR(session(request->session_id(), &environment));

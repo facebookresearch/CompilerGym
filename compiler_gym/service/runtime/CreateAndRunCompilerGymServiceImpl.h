@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "boost/filesystem.hpp"
+#include "compiler_gym/service/CompilerGymServiceContext.h"
 #include "compiler_gym/service/proto/compiler_gym_service.pb.h"
 #include "compiler_gym/service/runtime/CompilerGymService.h"
 
@@ -50,7 +51,8 @@ void setGrpcChannelOptions(grpc::ServerBuilder& builder);
 //     int main(int argc, char** argv) {
 //       createAndRunCompilerGymServiceImpl(argc, argv, "usage string");
 //     }
-template <typename CompilationSessionType>
+template <typename CompilationSessionType,
+          typename CompilerGymServiceContextType = CompilerGymServiceContext>
 [[nodiscard]] int createAndRunCompilerGymServiceImpl(int argc, char** argv, const char* usage) {
   // Register a signal handler for SIGTERM that will set the shutdown_signal
   // future value.
@@ -80,7 +82,19 @@ template <typename CompilationSessionType>
 
   google::InitGoogleLogging(argv[0]);
 
-  CompilerGymService<CompilationSessionType> service{workingDirectory};
+  // Create and initialize the service context.
+  CompilerGymServiceContextType context{workingDirectory};
+  Status status = context.init();
+  if (!status.ok()) {
+    LOG(ERROR) << "Error during initialization of service context: " << status.error_message();
+    status = context.shutdown();
+    if (!status.ok()) {
+      LOG(ERROR) << "Error during shutdown of service context: " << status.error_message();
+    }
+    return 1;
+  }
+
+  CompilerGymService<CompilationSessionType> service{&context};
 
   grpc::ServerBuilder builder;
   builder.RegisterService(&service);
@@ -129,7 +143,14 @@ template <typename CompilationSessionType>
   VLOG(2) << "Shutting down the RPC service";
   server->Shutdown();
   serverThread.join();
+
   VLOG(2) << "Service closed";
+
+  status = context.shutdown();
+  if (!status.ok()) {
+    LOG(ERROR) << "Error during shutdown of service context: " << status.error_message();
+    return 1;
+  }
 
   if (service.sessionCount()) {
     LOG(ERROR) << "ERROR: Killing a service with " << service.sessionCount()

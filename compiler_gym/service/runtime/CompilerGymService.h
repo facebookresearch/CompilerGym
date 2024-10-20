@@ -28,7 +28,7 @@ namespace compiler_gym::runtime {
 template <typename CompilationSessionType>
 class CompilerGymService final : public compiler_gym::CompilerGymService::Service {
  public:
-  CompilerGymService(const boost::filesystem::path& workingDirectory,
+  CompilerGymService(CompilerGymServiceContext* const context,
                      std::unique_ptr<BenchmarkCache> benchmarks = nullptr);
 
   // RPC endpoints.
@@ -77,7 +77,7 @@ class CompilerGymService final : public compiler_gym::CompilerGymService::Servic
   [[nodiscard]] grpc::Status observation_space(const CompilationSession* session, int index,
                                                const ObservationSpace** observationSpace) const;
 
-  inline const boost::filesystem::path& workingDirectory() const { return workingDirectory_; }
+  inline CompilerGymServiceContext* const context() { return context_; }
 
   // Add the given session and return its ID.
   uint64_t addSession(std::unique_ptr<CompilationSession> session);
@@ -88,7 +88,7 @@ class CompilerGymService final : public compiler_gym::CompilerGymService::Servic
                                                            std::optional<std::string>& reply);
 
  private:
-  const boost::filesystem::path workingDirectory_;
+  CompilerGymServiceContext* const context_;
   const std::vector<ActionSpace> actionSpaces_;
   const std::vector<ObservationSpace> observationSpaces_;
 

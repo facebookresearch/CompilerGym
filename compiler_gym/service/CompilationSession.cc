@@ -25,7 +25,7 @@ Status CompilationSession::handleSessionParameter(const std::string& key, const 
   return Status::OK;
 }
 
-CompilationSession::CompilationSession(const boost::filesystem::path& workingDirectory)
-    : workingDirectory_(workingDirectory) {}
+CompilationSession::CompilationSession(CompilerGymServiceContext* const context)
+    : context_(context) {}
 
 }  // namespace compiler_gym

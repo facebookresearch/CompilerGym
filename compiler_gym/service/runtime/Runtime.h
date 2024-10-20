@@ -4,6 +4,7 @@
 // LICENSE file in the root directory of this source tree.
 #pragma once
 
+#include "compiler_gym/service/CompilerGymServiceContext.h"
 #include "compiler_gym/service/runtime/CompilerGymService.h"
 #include "compiler_gym/service/runtime/CreateAndRunCompilerGymServiceImpl.h"
 
@@ -31,9 +32,11 @@ namespace compiler_gym::runtime {
  *
  * @return An integer return code.
  */
-template <typename CompilationSessionType>
+template <typename CompilationSessionType,
+          typename CompilerGymServiceContextType = CompilerGymServiceContext>
 [[nodiscard]] int createAndRunCompilerGymService(int argc, char** argv, const char* usage) {
-  return createAndRunCompilerGymServiceImpl<CompilationSessionType>(argc, argv, usage);
+  return createAndRunCompilerGymServiceImpl<CompilationSessionType, CompilerGymServiceContextType>(
+      argc, argv, usage);
 }
 
 }  // namespace compiler_gym::runtime
