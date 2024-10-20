@@ -19,8 +19,10 @@
 #include "compiler_gym/third_party/autophase/InstCount.h"
 #include "compiler_gym/third_party/llvm/InstCount.h"
 #include "compiler_gym/util/GrpcStatusMacros.h"
+#include "compiler_gym/util/RunfilesPath.h"
 #include "llvm/Bitcode/BitcodeWriter.h"
 // #include "llvm/IR/Metadata.h"
+#include "IR2Vec.h"
 #include "llvm/IR/Module.h"
 #include "llvm/Support/raw_ostream.h"
 #include "nlohmann/json.hpp"
@@ -78,15 +80,78 @@ Status setObservation(LlvmObservationSpace space, const fs::path& workingDirecto
       break;
     }
     case LlvmObservationSpace::INST_COUNT: {
-      const auto features = InstCount::getFeatureVector(benchmark.module());
+      InstCountFeatureVector features = InstCount::getFeatureVector(benchmark.module());
       *reply.mutable_int64_tensor()->mutable_shape()->Add() = features.size();
       *reply.mutable_int64_tensor()->mutable_value() = {features.begin(), features.end()};
       break;
     }
     case LlvmObservationSpace::AUTOPHASE: {
-      const auto features = autophase::InstCount::getFeatureVector(benchmark.module());
+      const std::vector<int64_t> features =
+          autophase::InstCount::getFeatureVector(benchmark.module());
       *reply.mutable_int64_tensor()->mutable_shape()->Add() = features.size();
       *reply.mutable_int64_tensor()->mutable_value() = {features.begin(), features.end()};
+      break;
+    }
+    case LlvmObservationSpace::IR2VEC_FLOW_AWARE: {
+      const auto ir2vecEmbeddingsPath = util::getRunfilesPath(
+          "compiler_gym/third_party/ir2vec/seedEmbeddingVocab-300-llvm10.txt");
+
+      IR2Vec::Embeddings embeddings(benchmark.module(), IR2Vec::IR2VecMode::FlowAware,
+                                    ir2vecEmbeddingsPath.string());
+      const IR2Vec::Vector& features = embeddings.getProgramVector();
+      reply.mutable_float_tensor()->mutable_shape()->Add(features.size());
+      *reply.mutable_float_tensor()->mutable_value() = {features.begin(), features.end()};
+      break;
+    }
+    case LlvmObservationSpace::IR2VEC_SYMBOLIC: {
+      const auto ir2vecEmbeddingsPath = util::getRunfilesPath(
+          "compiler_gym/third_party/ir2vec/seedEmbeddingVocab-300-llvm10.txt");
+
+      IR2Vec::Embeddings embeddings(benchmark.module(), IR2Vec::IR2VecMode::Symbolic,
+                                    ir2vecEmbeddingsPath.string());
+      const llvm::SmallVector<double, 300>& features = embeddings.getProgramVector();
+      reply.mutable_float_tensor()->mutable_shape()->Add(features.size());
+      *reply.mutable_float_tensor()->mutable_value() = {features.begin(), features.end()};
+      break;
+    }
+    case LlvmObservationSpace::IR2VEC_FUNCTION_LEVEL_FLOW_AWARE: {
+      const auto ir2vecEmbeddingsPath = util::getRunfilesPath(
+          "compiler_gym/third_party/ir2vec/seedEmbeddingVocab-300-llvm10.txt");
+      IR2Vec::Embeddings embeddings(benchmark.module(), IR2Vec::IR2VecMode::FlowAware,
+                                    ir2vecEmbeddingsPath.string());
+      const llvm::SmallMapVector<const llvm::Function*, llvm::SmallVector<double, 300>, 16>&
+          functionMap = embeddings.getFunctionVecMap();
+
+      json data;
+      for (auto function : functionMap) {
+        data[function.first->getName()] =
+            std::vector<double>({function.second.begin(), function.second.end()});
+      }
+
+      Opaque opaque;
+      opaque.set_format("json://");
+      *opaque.mutable_data() = data.dump();
+      reply.mutable_any_value()->PackFrom(opaque);
+      break;
+    }
+    case LlvmObservationSpace::IR2VEC_FUNCTION_LEVEL_SYMBOLIC: {
+      const auto ir2vecEmbeddingsPath = util::getRunfilesPath(
+          "compiler_gym/third_party/ir2vec/seedEmbeddingVocab-300-llvm10.txt");
+      IR2Vec::Embeddings embeddings(benchmark.module(), IR2Vec::IR2VecMode::Symbolic,
+                                    ir2vecEmbeddingsPath.string());
+      const llvm::SmallMapVector<const llvm::Function*, llvm::SmallVector<double, 300>, 16>&
+          functionMap = embeddings.getFunctionVecMap();
+
+      json data;
+      for (auto function : functionMap) {
+        data[function.first->getName()] =
+            std::vector<double>({function.second.begin(), function.second.end()});
+      }
+
+      Opaque opaque;
+      opaque.set_format("json://");
+      *opaque.mutable_data() = data.dump();
+      reply.mutable_any_value()->PackFrom(opaque);
       break;
     }
     case LlvmObservationSpace::PROGRAML:

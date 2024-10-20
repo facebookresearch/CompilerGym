@@ -55,6 +55,10 @@ def test_observation_spaces(env: LlvmEnv):
         "InstCountNorm",
         "InstCountNormDict",
         "Ir",
+        "Ir2vecFlowAware",
+        "Ir2vecSymbolic",
+        "Ir2vecFunctionLevelFlowAware",
+        "Ir2vecFunctionLevelSymbolic",
         "IrInstructionCount",
         "IrInstructionCountO0",
         "IrInstructionCountO3",
@@ -1109,7 +1113,6 @@ def test_inst2vec_embedding_indices_observation_space(
     value: List[int] = env.observation[key]
     print(value)  # For debugging in case of error.
 
-    print(value)
     assert isinstance(value, list)
     for item in value:
         assert isinstance(item, int)
@@ -1447,6 +1450,59 @@ def test_is_buildable_observation_space_not_buildable(env: LlvmEnv):
     print(value)  # For debugging in case of error.
     assert isinstance(value, int)
     assert value == 0
+
+
+@pytest.mark.parametrize("name", ["Ir2vecFlowAware", "Ir2vecSymbolic"])
+def test_ir2vec(env: LlvmEnv, name: str):
+    env.reset()
+    space = env.observation.spaces[name]
+    assert isinstance(space.space, Box)
+    value: np.ndarray = env.observation[name]
+
+    assert space.space.dtype == np.float32
+    assert space.space.shape == (300,)
+    assert space.deterministic
+    assert not space.platform_dependent
+
+    np.testing.assert_array_almost_equal(
+        space.space.low, np.full((300,), np.finfo(np.float32).min)
+    )
+    np.testing.assert_array_almost_equal(
+        space.space.high, np.full((300,), np.finfo(np.float32).max)
+    )
+
+    assert isinstance(value, np.ndarray)
+    assert value.shape == (300,)
+    assert space.space.contains(value)
+
+
+@pytest.mark.parametrize(
+    "name", ["Ir2vecFunctionLevelFlowAware", "Ir2vecFunctionLevelSymbolic"]
+)
+def test_ir2vec_function_level(env: LlvmEnv, name: str):
+    env.reset()
+    space = env.observation.spaces[name]
+    assert isinstance(space.space, Sequence)
+    value: Dict[str, List[float]] = env.observation[name]
+
+    assert value
+    for k, v in value.items():
+        assert isinstance(k, str)
+        assert isinstance(v, list)
+        assert len(v) == 300
+
+
+@pytest.mark.xfail(
+    reason="TODO(cummins): contains() method is broken for opaque types", strict=True
+)
+@pytest.mark.parametrize(
+    "name", ["Ir2vecFunctionLevelFlowAware", "Ir2vecFunctionLevelSymbolic"]
+)
+def test_ir2vec_function_level_(env: LlvmEnv, name: str):
+    env.reset()
+    space = env.observation.spaces[name]
+    value: Dict[str, List[float]] = env.observation[name]
+    assert space.space.contains(value)
 
 
 def test_add_derived_space(env: LlvmEnv):

@@ -17,9 +17,9 @@ namespace compiler_gym::llvm_service {
  *   1. Add a new entry to this LlvmObservationSpace enum.
  *   2. Add a new switch case to getLlvmObservationSpaceList() to return the
  *      ObserverationSpace.
- *   3. Add a new switch case to LlvmSession::getObservation() to compute
- *      the actual observation.
- *   4. Run `bazel test //compiler_gym/...` and update the newly failing tests.
+ *   3. Add a new switch case to setObservation() to compute the actual
+ *      observation.
+ *   4. Run `make test` and update the newly failing tests.
  */
 enum class LlvmObservationSpace {
   /**
@@ -46,6 +46,58 @@ enum class LlvmObservationSpace {
    *     deep reinforcement learning. FCCM.
    */
   AUTOPHASE,
+  /**
+   * The IR2Vec Program Level Flow-Aware embeddings.
+   *
+   * From:
+   *
+   * 	  S. VenkataKeerthy, Rohit Aggarwal, Shalini Jain, Maunendra Sankar Desarkar,
+          Ramakrishna Upadrasta, and Y. N. Srikant. (2020).
+          IR2VEC: LLVM IR Based Scalable Program Embeddings.
+          ACM Trans. Archit. Code Optim. 17, 4, Article 32 (December 2020), 27 pages.
+          DOI:https://doi.org/10.1145/3418463
+   *
+   */
+  IR2VEC_FLOW_AWARE,
+  /**
+  * The IR2Vec Program Level Symbolic embeddings.
+  *
+  * From:
+  *
+  * 	  S. VenkataKeerthy, Rohit Aggarwal, Shalini Jain, Maunendra Sankar Desarkar,
+          Ramakrishna Upadrasta, and Y. N. Srikant. (2020).
+          IR2VEC: LLVM IR Based Scalable Program Embeddings.
+          ACM Trans. Archit. Code Optim. 17, 4, Article 32 (December 2020), 27 pages.
+          DOI:https://doi.org/10.1145/3418463
+  *
+  */
+  IR2VEC_SYMBOLIC,
+  /**
+  * The IR2Vec Function level Flow Aware embeddings.
+  *
+  * From:
+  *
+  * 	  S. VenkataKeerthy, Rohit Aggarwal, Shalini Jain, Maunendra Sankar Desarkar,
+          Ramakrishna Upadrasta, and Y. N. Srikant. (2020).
+          IR2VEC: LLVM IR Based Scalable Program Embeddings.
+          ACM Trans. Archit. Code Optim. 17, 4, Article 32 (December 2020), 27 pages.
+          DOI:https://doi.org/10.1145/3418463
+  *
+  */
+  IR2VEC_FUNCTION_LEVEL_FLOW_AWARE,
+  /**
+  * The IR2Vec Function level Symbolic embeddings.
+  *
+  * From:
+  *
+  * 	  S. VenkataKeerthy, Rohit Aggarwal, Shalini Jain, Maunendra Sankar Desarkar,
+          Ramakrishna Upadrasta, and Y. N. Srikant. (2020).
+          IR2VEC: LLVM IR Based Scalable Program Embeddings.
+          ACM Trans. Archit. Code Optim. 17, 4, Article 32 (December 2020), 27 pages.
+          DOI:https://doi.org/10.1145/3418463
+  *
+  */
+  IR2VEC_FUNCTION_LEVEL_SYMBOLIC,
   /**
    * Returns the graph representation of a program as a networkx Graph.
    *
