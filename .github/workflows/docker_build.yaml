@@ -1,0 +1,41 @@
+---
+# This workflow is used to build the binary wheels that can be uploaded to pypi
+# for releases. It produces an artifact containing a macOS and manylinux binary
+# wheel from the requested branch. It also runs the full test suite against
+# these wheels.
+name: Publish Docker Image
+
+on:
+    push:
+        branches:
+            - development
+        tags:
+            - v*
+    pull_request:
+        branches:
+            - development
+
+jobs:
+    docker:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Log in to Docker Hub
+              uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+              with:
+                  username: chriscummins
+                  password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+
+            - name: Get docker metadata
+              uses: docker/metadata-action@v3
+              with:
+                  images: chriscummins/compiler_gym
+
+            - name: Build and push Docker image
+              uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+              with:
+                  context: packaging/compiler_gym
+                  push: true
+                  tags: ${{ steps.meta.outputs.tags }}
+                  labels: ${{ steps.meta.outputs.labels }}
