@@ -48,7 +48,10 @@ from compiler_gym.wrappers.datasets import (
 from compiler_gym.wrappers.fork import ForkOnStep
 
 if config.enable_llvm_env:
-    from compiler_gym.wrappers.llvm import RuntimePointEstimateReward  # noqa: F401
+    from compiler_gym.wrappers.llvm import (
+        RuntimePointEstimateReward, # noqa: F401
+        RuntimeSeriesEstimateReward,
+    )
     from compiler_gym.wrappers.sqlite_logger import (  # noqa: F401
         SynchronousSqliteLogger,
     )
@@ -76,4 +79,5 @@ __all__ = [
 
 if config.enable_llvm_env:
     __all__.append("RuntimePointEstimateReward")
+    __all__.append("RuntimeSeriesEstimateReward")
     __all__.append("SynchronousSqliteLogger")
